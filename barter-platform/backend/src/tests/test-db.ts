@@ -42,7 +42,7 @@ const testDatabase = async () => {
     // Test 3: Complete onboarding using repository helper
     console.log("📝 Test 3: Completing onboarding...");
     const updatedUser = await userRepo.completeOnboarding(user._id.toString());
-    console.log(`✅ Onboarding completed: ${updatedUser.onBoardingCompletd}\n`);
+    console.log(`✅ Onboarding completed: ${updatedUser.onBoardingCompleted}\n`);
 
     // Test 4: Count users by role
     console.log("📊 Test 4: Counting users by role...");
