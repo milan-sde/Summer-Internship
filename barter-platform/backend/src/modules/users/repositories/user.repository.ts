@@ -43,7 +43,9 @@ export class UserRepository implements IRepository<IUser> {
 
     // If password is being set/updated, hash it before updating
     if (data.password) {
-      const isHashed = /^\$2[ayb]\$[0-9]{2}\$[A-Za-z0-9./]{53}$/.test(data.password);
+      const isHashed = /^\$2[ayb]\$[0-9]{2}\$[A-Za-z0-9./]{53}$/.test(
+        data.password,
+      );
       if (!isHashed) {
         const salt = await bcrypt.genSalt(12);
         updatedData.password = await bcrypt.hash(data.password as string, salt);

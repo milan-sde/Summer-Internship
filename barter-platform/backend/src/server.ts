@@ -7,8 +7,10 @@ import dotenv from "dotenv";
 import { requestLogger } from "@shared/middlewares/request-logger";
 import { errorHandler } from "@shared/middlewares/error-handler";
 import { connectDatabase } from "@shared/database/connection";
-import authRoutes from "@modules/auth/routes/auth.routes";
 import { authenticate, requireRole } from "@shared/middlewares/auth.middleware";
+import authRoutes from "@modules/auth/routes/auth.routes";
+import profileRoutes from "@modules/profile/routes/profile.routes";
+import { requireOnboarding } from "@shared/middlewares/onboarding.guard";
 
 //load environment variables:
 dotenv.config();
@@ -54,6 +56,7 @@ app.get("/health", (req: Request, res: Response) => {
   });
 });
 
+//Auth routes:
 app.use("/api/auth", authRoutes);
 // Example protected route
 app.get("/api/protected", authenticate, (req: Request, res: Response) => {
@@ -71,6 +74,23 @@ app.get(
   (req: Request, res: Response) => {
     res.json({
       message: "Welcome admin!",
+      user: req.user,
+    });
+  },
+);
+
+//profile routes:
+app.use("/api/profile", profileRoutes);
+// example:
+
+app.get(
+  "/api/dashboard",
+  authenticate,
+  requireOnboarding,
+  (req: Request, res: Response) => {
+    res.json({
+      success: true,
+      message: "Welcome to dashboard",
       user: req.user,
     });
   },
