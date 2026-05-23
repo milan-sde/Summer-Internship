@@ -1,5 +1,3 @@
-// src/modules/auth/services/otp.service.ts
-
 import { ValidationError } from "@shared/errors/app-error";
 
 interface OtpData {
@@ -11,7 +9,7 @@ interface OtpData {
 
 /**
  * OTP Service - Handles one-time password generation and verification
- * 
+ *
  * PRODUCTION NOTE: This uses in-memory Map. For production:
  * 1. Use Redis with TTL (expiration)
  * 2. Store in database with cleanup job
@@ -25,7 +23,7 @@ export class OtpService {
 
   constructor() {
     this.otpStore = new Map();
-    
+
     // Clean up expired OTPs every hour
     setInterval(() => this.cleanupExpiredOtps(), 60 * 60 * 1000);
   }
@@ -49,7 +47,7 @@ export class OtpService {
       code,
       expiresAt,
       attempts: 0,
-      createdAt: new Date()
+      createdAt: new Date(),
     });
 
     return code;
@@ -64,26 +62,32 @@ export class OtpService {
     const storedData = this.otpStore.get(normalizedEmail);
 
     if (!storedData) {
-      throw new ValidationError('OTP not found or expired. Please request a new one.');
+      throw new ValidationError(
+        "OTP not found or expired. Please request a new one.",
+      );
     }
 
     // Check attempts
     if (storedData.attempts >= this.MAX_ATTEMPTS) {
       this.otpStore.delete(normalizedEmail);
-      throw new ValidationError('Too many failed attempts. Please request a new OTP.');
+      throw new ValidationError(
+        "Too many failed attempts. Please request a new OTP.",
+      );
     }
 
     // Check expiration
     if (storedData.expiresAt < new Date()) {
       this.otpStore.delete(normalizedEmail);
-      throw new ValidationError('OTP expired. Please request a new one.');
+      throw new ValidationError("OTP expired. Please request a new one.");
     }
 
     // Verify code
     if (storedData.code !== otpCode) {
       storedData.attempts++;
       this.otpStore.set(normalizedEmail, storedData);
-      throw new ValidationError(`Invalid OTP. ${this.MAX_ATTEMPTS - storedData.attempts} attempts remaining.`);
+      throw new ValidationError(
+        `Invalid OTP. ${this.MAX_ATTEMPTS - storedData.attempts} attempts remaining.`,
+      );
     }
 
     // Success - delete OTP so it can't be reused
@@ -98,11 +102,11 @@ export class OtpService {
   hasValidOtp(email: string): boolean {
     const normalizedEmail = email.toLowerCase();
     const storedData = this.otpStore.get(normalizedEmail);
-    
+
     if (!storedData) return false;
     if (storedData.expiresAt < new Date()) return false;
     if (storedData.attempts >= this.MAX_ATTEMPTS) return false;
-    
+
     return true;
   }
 
@@ -111,10 +115,10 @@ export class OtpService {
    */
   resendOtp(email: string): string {
     const normalizedEmail = email.toLowerCase();
-    
+
     // Remove existing OTP
     this.otpStore.delete(normalizedEmail);
-    
+
     // Generate new one
     return this.generateAndStoreOtp(email);
   }
@@ -129,7 +133,9 @@ export class OtpService {
         this.otpStore.delete(email);
       }
     }
-    console.log(`🧹 Cleaned up expired OTPs. Current store size: ${this.otpStore.size}`);
+    console.log(
+      `🧹 Cleaned up expired OTPs. Current store size: ${this.otpStore.size}`,
+    );
   }
 
   /**
