@@ -88,6 +88,12 @@ userSchema.pre("save", async function (this: IUser) {
     return;
   }
 
+  // Prevent double-hashing if it's already a bcrypt hash
+  const isHashed = /^\$2[ayb]\$[0-9]{2}\$[A-Za-z0-9./]{53}$/.test(this.password);
+  if (isHashed) {
+    return;
+  }
+
   try {
     const salt = await bcrypt.genSalt(12);
     this.password = await bcrypt.hash(this.password, salt);

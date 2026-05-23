@@ -1,6 +1,7 @@
 import { IRepository } from "@shared/database/repository.interface";
 import { IUser, User, UserRole } from "../models/user.model";
 import { NotFoundError } from "@shared/errors/app-error";
+import bcrypt from "bcryptjs";
 
 export interface CreateUserDto {
   email: string;
@@ -38,9 +39,20 @@ export class UserRepository implements IRepository<IUser> {
   }
 
   async update(id: string, data: Partial<IUser>): Promise<IUser | null> {
+    const updatedData: any = { ...data };
+
+    // If password is being set/updated, hash it before updating
+    if (data.password) {
+      const isHashed = /^\$2[ayb]\$[0-9]{2}\$[A-Za-z0-9./]{53}$/.test(data.password);
+      if (!isHashed) {
+        const salt = await bcrypt.genSalt(12);
+        updatedData.password = await bcrypt.hash(data.password as string, salt);
+      }
+    }
+
     const user = await User.findByIdAndUpdate(
       id,
-      { $set: data },
+      { $set: updatedData },
       { new: true, runValidators: true },
     );
 

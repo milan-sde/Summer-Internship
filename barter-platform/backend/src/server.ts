@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express, { Application, Request, Response } from "express";
 import cors from "cors";
 import helmet from "helmet";
@@ -6,8 +7,8 @@ import dotenv from "dotenv";
 import { requestLogger } from "@shared/middlewares/request-logger";
 import { errorHandler } from "@shared/middlewares/error-handler";
 import { connectDatabase } from "@shared/database/connection";
-
-
+import authRoutes from "@modules/auth/routes/auth.routes";
+import { authenticate, requireRole } from "@shared/middlewares/auth.middleware";
 
 //load environment variables:
 dotenv.config();
@@ -48,10 +49,32 @@ app.use(requestLogger);
 app.get("/health", (req: Request, res: Response) => {
   res.status(200).json({
     status: "ok",
-    timeStamp: new Date().toISOString,
+    timeStamp: new Date().toISOString(),
     environment: process.env.NODE_ENV,
   });
 });
+
+app.use("/api/auth", authRoutes);
+// Example protected route
+app.get("/api/protected", authenticate, (req: Request, res: Response) => {
+  res.json({
+    message: "This is a protected route",
+    user: req.user,
+  });
+});
+
+// Example admin route
+app.get(
+  "/api/admin",
+  authenticate,
+  requireRole("ADMIN"),
+  (req: Request, res: Response) => {
+    res.json({
+      message: "Welcome admin!",
+      user: req.user,
+    });
+  },
+);
 
 //404 handler - routes not found:
 app.use((req: Request, res: Response) => {
