@@ -12,7 +12,7 @@ export interface IUser extends Document {
   password: string | null;
   role: UserRole;
   isEmailVerified: boolean;
-  onBoardingCompletd: boolean;
+  onBoardingCompleted: boolean;
   lastLoginAt: Date;
   refreshTokenVersion: number;
   createdAt: Date;
@@ -54,7 +54,7 @@ const userSchema = new Schema<IUser>(
       default: false,
     },
 
-    onBoardingCompletd: {
+    onBoardingCompleted: {
       type: Boolean,
       default: false,
     },
@@ -117,7 +117,7 @@ userSchema.methods.incrementRefreshTokenVersion = async function (
 userSchema.methods.markOnBoardingComplete = async function (
   this: IUser,
 ): Promise<void> {
-  this.onBoardingCompletd = true;
+  this.onBoardingCompleted = true;
   await (this as any).save();
 };
 
