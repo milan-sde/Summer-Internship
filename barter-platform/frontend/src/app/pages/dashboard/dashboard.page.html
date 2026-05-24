@@ -1,13 +1,84 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>dashboard</ion-title>
+<!-- src/app/pages/dashboard/dashboard.page.html -->
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Dashboard</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="logout()">
+        <ion-icon name="log-out-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">dashboard</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding">
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <ion-card class="welcome-card">
+    <ion-card-header>
+      <ion-card-title>Welcome back, {{ user?.fullName || user?.email }}!</ion-card-title>
+      <ion-card-subtitle>
+        You're logged in as a {{ user?.role | lowercase }}
+      </ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-icon name="checkmark-circle" color="success" slot="start"></ion-icon>
+      Your profile is complete and you're ready to start collaborating!
+    </ion-card-content>
+  </ion-card>
+
+  <ion-grid>
+    <ion-row>
+      <ion-col size="12" size-md="6">
+        <ion-card button (click)="exploreCollaborations()">
+          <ion-card-header>
+            <ion-card-title>
+              <ion-icon name="people-outline"></ion-icon>
+              Explore Collaborations
+            </ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            Find brands and influencers to collaborate with
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+      <ion-col size="12" size-md="6">
+        <ion-card button (click)="viewProfile()">
+          <ion-card-header>
+            <ion-card-title>
+              <ion-icon name="person-outline"></ion-icon>
+              My Profile
+            </ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            View and edit your profile information
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Quick Stats</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list>
+        <ion-item>
+          <ion-label>Profile Views</ion-label>
+          <ion-badge slot="end" color="primary">0</ion-badge>
+        </ion-item>
+        <ion-item>
+          <ion-label>Collaboration Requests</ion-label>
+          <ion-badge slot="end" color="success">0</ion-badge>
+        </ion-item>
+        <ion-item>
+          <ion-label>Active Collaborations</ion-label>
+          <ion-badge slot="end" color="warning">0</ion-badge>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
 </ion-content>
