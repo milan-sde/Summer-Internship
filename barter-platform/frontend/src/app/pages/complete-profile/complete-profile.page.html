@@ -1,13 +1,113 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>complete-profile</ion-title>
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Complete Your Profile</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">complete-profile</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding">
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="create-outline" size="large"></ion-icon>
+        Almost There!
+      </ion-card-title>
+      <ion-card-subtitle>
+        Tell the community about yourself to get started
+      </ion-card-subtitle>
+    </ion-card-header>
+
+    <ion-card-content>
+      <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+        <ion-item>
+          <ion-label position="floating">Full Name *</ion-label>
+          <ion-input
+            type="text"
+            formControlName="fullName"
+            placeholder="John Doe">
+          </ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="floating">Instagram Handle *</ion-label>
+          <ion-input
+            type="text"
+            formControlName="instagramHandle"
+            placeholder="@johndoe">
+          </ion-input>
+          <ion-note slot="helper">Your Instagram username (without @)</ion-note>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Bio *</ion-label>
+          <ion-textarea
+            formControlName="bio"
+            rows="4"
+            placeholder="Tell us about yourself, your content niche, and what you're looking for...">
+          </ion-textarea>
+          <ion-note slot="helper">
+            {{ profileForm.get('bio')?.value?.length || 0 }}/500 characters
+          </ion-note>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="floating">Website (Optional)</ion-label>
+          <ion-input
+            type="url"
+            formControlName="website"
+            placeholder="https://yourportfolio.com">
+          </ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="floating">Location (Optional)</ion-label>
+          <ion-input
+            type="text"
+            formControlName="location"
+            placeholder="New York, NY">
+          </ion-input>
+        </ion-item>
+
+        <ion-card *ngIf="currentUser?.role === 'INFLUENCER'" class="ion-margin-top">
+          <ion-card-header>
+            <ion-card-title>Influencer Metrics (Optional)</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-item>
+              <ion-label position="floating">Followers</ion-label>
+              <ion-input type="number" formControlName="followers"></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-label position="floating">Engagement Rate (%)</ion-label>
+              <ion-input type="number" step="0.1" formControlName="engagementRate"></ion-input>
+            </ion-item>
+          </ion-card-content>
+        </ion-card>
+
+        <ion-card class="ion-margin-top">
+          <ion-card-header>
+            <ion-card-title>Social Links (Optional)</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-item>
+              <ion-label position="floating">Twitter</ion-label>
+              <ion-input type="url" formControlName="twitter"></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-label position="floating">TikTok</ion-label>
+              <ion-input type="url" formControlName="tiktok"></ion-input>
+            </ion-item>
+          </ion-card-content>
+        </ion-card>
+
+        <ion-button
+          expand="block"
+          type="submit"
+          [disabled]="profileForm.invalid || isSubmitting"
+          class="ion-margin-top">
+          <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+          {{ isSubmitting ? 'Creating Profile...' : 'Complete Registration' }}
+        </ion-button>
+      </form>
+    </ion-card-content>
+  </ion-card>
 </ion-content>
