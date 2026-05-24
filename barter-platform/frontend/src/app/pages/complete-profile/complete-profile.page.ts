@@ -1,4 +1,3 @@
-// src/app/pages/complete-profile/complete-profile.page.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -27,6 +26,7 @@ import {
   IonTextarea,
   IonNote,
   IonButton,
+  IonText,
 } from '@ionic/angular/standalone';
 
 @Component({
@@ -35,6 +35,7 @@ import {
   styleUrls: ['./complete-profile.page.scss'],
   standalone: true,
   imports: [
+    IonText,
     CommonModule,
     ReactiveFormsModule,
     IonHeader,
@@ -80,13 +81,23 @@ export class CompleteProfilePage implements OnInit {
           Validators.maxLength(500),
         ],
       ],
-      website: [''],
-      location: [''],
-      followers: [''],
-      engagementRate: [''],
-      twitter: [''],
-      tiktok: [''],
+      website: [null],
+      location: [null],
+      followers: [null],
+      engagementRate: [null],
+      twitter: [null],
+      tiktok: [null],
     });
+  }
+
+  // Help debug: returns names of invalid controls
+  getInvalidControls(): string[] {
+    const invalid: string[] = [];
+    const controls = this.profileForm.controls;
+    for (const name in controls) {
+      if (controls[name].invalid) invalid.push(name);
+    }
+    return invalid;
   }
 
   async ngOnInit() {
@@ -97,24 +108,39 @@ export class CompleteProfilePage implements OnInit {
     if (this.profileForm.valid && !this.isSubmitting) {
       this.isSubmitting = true;
 
-      const profileData = {
-        fullName: this.profileForm.value.fullName,
-        instagramHandle: this.profileForm.value.instagramHandle,
-        bio: this.profileForm.value.bio,
-        website: this.profileForm.value.website,
-        location: this.profileForm.value.location,
-        stats:
-          this.currentUser?.role === 'INFLUENCER'
-            ? {
-                followers: this.profileForm.value.followers,
-                engagementRate: this.profileForm.value.engagementRate,
-              }
-            : undefined,
-        socialLinks: {
-          twitter: this.profileForm.value.twitter,
-          tiktok: this.profileForm.value.tiktok,
-        },
+      // Sanitize form values to match backend DTO expectations (no nulls)
+      const raw = this.profileForm.value;
+
+      const profileData: any = {
+        fullName: raw.fullName,
+        instagramHandle: raw.instagramHandle,
+        bio: raw.bio,
       };
+
+      if (raw.website) profileData.website = raw.website;
+      if (raw.location) profileData.location = raw.location;
+
+      if (this.currentUser?.role === 'INFLUENCER') {
+        const followers =
+          raw.followers !== null && raw.followers !== ''
+            ? Number(raw.followers)
+            : undefined;
+        const engagementRate =
+          raw.engagementRate !== null && raw.engagementRate !== ''
+            ? Number(raw.engagementRate)
+            : undefined;
+
+        profileData.stats = {} as any;
+        if (followers !== undefined && !isNaN(followers))
+          profileData.stats.followers = followers;
+        if (engagementRate !== undefined && !isNaN(engagementRate))
+          profileData.stats.engagementRate = engagementRate;
+      }
+
+      const social: any = {};
+      if (raw.twitter) social.twitter = raw.twitter;
+      if (raw.tiktok) social.tiktok = raw.tiktok;
+      if (Object.keys(social).length) profileData.socialLinks = social;
 
       try {
         const profile = await this.profileService.createProfile(profileData);
