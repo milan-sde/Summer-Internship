@@ -1,4 +1,8 @@
-import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpErrorResponse,
+  HttpHeaders,
+} from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { StorageService } from './storage.service';
@@ -64,6 +68,38 @@ export class ApiService {
     const headers = await this.getAuthHeaders();
     return this.http
       .delete<T>(`${this.baseUrl}/${endpoint}`, { headers })
+      .pipe(retry(1), catchError(this.handleError));
+  }
+
+
+  // For file uploads (multipart/form-data)
+  async authPostFormData<T>(
+    endpoint: string,
+    formData: FormData,
+  ): Promise<Observable<T>> {
+    const token = await this.storage.getAccessToken();
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+      // Don't set Content-Type - let browser set it with boundary
+    });
+
+    return this.http
+      .post<T>(`${this.baseUrl}/${endpoint}`, formData, { headers })
+      .pipe(retry(1), catchError(this.handleError));
+  }
+
+  // For PUT requests with form data
+  async authPutFormData<T>(
+    endpoint: string,
+    formData: FormData,
+  ): Promise<Observable<T>> {
+    const token = await this.storage.getAccessToken();
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
+
+    return this.http
+      .put<T>(`${this.baseUrl}/${endpoint}`, formData, { headers })
       .pipe(retry(1), catchError(this.handleError));
   }
 
