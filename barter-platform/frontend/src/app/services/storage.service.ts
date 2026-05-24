@@ -1,0 +1,58 @@
+// src/app/services/storage.service.ts
+import { Injectable } from '@angular/core';
+import { Storage } from '@ionic/storage-angular';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class StorageService {
+  private _storage: Storage | null = null;
+
+  constructor(private storage: Storage) {
+    this.init();
+  }
+
+  async init() {
+    const storage = await this.storage.create();
+    this._storage = storage;
+  }
+
+  // Store access token (short-lived)
+  async setAccessToken(token: string): Promise<void> {
+    await this._storage?.set('access_token', token);
+  }
+
+  async getAccessToken(): Promise<string | null> {
+    return (await this._storage?.get('access_token')) || null;
+  }
+
+  // Store refresh token (with security flag)
+  async setRefreshToken(token: string): Promise<void> {
+    await this._storage?.set('refresh_token', token);
+  }
+
+  async getRefreshToken(): Promise<string | null> {
+    return (await this._storage?.get('refresh_token')) || null;
+  }
+
+  // Store user data
+  async setUser(user: any): Promise<void> {
+    await this._storage?.set('user', JSON.stringify(user));
+  }
+
+  async getUser(): Promise<any> {
+    const user = await this._storage?.get('user');
+    return user ? JSON.parse(user) : null;
+  }
+
+  // Check if user is logged in
+  async isLoggedIn(): Promise<boolean> {
+    const token = await this.getAccessToken();
+    return !!token;
+  }
+
+  // Clear all data on logout
+  async clear(): Promise<void> {
+    await this._storage?.clear();
+  }
+}
