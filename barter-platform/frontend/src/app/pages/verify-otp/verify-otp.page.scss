@@ -1,0 +1,25 @@
+// src/app/pages/verify-otp/verify-otp.page.scss
+.verify-container {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.timer-section {
+  text-align: center;
+  margin: 16px 0;
+}
+
+.resend-link {
+  margin-left: 8px;
+  cursor: pointer;
+  text-decoration: underline;
+
+  &.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:not(.disabled):hover {
+    color: var(--ion-color-primary);
+  }
+}
