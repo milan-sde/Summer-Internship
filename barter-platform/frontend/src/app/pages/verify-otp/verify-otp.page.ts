@@ -1,7 +1,23 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
+import {
+  IonContent,
+  IonHeader,
+  IonTitle,
+  IonToolbar,
+  IonButton,
+  IonIcon,
+  IonItem,
+  IonLabel,
+  IonText,
+  IonInputOtp,
+  IonNote,
+  IonButtons,
+  IonBackButton,
+} from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { mailUnreadOutline, checkmarkCircleOutline } from 'ionicons/icons';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
@@ -11,14 +27,26 @@ import { AuthService } from '../../services/auth.service';
   styleUrls: ['./verify-otp.page.scss'],
   standalone: true,
   imports: [
+    IonInputOtp,
+    IonNote,
+    IonText,
+    IonLabel,
+    IonItem,
+    IonIcon,
+    IonButton,
+    IonContent,
+    IonHeader,
+    IonTitle,
+    IonToolbar,
+    IonButtons,
+    IonBackButton,
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    IonicModule,
     RouterModule
   ]
 })
-export class VerifyOtpPage implements OnInit {
+export class VerifyOtpPage implements OnInit, OnDestroy {
   verifyOtpForm: FormGroup;
   isSubmitting = false;
   email: string = '';
@@ -32,6 +60,8 @@ export class VerifyOtpPage implements OnInit {
     private router: Router,
     private route: ActivatedRoute
   ) {
+    addIcons({ mailUnreadOutline, checkmarkCircleOutline });
+
     this.verifyOtpForm = this.fb.group({
       otp: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(6), Validators.pattern(/^\d+$/)]]
     });
@@ -106,7 +136,7 @@ export class VerifyOtpPage implements OnInit {
   }
 
   async createToast(message: string, color: string) {
-    const { ToastController } = await import('@ionic/angular');
+    const { ToastController } = await import('@ionic/angular/standalone');
     const toastController = new ToastController();
     return await toastController.create({
       message: message,

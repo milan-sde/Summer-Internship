@@ -1,69 +1,65 @@
-<ion-header>
+<ion-header class="ion-no-border">
   <ion-toolbar color="primary">
-    <ion-title>Verify Email</ion-title>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/register"></ion-back-button>
+      <ion-back-button defaultHref="/register" text=""></ion-back-button>
     </ion-buttons>
+    <ion-title class="headings">Verify Email</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <div class="verify-container">
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>
-          <ion-icon name="mail-unread-outline" size="large"></ion-icon>
-          Check Your Email
-        </ion-card-title>
-        <ion-card-subtitle>
-          We've sent a verification code to
-        </ion-card-subtitle>
-        <ion-text color="primary">
-          <h3>{{ email }}</h3>
-        </ion-text>
-      </ion-card-header>
+<ion-content class="ion-padding" [fullscreen]="true">
+  <div class="form-container">
 
-      <ion-card-content>
-        <form [formGroup]="verifyOtpForm" (ngSubmit)="onSubmit()">
-          <ion-item>
-            <ion-label position="floating">Enter 6-Digit Code</ion-label>
-            <ion-input
-              type="text"
-              formControlName="otp"
-              placeholder="123456"
-              maxlength="6"
-              inputmode="numeric">
-            </ion-input>
-            <ion-note slot="error" *ngIf="verifyOtpForm.get('otp')?.invalid && verifyOtpForm.get('otp')?.touched">
-              Please enter a valid 6-digit code
-            </ion-note>
-          </ion-item>
+    <!-- Title Area -->
+    <div class="form-header">
+      <h2>Check Your Email</h2>
+      <p>We've sent a 6-digit verification code to</p>
+      <h3 class="verify-email-text">
+        {{ email }}
+      </h3>
+    </div>
 
-          <div class="timer-section" *ngIf="!canResend">
-            <ion-text color="medium">
-              Resend code in {{ timer }} seconds
-            </ion-text>
-          </div>
+    <!-- Glassmorphic Card Container -->
+    <div class="glassmorphism-card">
 
-          <ion-button
-            expand="block"
-            type="submit"
-            [disabled]="verifyOtpForm.invalid || isSubmitting"
-            class="ion-margin-top">
-            <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
-            {{ isSubmitting ? 'Verifying...' : 'Verify Code' }}
-          </ion-button>
+      <form [formGroup]="verifyOtpForm" (ngSubmit)="onSubmit()">
 
-          <div class="ion-text-center ion-margin-top">
-            <ion-text color="medium">
-              Didn't receive the code?
-              <a (click)="resendOtp()" [class.disabled]="!canResend" class="resend-link">
-                Resend
-              </a>
-            </ion-text>
-          </div>
-        </form>
-      </ion-card-content>
-    </ion-card>
+        <!-- Icon Banner -->
+        <div class="mail-icon-container">
+          <ion-icon name="mail-unread-outline"></ion-icon>
+        </div>
+
+        <div class="otp-wrapper">
+          <label class="otp-label">Enter 6-Digit Code *</label>
+          <ion-input-otp length="6" type="text" formControlName="otp" class="otp-input-component">
+            Didn't get a code? <a (click)="resendOtp()" [class.disabled]="!canResend" class="link" [style.opacity]="canResend ? 1 : 0.5">Resend the code</a>
+          </ion-input-otp>
+        </div>
+
+        <div *ngIf="verifyOtpForm.get('otp')?.invalid && verifyOtpForm.get('otp')?.touched" class="otp-error-container">
+          <ion-text color="danger">
+            <small>Please enter a valid 6-digit code</small>
+          </ion-text>
+        </div>
+
+        <!-- Timer resend info -->
+        <div class="timer-container" *ngIf="!canResend">
+          <ion-text color="medium">
+            Resend code in <span>{{ timer }}s</span>
+          </ion-text>
+        </div>
+
+        <ion-button
+          expand="block"
+          type="submit"
+          [disabled]="verifyOtpForm.invalid || isSubmitting"
+          class="submit-btn verify-button">
+          <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+          {{ isSubmitting ? 'Verifying...' : 'Verify Code' }}
+        </ion-button>
+
+      </form>
+
+    </div>
   </div>
 </ion-content>
