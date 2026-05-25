@@ -1,7 +1,37 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
+import {
+  FormsModule,
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+  AbstractControl,
+  ValidationErrors,
+} from '@angular/forms';
+import {
+  IonContent,
+  IonHeader,
+  IonTitle,
+  IonToolbar,
+  IonButton,
+  IonIcon,
+  IonItem,
+  IonLabel,
+  IonText,
+  IonInput,
+  IonButtons,
+  IonBackButton,
+} from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import {
+  lockClosedOutline,
+  eye,
+  eyeOff,
+  checkmarkCircle,
+  closeCircle,
+  saveOutline,
+} from 'ionicons/icons';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
@@ -11,12 +41,23 @@ import { AuthService } from '../../services/auth.service';
   styleUrls: ['./create-password.page.scss'],
   standalone: true,
   imports: [
+    IonInput,
+    IonText,
+    IonLabel,
+    IonItem,
+    IonIcon,
+    IonButton,
+    IonContent,
+    IonHeader,
+    IonTitle,
+    IonToolbar,
+    IonButtons,
+    IonBackButton,
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    IonicModule,
-    RouterModule
-  ]
+    RouterModule,
+  ],
 })
 export class CreatePasswordPage implements OnInit {
   createPasswordForm: FormGroup;
@@ -31,28 +72,43 @@ export class CreatePasswordPage implements OnInit {
     hasUpperCase: false,
     hasLowerCase: false,
     hasNumber: false,
-    hasSpecialChar: false
+    hasSpecialChar: false,
   };
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
   ) {
-    this.createPasswordForm = this.fb.group({
-      password: ['', [
-        Validators.required,
-        Validators.minLength(8),
-        this.passwordStrengthValidator.bind(this)
-      ]],
-      confirmPassword: ['', [Validators.required]]
-    }, { validator: this.passwordMatchValidator });
+    addIcons({
+      lockClosedOutline,
+      eye,
+      eyeOff,
+      checkmarkCircle,
+      closeCircle,
+      saveOutline,
+    });
+
+    this.createPasswordForm = this.fb.group(
+      {
+        password: [
+          '',
+          [
+            Validators.required,
+            Validators.minLength(8),
+            this.passwordStrengthValidator.bind(this),
+          ],
+        ],
+        confirmPassword: ['', [Validators.required]],
+      },
+      { validator: this.passwordMatchValidator },
+    );
   }
 
   ngOnInit() {
     // Get email from query params or navigation state
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.subscribe((params) => {
       this.email = params['email'] || '';
       if (!this.email) {
         const navigation = this.router.getCurrentNavigation();
@@ -61,13 +117,17 @@ export class CreatePasswordPage implements OnInit {
     });
 
     // Listen to password changes for strength indicator
-    this.createPasswordForm.get('password')?.valueChanges.subscribe((password: string) => {
-      this.updatePasswordStrength(password);
-    });
+    this.createPasswordForm
+      .get('password')
+      ?.valueChanges.subscribe((password: string) => {
+        this.updatePasswordStrength(password);
+      });
   }
 
   // Custom validator for password strength
-  passwordStrengthValidator(control: AbstractControl): ValidationErrors | null {
+  passwordStrengthValidator(
+    control: AbstractControl,
+  ): ValidationErrors | null {
     const password = control.value || '';
 
     const hasMinLength = password.length >= 8;
@@ -76,7 +136,12 @@ export class CreatePasswordPage implements OnInit {
     const hasNumber = /[0-9]/.test(password);
     const hasSpecialChar = /[^A-Za-z0-9]/.test(password);
 
-    const isValid = hasMinLength && hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar;
+    const isValid =
+      hasMinLength &&
+      hasUpperCase &&
+      hasLowerCase &&
+      hasNumber &&
+      hasSpecialChar;
 
     return !isValid ? { weakPassword: true } : null;
   }
@@ -95,7 +160,7 @@ export class CreatePasswordPage implements OnInit {
       hasUpperCase: /[A-Z]/.test(password),
       hasLowerCase: /[a-z]/.test(password),
       hasNumber: /[0-9]/.test(password),
-      hasSpecialChar: /[^A-Za-z0-9]/.test(password)
+      hasSpecialChar: /[^A-Za-z0-9]/.test(password),
     };
   }
 
@@ -129,7 +194,11 @@ export class CreatePasswordPage implements OnInit {
       const { password, confirmPassword } = this.createPasswordForm.value;
 
       try {
-        await this.authService.createPassword(this.email, password, confirmPassword);
+        await this.authService.createPassword(
+          this.email,
+          password,
+          confirmPassword,
+        );
         // Navigate to login page
         await this.router.navigate(['/login']);
       } catch (error) {
