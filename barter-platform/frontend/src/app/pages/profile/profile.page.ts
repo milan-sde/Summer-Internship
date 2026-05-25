@@ -31,6 +31,8 @@ import {
   IonGrid,
   IonRow,
   IonCol,
+  IonButtons,
+  IonBackButton,
 } from '@ionic/angular/standalone';
 import { ToastController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -43,12 +45,13 @@ import {
   logoYoutube,
   logoTwitter,
   lockClosedOutline,
+  arrowBackOutline,
 } from 'ionicons/icons';
 
 @Component({
-  selector: 'app-complete-profile',
-  templateUrl: './complete-profile.page.html',
-  styleUrls: ['./complete-profile.page.scss'],
+  selector: 'app-profile',
+  templateUrl: './profile.page.html',
+  styleUrls: ['./profile.page.scss'],
   standalone: true,
   imports: [
     IonText,
@@ -74,12 +77,16 @@ import {
     IonGrid,
     IonRow,
     IonCol,
+    IonButtons,
+    IonBackButton,
   ],
 })
-export class CompleteProfilePage implements OnInit {
+export class ProfilePage implements OnInit {
   profileForm!: FormGroup;
   isSubmitting = false;
+  isLoading = true;
   currentUser: any;
+  profileData: any;
 
   // Custom visual chips selections lists
   categoriesList = [
@@ -140,12 +147,14 @@ export class CompleteProfilePage implements OnInit {
       logoYoutube,
       logoTwitter,
       lockClosedOutline,
+      arrowBackOutline,
     });
   }
 
   async ngOnInit() {
     this.currentUser = await this.storage.getUser();
     this.setupForm();
+    await this.loadProfileData();
   }
 
   setupForm() {
@@ -202,6 +211,58 @@ export class CompleteProfilePage implements OnInit {
         budgetMin: [0, [Validators.required, Validators.min(0)]],
         budgetMax: [0, [Validators.required, Validators.min(0)]],
       });
+    }
+  }
+
+  async loadProfileData() {
+    this.isLoading = true;
+    try {
+      this.profileData = await this.profileService.getMyProfile();
+      if (this.profileData) {
+        this.avatarPreview = this.profileData.avatarUrl || null;
+        
+        if (this.currentUser?.role === 'INFLUENCER') {
+          this.profileForm.patchValue({
+            fullName: this.profileData.fullName || '',
+            username: this.profileData.username || '',
+            phoneNumber: this.profileData.phoneNumber || '',
+            bio: this.profileData.bio || '',
+            avatarUrl: this.profileData.avatarUrl || '',
+            website: this.profileData.website || '',
+            location: this.profileData.location || '',
+            instagramUsername: this.profileData.platforms?.instagram?.username || '',
+            instagramFollowers: this.profileData.platforms?.instagram?.followers || null,
+            youtubeUsername: this.profileData.platforms?.youtube?.username || '',
+            youtubeFollowers: this.profileData.platforms?.youtube?.followers || null,
+            twitterUsername: this.profileData.platforms?.twitter?.username || '',
+            twitterFollowers: this.profileData.platforms?.twitter?.followers || null,
+          });
+
+          this.selectedCategories = this.profileData.categories || [];
+          this.selectedCountries = this.profileData.countries || [];
+          this.pastWorkLinks = this.profileData.pastWorkLinks && this.profileData.pastWorkLinks.length > 0
+            ? [...this.profileData.pastWorkLinks]
+            : [''];
+        } else {
+          this.profileForm.patchValue({
+            firstName: this.profileData.firstName || '',
+            lastName: this.profileData.lastName || '',
+            phoneNumber: this.profileData.phoneNumber || '',
+            bio: this.profileData.bio || '',
+            avatarUrl: this.profileData.avatarUrl || '',
+            website: this.profileData.website || '',
+            location: this.profileData.location || '',
+            budgetMin: this.profileData.budgetMin || 0,
+            budgetMax: this.profileData.budgetMax || 0,
+          });
+
+          this.selectedIndustries = this.profileData.industries || [];
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load user profile details:', error);
+    } finally {
+      this.isLoading = false;
     }
   }
 
@@ -272,17 +333,6 @@ export class CompleteProfilePage implements OnInit {
       };
       reader.readAsDataURL(file);
     }
-  }
-
-  // Validation display helper
-  getInvalidControls(): string[] {
-    const invalid: string[] = [];
-    if (!this.profileForm) return [];
-    const controls = this.profileForm.controls;
-    for (const name in controls) {
-      if (controls[name].invalid) invalid.push(name);
-    }
-    return invalid;
   }
 
   async onSubmit() {
@@ -433,17 +483,11 @@ export class CompleteProfilePage implements OnInit {
       this.isSubmitting = true;
 
       try {
-        const profile = await this.profileService.createProfile(profileData);
-
-        // Update user in storage
-        if (this.currentUser) {
-          this.currentUser.onboardingCompleted = true;
-          await this.storage.setUser(this.currentUser);
-        }
-
+        const profile = await this.profileService.updateProfile(profileData);
+        await this.showToast('Profile updated successfully!', 'success');
         await this.router.navigate(['/dashboard']);
       } catch (error) {
-        console.error('Profile creation failed:', error);
+        console.error('Profile update failed:', error);
       } finally {
         this.isSubmitting = false;
       }
@@ -458,6 +502,17 @@ export class CompleteProfilePage implements OnInit {
       color: 'danger',
       duration: 3500,
       position: 'bottom',
+      buttons: ['OK'],
+    });
+    await toast.present();
+  }
+
+  async showToast(message: string, color: string = 'primary') {
+    const toast = await this.toastController.create({
+      message: message,
+      color: color,
+      duration: 3000,
+      position: 'top',
       buttons: ['OK'],
     });
     await toast.present();
