@@ -1,65 +1,73 @@
-<!-- src/app/pages/login/login.page.html -->
-<ion-header>
+<ion-header class="ion-no-border">
   <ion-toolbar color="primary">
-    <ion-title>Welcome Back</ion-title>
+    <ion-title class="headings">Welcome Back</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <div class="login-container">
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>
-          <ion-icon name="log-in-outline" size="large"></ion-icon>
-          Login to Your Account
-        </ion-card-title>
-        <ion-card-subtitle>Enter your credentials to continue</ion-card-subtitle>
-      </ion-card-header>
+<ion-content class="ion-padding" [fullscreen]="true">
+  <div class="form-container">
+    
+    <!-- Title Area -->
+    <div class="form-header">
+      <h2>Barter Platform</h2>
+      <p>Log in to your account to continue</p>
+    </div>
 
-      <ion-card-content>
-        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-          <ion-item>
-            <ion-label position="floating">Email</ion-label>
-            <ion-input
-              type="email"
-              formControlName="email"
-              placeholder="you@example.com"
-              [class.invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
-            </ion-input>
-            <ion-note slot="error" *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
-              Valid email is required
-            </ion-note>
-          </ion-item>
+    <!-- Glassmorphic Card Container -->
+    <div class="glassmorphism-card">
+      
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        
+        <!-- Icon Banner -->
+        <div class="login-icon-container">
+          <ion-icon name="log-in-outline"></ion-icon>
+        </div>
 
-          <ion-item>
-            <ion-label position="floating">Password</ion-label>
-            <ion-input
-              [type]="showPassword ? 'text' : 'password'"
-              formControlName="password"
-              placeholder="Enter your password">
-            </ion-input>
-            <ion-button slot="end" fill="clear" (click)="togglePassword()">
-              <ion-icon [name]="showPassword ? 'eye-off' : 'eye'"></ion-icon>
-            </ion-button>
-          </ion-item>
+        <ion-item lines="none" class="custom-item">
+          <ion-label position="stacked">Email</ion-label>
+          <ion-input
+            type="email"
+            formControlName="email"
+            placeholder="you@example.com"
+            [class.invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+          </ion-input>
+        </ion-item>
+        <div *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" class="error-container">
+          <ion-text color="danger">
+            <small>A valid email is required</small>
+          </ion-text>
+        </div>
 
-          <ion-button
-            expand="block"
-            type="submit"
-            [disabled]="loginForm.invalid || isSubmitting"
-            class="ion-margin-top">
-            <ion-icon name="log-in-outline" slot="start"></ion-icon>
-            {{ isSubmitting ? 'Logging in...' : 'Login' }}
+        <ion-item lines="none" class="custom-item">
+          <ion-label position="stacked">Password</ion-label>
+          <ion-input
+            [type]="showPassword ? 'text' : 'password'"
+            formControlName="password"
+            placeholder="Enter your password">
+          </ion-input>
+          <ion-button slot="end" fill="clear" (click)="togglePassword()" class="password-toggle-btn">
+            <ion-icon [name]="showPassword ? 'eye-off' : 'eye'" slot="icon-only"></ion-icon>
           </ion-button>
+        </ion-item>
 
-          <div class="ion-text-center ion-margin-top">
-            <ion-text color="medium">
-              Don't have an account?
-              <a routerLink="/register" class="link">Register here</a>
-            </ion-text>
-          </div>
-        </form>
-      </ion-card-content>
-    </ion-card>
+        <ion-button
+          expand="block"
+          type="submit"
+          [disabled]="loginForm.invalid || isSubmitting"
+          class="submit-btn">
+          <ion-icon name="log-in-outline" slot="start" style="font-size: 1.2rem;"></ion-icon>
+          {{ isSubmitting ? 'Logging in...' : 'Login' }}
+        </ion-button>
+
+        <div class="footer-container">
+          <ion-text color="medium" class="footer-text">
+            Don't have an account? 
+            <a routerLink="/register" class="link">Register here</a>
+          </ion-text>
+        </div>
+
+      </form>
+
+    </div>
   </div>
 </ion-content>
