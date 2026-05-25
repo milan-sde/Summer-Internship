@@ -1,72 +1,96 @@
-<!-- src/app/pages/register/register.page.html -->
-<ion-header>
+<ion-header class="ion-no-border">
   <ion-toolbar color="primary">
-    <ion-title>Create Account</ion-title>
+    <ion-title class="headings">Create Account</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>
-        <ion-icon name="person-add-outline" size="large"></ion-icon>
-        Join Barter Platform
-      </ion-card-title>
-      <ion-card-subtitle>Choose your account type</ion-card-subtitle>
-    </ion-card-header>
+<ion-content class="ion-padding" [fullscreen]="true">
+  <div class="form-container">
+    <!-- Title Area -->
+    <div class="form-header">
+      <h2>Join Barter Platform</h2>
+      <p>Create an account to start collaborating</p>
+    </div>
 
-    <ion-card-content>
+    <!-- Glassmorphic Card Container -->
+    <div class="glassmorphism-card">
       <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-        <ion-item>
-          <ion-label position="floating">Email</ion-label>
+        <!-- Icon Banner -->
+        <div class="register-icon-container">
+          <ion-icon name="person-add-outline"></ion-icon>
+        </div>
+
+        <ion-item lines="none" class="custom-item">
+          <ion-label position="stacked">Email</ion-label>
           <ion-input
             type="email"
             formControlName="email"
-            placeholder="you@example.com">
+            placeholder="you@example.com"
+            [class.invalid]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
+          >
           </ion-input>
         </ion-item>
+        <div
+          *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
+          class="error-container"
+        >
+          <ion-text color="danger">
+            <small>A valid email is required</small>
+          </ion-text>
+        </div>
 
-        <ion-item>
-          <ion-label>Account Type</ion-label>
-          <ion-radio-group formControlName="role">
-            <ion-list-header>
-              <ion-label>Select your role</ion-label>
-            </ion-list-header>
-
-            <ion-item>
-              <ion-label>Influencer</ion-label>
-              <ion-radio slot="start" value="INFLUENCER"></ion-radio>
-              <ion-text color="medium" class="ion-padding-start">
-                <small>Create content and collaborate with brands</small>
-              </ion-text>
-            </ion-item>
-
-            <ion-item>
-              <ion-label>Brand</ion-label>
-              <ion-radio slot="start" value="BRAND"></ion-radio>
-              <ion-text color="medium" class="ion-padding-start">
-                <small>Find influencers for your campaigns</small>
-              </ion-text>
-            </ion-item>
-          </ion-radio-group>
-        </ion-item>
+        <!-- Premium Visual Role Toggles -->
+        <div class="role-selection-container">
+          <h4 class="section-title">I am an...</h4>
+          <ion-grid class="ion-no-padding">
+            <ion-row>
+              <ion-col size="6" class="ion-no-padding padding-right-sm">
+                <div
+                  class="role-card"
+                  [class.selected]="registerForm.get('role')?.value === 'INFLUENCER'"
+                  (click)="registerForm.patchValue({role: 'INFLUENCER'})"
+                >
+                  <ion-icon name="people-outline"></ion-icon>
+                  <span class="role-title">Influencer</span>
+                  <span class="role-desc">Create content & collaborate</span>
+                </div>
+              </ion-col>
+              <ion-col size="6" class="ion-no-padding padding-left-sm">
+                <div
+                  class="role-card"
+                  [class.selected]="registerForm.get('role')?.value === 'BRAND'"
+                  (click)="registerForm.patchValue({role: 'BRAND'})"
+                >
+                  <ion-icon name="briefcase-outline"></ion-icon>
+                  <span class="role-title">Brand</span>
+                  <span class="role-desc">Find influencers & grow</span>
+                </div>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </div>
 
         <ion-button
           expand="block"
           type="submit"
           [disabled]="registerForm.invalid || isSubmitting"
-          class="ion-margin-top">
-          <ion-icon name="mail-outline" slot="start"></ion-icon>
-          {{ isSubmitting ? 'Sending...' : 'Register with Email' }}
+          class="submit-btn"
+        >
+          <ion-icon
+            name="mail-outline"
+            slot="start"
+            style="font-size: 1.2rem"
+          ></ion-icon>
+          {{ isSubmitting ? 'Sending Code...' : 'Register with Email' }}
         </ion-button>
 
-        <div class="ion-text-center ion-margin-top">
-          <ion-text color="medium">
+        <div class="footer-container">
+          <ion-text color="medium" class="footer-text">
             Already have an account?
             <a routerLink="/login" class="link">Login here</a>
           </ion-text>
         </div>
       </form>
-    </ion-card-content>
-  </ion-card>
+    </div>
+  </div>
 </ion-content>

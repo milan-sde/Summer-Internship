@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -12,22 +12,23 @@ import {
   IonHeader,
   IonTitle,
   IonToolbar,
-  IonCard,
-  IonCardHeader,
   IonButton,
-  IonCardTitle,
   IonIcon,
-  IonCardSubtitle,
-  IonCardContent,
   IonItem,
   IonLabel,
-  IonNote,
   IonText,
-  IonListHeader,
-  IonRadio,
-  IonRadioGroup,
   IonInput,
+  IonGrid,
+  IonRow,
+  IonCol,
 } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import {
+  personAddOutline,
+  mailOutline,
+  peopleOutline,
+  briefcaseOutline,
+} from 'ionicons/icons';
 import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
@@ -36,27 +37,22 @@ import { AuthService } from 'src/app/services/auth.service';
   styleUrls: ['./register.page.scss'],
   standalone: true,
   imports: [
-    IonRadio,
-    IonRadioGroup,
-    IonListHeader,
     IonInput,
     IonText,
     IonLabel,
     IonItem,
-    IonCardContent,
-    IonCardSubtitle,
     IonIcon,
-    IonCardTitle,
     IonButton,
-    IonCardHeader,
     IonContent,
     IonHeader,
     IonTitle,
     IonToolbar,
+    IonGrid,
+    IonRow,
+    IonCol,
     CommonModule,
     ReactiveFormsModule,
     RouterLink,
-    IonCard,
   ],
 })
 export class RegisterPage {
@@ -67,6 +63,13 @@ export class RegisterPage {
     private fb: FormBuilder,
     private authService: AuthService,
   ) {
+    addIcons({
+      personAddOutline,
+      mailOutline,
+      peopleOutline,
+      briefcaseOutline,
+    });
+
     this.registerForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       role: ['INFLUENCER', Validators.required],
