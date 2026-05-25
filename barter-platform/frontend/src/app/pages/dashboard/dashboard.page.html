@@ -1,84 +1,88 @@
 <!-- src/app/pages/dashboard/dashboard.page.html -->
-<ion-header>
+<ion-header class="ion-no-border">
   <ion-toolbar color="primary">
-    <ion-title>Dashboard</ion-title>
+    <ion-title class="headings">Dashboard</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="logout()">
+      <ion-button (click)="logout()" style="--color: white;">
         <ion-icon name="log-out-outline" slot="icon-only"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="ion-padding" [fullscreen]="true">
   <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
-  <ion-card class="welcome-card">
-    <ion-card-header>
-      <ion-card-title>Welcome back, {{ user?.fullName || user?.email }}!</ion-card-title>
-      <ion-card-subtitle>
-        You're logged in as a {{ user?.role | lowercase }}
-      </ion-card-subtitle>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-icon name="checkmark-circle" color="success" slot="start"></ion-icon>
-      Your profile is complete and you're ready to start collaborating!
-    </ion-card-content>
-  </ion-card>
+  <div style="max-width: 800px; margin: 0 auto;">
+    
+    <!-- Welcome Card -->
+    <ion-card class="welcome-card" style="border-radius: 16px; margin: 15px 0 25px 0; box-shadow: 0 8px 24px rgba(255, 90, 54, 0.2);">
+      <ion-card-header>
+        <ion-card-title class="headings" style="font-size: 1.5rem; font-weight: 800;">
+          Welcome back, {{ user?.fullName || user?.email }}!
+        </ion-card-title>
+        <ion-card-subtitle style="color: rgba(255, 255, 255, 0.8); font-weight: 600; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; margin-top: 5px;">
+          Logged in as a {{ user?.role | lowercase }}
+        </ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content style="display: flex; align-items: center; font-weight: 500; font-size: 0.95rem;">
+        <ion-icon name="checkmark-circle" color="success" style="font-size: 1.4rem; margin-right: 8px;"></ion-icon>
+        Your profile is complete and you're ready to collaborate!
+      </ion-card-content>
+    </ion-card>
 
-  <ion-grid>
-    <ion-row>
-      <ion-col size="12" size-md="6">
-        <ion-card button (click)="exploreCollaborations()">
-          <ion-card-header>
-            <ion-card-title>
-              <ion-icon name="people-outline"></ion-icon>
-              Explore Collaborations
-            </ion-card-title>
-          </ion-card-header>
-          <ion-card-content>
-            Find brands and influencers to collaborate with
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
+    <!-- Visual Actions Grid -->
+    <ion-grid class="ion-no-padding">
+      <ion-row>
+        <ion-col size="12" size-md="6" style="padding-bottom: 10px; padding-right: 5px;">
+          <div class="glassmorphism-card ion-padding" style="cursor: pointer; display: flex; flex-direction: column; height: 100%; transition: transform 0.2s;" (click)="exploreCollaborations()">
+            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+              <ion-icon name="people-outline" style="font-size: 2rem; color: var(--ion-color-primary); margin-right: 8px;"></ion-icon>
+              <h3 class="headings" style="font-size: 1.15rem; margin: 0; font-weight: 700; color: var(--ion-color-step-800);">Explore</h3>
+            </div>
+            <p style="font-size: 0.9rem; color: var(--ion-color-step-600); margin: 0; line-height: 1.4;">
+              Find brands and influencers to collaborate with on campaigns
+            </p>
+          </div>
+        </ion-col>
 
-      <ion-col size="12" size-md="6">
-        <ion-card button (click)="viewProfile()">
-          <ion-card-header>
-            <ion-card-title>
-              <ion-icon name="person-outline"></ion-icon>
-              My Profile
-            </ion-card-title>
-          </ion-card-header>
-          <ion-card-content>
-            View and edit your profile information
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
+        <ion-col size="12" size-md="6" style="padding-bottom: 10px; padding-left: 5px;">
+          <div class="glassmorphism-card ion-padding" style="cursor: pointer; display: flex; flex-direction: column; height: 100%; transition: transform 0.2s;" (click)="viewProfile()">
+            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+              <ion-icon name="person-outline" style="font-size: 2rem; color: var(--ion-color-primary); margin-right: 8px;"></ion-icon>
+              <h3 class="headings" style="font-size: 1.15rem; margin: 0; font-weight: 700; color: var(--ion-color-step-800);">My Profile</h3>
+            </div>
+            <p style="font-size: 0.9rem; color: var(--ion-color-step-600); margin: 0; line-height: 1.4;">
+              View and edit your specialized profile information and metrics
+            </p>
+          </div>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
 
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Quick Stats</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-list>
-        <ion-item>
-          <ion-label>Profile Views</ion-label>
-          <ion-badge slot="end" color="primary">0</ion-badge>
+    <!-- Stats Table Card -->
+    <div class="glassmorphism-card ion-padding" style="margin-top: 20px; margin-bottom: 30px;">
+      <h3 class="headings" style="font-size: 1.25rem; font-weight: 700; color: var(--ion-color-step-800); margin: 0 0 15px 0; display: flex; align-items: center;">
+        <ion-icon name="bar-chart-outline" style="margin-right: 6px; color: var(--ion-color-primary);"></ion-icon>
+        Quick Stats
+      </h3>
+      <ion-list lines="none" style="background: transparent;">
+        <ion-item style="--background: transparent; margin-bottom: 6px; border-bottom: 1px solid var(--ion-color-step-100, #f0f0f0); padding-bottom: 4px;">
+          <ion-label style="font-weight: 600; color: var(--ion-color-step-700);">Profile Views</ion-label>
+          <ion-badge slot="end" color="primary" style="font-weight: 700; border-radius: 8px; padding: 6px 12px;">0</ion-badge>
         </ion-item>
-        <ion-item>
-          <ion-label>Collaboration Requests</ion-label>
-          <ion-badge slot="end" color="success">0</ion-badge>
+        <ion-item style="--background: transparent; margin-bottom: 6px; border-bottom: 1px solid var(--ion-color-step-100, #f0f0f0); padding-bottom: 4px;">
+          <ion-label style="font-weight: 600; color: var(--ion-color-step-700);">Collaboration Requests</ion-label>
+          <ion-badge slot="end" color="success" style="font-weight: 700; border-radius: 8px; padding: 6px 12px;">0</ion-badge>
         </ion-item>
-        <ion-item>
-          <ion-label>Active Collaborations</ion-label>
-          <ion-badge slot="end" color="warning">0</ion-badge>
+        <ion-item style="--background: transparent;">
+          <ion-label style="font-weight: 600; color: var(--ion-color-step-700);">Active Collaborations</ion-label>
+          <ion-badge slot="end" color="warning" style="font-weight: 700; border-radius: 8px; padding: 6px 12px;">0</ion-badge>
         </ion-item>
       </ion-list>
-    </ion-card-content>
-  </ion-card>
+    </div>
+
+  </div>
 </ion-content>

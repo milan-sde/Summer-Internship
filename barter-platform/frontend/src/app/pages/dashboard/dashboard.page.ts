@@ -27,6 +27,14 @@ import {
   IonLabel,
   IonBadge,
 } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import {
+  logOutOutline,
+  checkmarkCircle,
+  peopleOutline,
+  personOutline,
+  barChartOutline,
+} from 'ionicons/icons';
 
 @Component({
   selector: 'app-dashboard',
@@ -67,7 +75,15 @@ export class DashboardPage implements OnInit {
     private profileService: ProfileService,
     private storage: StorageService,
     private router: Router,
-  ) {}
+  ) {
+    addIcons({
+      logOutOutline,
+      checkmarkCircle,
+      peopleOutline,
+      personOutline,
+      barChartOutline,
+    });
+  }
 
   async ngOnInit() {
     this.user = await this.storage.getUser();
