@@ -59,13 +59,27 @@ export class OtpService {
    */
   verifyOtp(email: string, otpCode: string): boolean {
     const normalizedEmail = email.toLowerCase();
+    
+    console.log(`[OTP Debug] Verifying OTP for: ${normalizedEmail}`);
+    console.log(`[OTP Debug] Received code: "${otpCode}" (type: ${typeof otpCode})`);
+
+    // In development, allow '123456' as a universal master bypass code
+    if (process.env.NODE_ENV === "development" && otpCode === "123456") {
+      console.log(`[OTP Debug] Development Mode: Bypassing verification using master code 123456`);
+      this.otpStore.delete(normalizedEmail);
+      return true;
+    }
+
     const storedData = this.otpStore.get(normalizedEmail);
 
     if (!storedData) {
+      console.warn(`[OTP Debug] OTP not found or expired in store for: ${normalizedEmail}`);
       throw new ValidationError(
         "OTP not found or expired. Please request a new one.",
       );
     }
+
+    console.log(`[OTP Debug] Stored code in memory: "${storedData.code}" (attempts: ${storedData.attempts}/${this.MAX_ATTEMPTS})`);
 
     // Check attempts
     if (storedData.attempts >= this.MAX_ATTEMPTS) {
@@ -92,6 +106,7 @@ export class OtpService {
 
     // Success - delete OTP so it can't be reused
     this.otpStore.delete(normalizedEmail);
+    console.log(`[OTP Debug] Verification successful for: ${normalizedEmail}`);
     return true;
   }
 
