@@ -33,24 +33,108 @@ export class ProfileService {
       throw new ConflictError('Profile already exists');
     }
 
-    // Check if Instagram handle is taken
-    const handleTaken = await this.profileRepository.findByInstagramHandle(
-      data.instagramHandle
-    );
-    if (handleTaken) {
-      throw new ConflictError('Instagram handle is already in use');
+    // Role-specific validations
+    if (user.role === 'INFLUENCER') {
+      if (!data.username) {
+        throw new ValidationError('Username is required for influencers');
+      }
+      if (!data.phoneNumber) {
+        throw new ValidationError('Phone number is required for influencers');
+      }
+      if (!data.categories || data.categories.length === 0) {
+        throw new ValidationError('At least one category is required');
+      }
+      if (!data.countries || data.countries.length === 0) {
+        throw new ValidationError('At least one country is required');
+      }
+      if (!data.fullName) {
+        throw new ValidationError('Full name is required');
+      }
+
+      // Check if username is taken
+      const usernameTaken = await this.profileRepository.findByUsername(data.username);
+      if (usernameTaken) {
+        throw new ConflictError('Username is already in use');
+      }
+
+      // Platforms validation
+      const platforms = data.platforms;
+      if (!platforms) {
+        throw new ValidationError('Platforms details are required');
+      }
+      const { instagram, youtube, twitter } = platforms;
+      const hasInstagram = instagram && instagram.username && instagram.followers !== undefined;
+      const hasYoutube = youtube && youtube.username && youtube.followers !== undefined;
+      const hasTwitter = twitter && twitter.username && twitter.followers !== undefined;
+
+      if (!hasInstagram && !hasYoutube && !hasTwitter) {
+        throw new ValidationError('At least one social media platform must be fully filled with both username and followers');
+      }
+
+      // If one field is present in any platform, the other must also be present
+      if (instagram && ((instagram.username && instagram.followers === undefined) || (!instagram.username && instagram.followers !== undefined))) {
+        throw new ValidationError('Instagram username and followers must both be filled if one is provided');
+      }
+      if (youtube && ((youtube.username && youtube.followers === undefined) || (!youtube.username && youtube.followers !== undefined))) {
+        throw new ValidationError('YouTube username and followers must both be filled if one is provided');
+      }
+      if (twitter && ((twitter.username && twitter.followers === undefined) || (!twitter.username && twitter.followers !== undefined))) {
+        throw new ValidationError('Twitter username and followers must both be filled if one is provided');
+      }
+
+      // Also check instagramHandle uniqueness if provided
+      if (data.instagramHandle) {
+        const handleTaken = await this.profileRepository.findByInstagramHandle(data.instagramHandle);
+        if (handleTaken) {
+          throw new ConflictError('Instagram handle is already in use');
+        }
+      }
+    } else if (user.role === 'BRAND') {
+      if (!data.firstName || !data.lastName) {
+        throw new ValidationError('First name and last name are required for brands');
+      }
+      if (!data.phoneNumber) {
+        throw new ValidationError('Contact number is required for brands');
+      }
+      if (!data.industries || data.industries.length === 0) {
+        throw new ValidationError('At least one industry is required');
+      }
+      if (data.budgetMin === undefined || data.budgetMax === undefined) {
+        throw new ValidationError('Budget range (min and max) is required');
+      }
+      if (data.budgetMin > data.budgetMax) {
+        throw new ValidationError('Minimum budget cannot exceed maximum budget');
+      }
+
+      // Automatically construct fullName for brands
+      data.fullName = `${data.firstName} ${data.lastName}`;
     }
 
     // Create profile
     const profile = await this.profileRepository.create({
       userId: new mongoose.Types.ObjectId(userId),
-      fullName: data.fullName,
+      fullName: data.fullName!,
       instagramHandle: data.instagramHandle,
       bio: data.bio,
       role: user.role,
       avatarUrl: data.avatarUrl,
       website: data.website,
-      location: data.location
+      location: data.location,
+
+      // Influencer fields
+      username: data.username,
+      phoneNumber: data.phoneNumber,
+      categories: data.categories,
+      countries: data.countries,
+      platforms: data.platforms,
+      pastWorkLinks: data.pastWorkLinks,
+
+      // Brand fields
+      firstName: data.firstName,
+      lastName: data.lastName,
+      industries: data.industries,
+      budgetMin: data.budgetMin,
+      budgetMax: data.budgetMax
     });
 
     // Mark onboarding as complete
@@ -116,6 +200,23 @@ export class ProfileService {
       );
       if (handleTaken && handleTaken.userId.toString() !== userId) {
         throw new ConflictError('Instagram handle is already in use');
+      }
+    }
+
+    // If updating Fluencr username, check uniqueness
+    if (data.username && data.username !== profile.username) {
+      const usernameTaken = await this.profileRepository.findByUsername(data.username);
+      if (usernameTaken && usernameTaken.userId.toString() !== userId) {
+        throw new ConflictError('Username is already in use');
+      }
+    }
+
+    // Dynamic brand logic for full name construction on update
+    if (profile.role === 'BRAND') {
+      const firstName = data.firstName !== undefined ? data.firstName : profile.firstName;
+      const lastName = data.lastName !== undefined ? data.lastName : profile.lastName;
+      if (firstName || lastName) {
+        data.fullName = `${firstName || ''} ${lastName || ''}`.trim();
       }
     }
 
@@ -195,7 +296,23 @@ export class ProfileService {
       socialLinks: profile.socialLinks,
       preferences: profile.preferences,
       createdAt: profile.createdAt,
-      updatedAt: profile.updatedAt
+      updatedAt: profile.updatedAt,
+
+      // Influencer-specific fields
+      username: profile.username,
+      phoneNumber: profile.phoneNumber,
+      categories: profile.categories,
+      countries: profile.countries,
+      platforms: profile.platforms,
+      pastWorkLinks: profile.pastWorkLinks,
+      isVerified: profile.isVerified,
+
+      // Brand-specific fields
+      firstName: profile.firstName,
+      lastName: profile.lastName,
+      industries: profile.industries,
+      budgetMin: profile.budgetMin,
+      budgetMax: profile.budgetMax
     };
   }
 }

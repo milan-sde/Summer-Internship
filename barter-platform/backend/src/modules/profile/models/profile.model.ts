@@ -8,7 +8,7 @@ import { UserRole } from '@modules/users/models/user.model';
 export interface IProfile extends Document {
   userId: mongoose.Types.ObjectId;
   fullName: string;
-  instagramHandle: string;
+  instagramHandle?: string;
   bio: string;
   avatarUrl?: string;
   website?: string;
@@ -28,6 +28,27 @@ export interface IProfile extends Document {
     emailNotifications: boolean;
     collaborationAlerts: boolean;
   };
+  
+  // Influencer-specific fields
+  username?: string;
+  phoneNumber?: string;
+  categories?: string[];
+  countries?: string[];
+  platforms?: {
+    instagram?: { username?: string; followers?: number };
+    youtube?: { username?: string; followers?: number };
+    twitter?: { username?: string; followers?: number };
+  };
+  pastWorkLinks?: string[];
+  isVerified?: boolean;
+
+  // Brand-specific fields
+  firstName?: string;
+  lastName?: string;
+  industries?: string[];
+  budgetMin?: number;
+  budgetMax?: number;
+
   createdAt: Date;
   updatedAt: Date;
 }
@@ -50,12 +71,11 @@ const profileSchema = new Schema<IProfile>(
     },
     instagramHandle: {
       type: String,
-      required: true,
-      unique: true,
+      required: false,
       trim: true,
       lowercase: true,
       match: [/^@?[a-zA-Z0-9_.]{1,30}$/, 'Invalid Instagram handle'],
-      set: (value: string) => value.replace('@', '') // Remove @ if provided
+      set: (value: string) => value ? value.replace('@', '') : undefined
     },
     bio: {
       type: String,
@@ -93,6 +113,72 @@ const profileSchema = new Schema<IProfile>(
     preferences: {
       emailNotifications: { type: Boolean, default: true },
       collaborationAlerts: { type: Boolean, default: true }
+    },
+
+    // Influencer fields
+    username: {
+      type: String,
+      unique: true,
+      sparse: true,
+      trim: true,
+      lowercase: true,
+      match: [/^[a-zA-Z0-9_.]{1,30}$/, 'Invalid username']
+    },
+    phoneNumber: {
+      type: String,
+      trim: true
+    },
+    categories: {
+      type: [String],
+      default: []
+    },
+    countries: {
+      type: [String],
+      default: []
+    },
+    platforms: {
+      instagram: {
+        username: String,
+        followers: Number
+      },
+      youtube: {
+        username: String,
+        followers: Number
+      },
+      twitter: {
+        username: String,
+        followers: Number
+      }
+    },
+    pastWorkLinks: {
+      type: [String],
+      default: []
+    },
+    isVerified: {
+      type: Boolean,
+      default: false
+    },
+
+    // Brand fields
+    firstName: {
+      type: String,
+      trim: true
+    },
+    lastName: {
+      type: String,
+      trim: true
+    },
+    industries: {
+      type: [String],
+      default: []
+    },
+    budgetMin: {
+      type: Number,
+      default: 0
+    },
+    budgetMax: {
+      type: Number,
+      default: 0
     }
   },
   {
@@ -109,6 +195,6 @@ const profileSchema = new Schema<IProfile>(
 );
 
 // Compound index for searching
-profileSchema.index({ fullName: 'text', instagramHandle: 'text', bio: 'text' });
+profileSchema.index({ fullName: 'text', username: 'text', bio: 'text' });
 
 export const Profile = mongoose.model<IProfile>('Profile', profileSchema);

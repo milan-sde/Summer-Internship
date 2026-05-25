@@ -5,12 +5,32 @@ import mongoose from "mongoose";
 export interface CreateProfileDto {
   userId: mongoose.Types.ObjectId;
   fullName: string;
-  instagramHandle: string;
+  instagramHandle?: string;
   bio: string;
   role: string;
   avatarUrl?: string;
   website?: string;
   location?: string;
+
+  // Influencer-specific fields
+  username?: string;
+  phoneNumber?: string;
+  categories?: string[];
+  countries?: string[];
+  platforms?: {
+    instagram?: { username?: string; followers?: number };
+    youtube?: { username?: string; followers?: number };
+    twitter?: { username?: string; followers?: number };
+  };
+  pastWorkLinks?: string[];
+  isVerified?: boolean;
+
+  // Brand-specific fields
+  firstName?: string;
+  lastName?: string;
+  industries?: string[];
+  budgetMin?: number;
+  budgetMax?: number;
 }
 
 export interface UpdateProfileDto {
@@ -23,6 +43,26 @@ export interface UpdateProfileDto {
   stats?: Partial<IProfile["stats"]>;
   socialLinks?: Partial<IProfile["socialLinks"]>;
   preferences?: Partial<IProfile["preferences"]>;
+
+  // Influencer-specific fields
+  username?: string;
+  phoneNumber?: string;
+  categories?: string[];
+  countries?: string[];
+  platforms?: {
+    instagram?: { username?: string; followers?: number };
+    youtube?: { username?: string; followers?: number };
+    twitter?: { username?: string; followers?: number };
+  };
+  pastWorkLinks?: string[];
+  isVerified?: boolean;
+
+  // Brand-specific fields
+  firstName?: string;
+  lastName?: string;
+  industries?: string[];
+  budgetMin?: number;
+  budgetMax?: number;
 }
 
 export class ProfileRepository {
@@ -45,7 +85,16 @@ export class ProfileRepository {
    * Find profile by Instagram handle
    */
   async findByInstagramHandle(handle: string): Promise<IProfile | null> {
+    if (!handle) return null;
     return Profile.findOne({ instagramHandle: handle.toLowerCase() });
+  }
+
+  /**
+   * Find profile by Fluencr username
+   */
+  async findByUsername(username: string): Promise<IProfile | null> {
+    if (!username) return null;
+    return Profile.findOne({ username: username.toLowerCase() });
   }
 
   /**
