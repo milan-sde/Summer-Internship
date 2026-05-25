@@ -15,7 +15,6 @@ import {
   IonButton,
   IonIcon,
   IonItem,
-  IonLabel,
   IonText,
   IonInput,
   IonGrid,
@@ -39,7 +38,6 @@ import { AuthService } from 'src/app/services/auth.service';
   imports: [
     IonInput,
     IonText,
-    IonLabel,
     IonItem,
     IonIcon,
     IonButton,

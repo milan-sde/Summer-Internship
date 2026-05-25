@@ -17,7 +17,6 @@ import {
   IonButton,
   IonIcon,
   IonItem,
-  IonLabel,
   IonText,
   IonInput,
   IonButtons,
@@ -43,7 +42,6 @@ import { AuthService } from '../../services/auth.service';
   imports: [
     IonInput,
     IonText,
-    IonLabel,
     IonItem,
     IonIcon,
     IonButton,
@@ -125,9 +123,7 @@ export class CreatePasswordPage implements OnInit {
   }
 
   // Custom validator for password strength
-  passwordStrengthValidator(
-    control: AbstractControl,
-  ): ValidationErrors | null {
+  passwordStrengthValidator(control: AbstractControl): ValidationErrors | null {
     const password = control.value || '';
 
     const hasMinLength = password.length >= 8;

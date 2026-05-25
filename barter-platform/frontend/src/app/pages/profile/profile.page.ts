@@ -15,17 +15,10 @@ import {
   IonToolbar,
   IonTitle,
   IonContent,
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardSubtitle,
-  IonCardContent,
   IonIcon,
   IonItem,
-  IonLabel,
   IonInput,
   IonTextarea,
-  IonNote,
   IonButton,
   IonText,
   IonGrid,
@@ -46,6 +39,13 @@ import {
   logoTwitter,
   lockClosedOutline,
   arrowBackOutline,
+  personOutline,
+  callOutline,
+  mailOutline,
+  documentTextOutline,
+  globeOutline,
+  locationOutline,
+  cashOutline,
 } from 'ionicons/icons';
 
 @Component({
@@ -62,17 +62,10 @@ import {
     IonToolbar,
     IonTitle,
     IonContent,
-    IonCard,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardSubtitle,
-    IonCardContent,
     IonIcon,
     IonItem,
-    IonLabel,
     IonInput,
     IonTextarea,
-    IonNote,
     IonButton,
     IonGrid,
     IonRow,
@@ -89,26 +82,6 @@ export class ProfilePage implements OnInit {
   profileData: any;
 
   // Custom visual chips selections lists
-  categoriesList = [
-    'Fashion',
-    'Beauty & Cosmetics',
-    'Travel & Adventure',
-    'Food & Culinary',
-    'Tech & Gaming',
-    'Fitness & Wellness',
-    'Lifestyle & Decor',
-    'Business & Finance',
-  ];
-  countriesList = [
-    'United States',
-    'United Kingdom',
-    'Canada',
-    'Australia',
-    'India',
-    'Germany',
-    'France',
-    'Japan',
-  ];
   industriesList = [
     'Apparel & Fashion',
     'Beauty & Personal Care',
@@ -120,8 +93,6 @@ export class ProfilePage implements OnInit {
     'Travel & Hospitality',
   ];
 
-  selectedCategories: string[] = [];
-  selectedCountries: string[] = [];
   selectedIndustries: string[] = [];
 
   // Past work links dynamic fields
@@ -148,6 +119,13 @@ export class ProfilePage implements OnInit {
       logoTwitter,
       lockClosedOutline,
       arrowBackOutline,
+      personOutline,
+      callOutline,
+      mailOutline,
+      documentTextOutline,
+      globeOutline,
+      locationOutline,
+      cashOutline,
     });
   }
 
@@ -176,8 +154,6 @@ export class ProfilePage implements OnInit {
           ],
         ],
         avatarUrl: [''],
-        website: ['', Validators.pattern(/^https?:\/\/.+/)],
-        location: [''],
 
         // Platforms usernames/followers
         instagramUsername: [''],
@@ -203,11 +179,6 @@ export class ProfilePage implements OnInit {
           ],
         ],
         avatarUrl: [''],
-        website: [
-          '',
-          [Validators.required, Validators.pattern(/^https?:\/\/.+/)],
-        ],
-        location: [''],
         budgetMin: [0, [Validators.required, Validators.min(0)]],
         budgetMax: [0, [Validators.required, Validators.min(0)]],
       });
@@ -220,7 +191,7 @@ export class ProfilePage implements OnInit {
       this.profileData = await this.profileService.getMyProfile();
       if (this.profileData) {
         this.avatarPreview = this.profileData.avatarUrl || null;
-        
+
         if (this.currentUser?.role === 'INFLUENCER') {
           this.profileForm.patchValue({
             fullName: this.profileData.fullName || '',
@@ -228,21 +199,25 @@ export class ProfilePage implements OnInit {
             phoneNumber: this.profileData.phoneNumber || '',
             bio: this.profileData.bio || '',
             avatarUrl: this.profileData.avatarUrl || '',
-            website: this.profileData.website || '',
-            location: this.profileData.location || '',
-            instagramUsername: this.profileData.platforms?.instagram?.username || '',
-            instagramFollowers: this.profileData.platforms?.instagram?.followers || null,
-            youtubeUsername: this.profileData.platforms?.youtube?.username || '',
-            youtubeFollowers: this.profileData.platforms?.youtube?.followers || null,
-            twitterUsername: this.profileData.platforms?.twitter?.username || '',
-            twitterFollowers: this.profileData.platforms?.twitter?.followers || null,
+            instagramUsername:
+              this.profileData.platforms?.instagram?.username || '',
+            instagramFollowers:
+              this.profileData.platforms?.instagram?.followers || null,
+            youtubeUsername:
+              this.profileData.platforms?.youtube?.username || '',
+            youtubeFollowers:
+              this.profileData.platforms?.youtube?.followers || null,
+            twitterUsername:
+              this.profileData.platforms?.twitter?.username || '',
+            twitterFollowers:
+              this.profileData.platforms?.twitter?.followers || null,
           });
 
-          this.selectedCategories = this.profileData.categories || [];
-          this.selectedCountries = this.profileData.countries || [];
-          this.pastWorkLinks = this.profileData.pastWorkLinks && this.profileData.pastWorkLinks.length > 0
-            ? [...this.profileData.pastWorkLinks]
-            : [''];
+          this.pastWorkLinks =
+            this.profileData.pastWorkLinks &&
+            this.profileData.pastWorkLinks.length > 0
+              ? [...this.profileData.pastWorkLinks]
+              : [''];
         } else {
           this.profileForm.patchValue({
             firstName: this.profileData.firstName || '',
@@ -250,8 +225,6 @@ export class ProfilePage implements OnInit {
             phoneNumber: this.profileData.phoneNumber || '',
             bio: this.profileData.bio || '',
             avatarUrl: this.profileData.avatarUrl || '',
-            website: this.profileData.website || '',
-            location: this.profileData.location || '',
             budgetMin: this.profileData.budgetMin || 0,
             budgetMax: this.profileData.budgetMax || 0,
           });
@@ -267,24 +240,6 @@ export class ProfilePage implements OnInit {
   }
 
   // Toggles for chips
-  toggleCategory(category: string) {
-    const idx = this.selectedCategories.indexOf(category);
-    if (idx > -1) {
-      this.selectedCategories.splice(idx, 1);
-    } else {
-      this.selectedCategories.push(category);
-    }
-  }
-
-  toggleCountry(country: string) {
-    const idx = this.selectedCountries.indexOf(country);
-    if (idx > -1) {
-      this.selectedCountries.splice(idx, 1);
-    } else {
-      this.selectedCountries.push(country);
-    }
-  }
-
   toggleIndustry(industry: string) {
     const idx = this.selectedIndustries.indexOf(industry);
     if (idx > -1) {
@@ -343,16 +298,12 @@ export class ProfilePage implements OnInit {
       const profileData: any = {
         bio: raw.bio,
         avatarUrl: raw.avatarUrl || '',
-        website: raw.website || '',
-        location: raw.location || '',
       };
 
       if (this.currentUser?.role === 'INFLUENCER') {
         profileData.fullName = raw.fullName;
         profileData.username = raw.username;
         profileData.phoneNumber = raw.phoneNumber;
-        profileData.categories = this.selectedCategories;
-        profileData.countries = this.selectedCountries;
 
         // Collect platforms
         const platforms: any = {};
@@ -390,16 +341,6 @@ export class ProfilePage implements OnInit {
           (link) => link && link.trim() !== '',
         );
 
-        // Core validation checks
-        if (this.selectedCategories.length === 0) {
-          this.showValidationToast('Please select at least one Category/Niche.');
-          return;
-        }
-        if (this.selectedCountries.length === 0) {
-          this.showValidationToast('Please select at least one Country.');
-          return;
-        }
-
         const hasInstagram =
           platforms.instagram &&
           platforms.instagram.username &&
@@ -425,15 +366,11 @@ export class ProfilePage implements OnInit {
           raw.instagramUsername &&
           (raw.instagramFollowers === null || raw.instagramFollowers === '')
         ) {
-          this.showValidationToast(
-            'Please fill in followers for Instagram.',
-          );
+          this.showValidationToast('Please fill in followers for Instagram.');
           return;
         }
         if (!raw.instagramUsername && raw.instagramFollowers) {
-          this.showValidationToast(
-            'Please fill in username for Instagram.',
-          );
+          this.showValidationToast('Please fill in username for Instagram.');
           return;
         }
         if (

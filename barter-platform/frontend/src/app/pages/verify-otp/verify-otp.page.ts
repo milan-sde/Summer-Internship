@@ -1,6 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  FormsModule,
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 import {
   IonContent,
   IonHeader,
@@ -8,11 +14,8 @@ import {
   IonToolbar,
   IonButton,
   IonIcon,
-  IonItem,
-  IonLabel,
   IonText,
   IonInputOtp,
-  IonNote,
   IonButtons,
   IonBackButton,
 } from '@ionic/angular/standalone';
@@ -28,10 +31,7 @@ import { AuthService } from '../../services/auth.service';
   standalone: true,
   imports: [
     IonInputOtp,
-    IonNote,
     IonText,
-    IonLabel,
-    IonItem,
     IonIcon,
     IonButton,
     IonContent,
@@ -43,8 +43,8 @@ import { AuthService } from '../../services/auth.service';
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    RouterModule
-  ]
+    RouterModule,
+  ],
 })
 export class VerifyOtpPage implements OnInit, OnDestroy {
   verifyOtpForm: FormGroup;
@@ -58,18 +58,26 @@ export class VerifyOtpPage implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
   ) {
     addIcons({ mailUnreadOutline, checkmarkCircleOutline });
 
     this.verifyOtpForm = this.fb.group({
-      otp: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(6), Validators.pattern(/^\d+$/)]]
+      otp: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(6),
+          Validators.maxLength(6),
+          Validators.pattern(/^\d+$/),
+        ],
+      ],
     });
   }
 
   ngOnInit() {
     // Get email from navigation state or query params
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.subscribe((params) => {
       this.email = params['email'] || '';
       if (!this.email) {
         // Try to get from navigation state
@@ -106,7 +114,7 @@ export class VerifyOtpPage implements OnInit, OnDestroy {
         // Navigate to create password page
         await this.router.navigate(['/create-password'], {
           queryParams: { email: this.email },
-          state: { email: this.email }
+          state: { email: this.email },
         });
       } catch (error) {
         console.error('OTP verification failed:', error);
@@ -126,11 +134,17 @@ export class VerifyOtpPage implements OnInit, OnDestroy {
       // Reset timer
       this.startTimer();
       // Show success message
-      const toast = await this.createToast('New OTP sent to your email!', 'success');
+      const toast = await this.createToast(
+        'New OTP sent to your email!',
+        'success',
+      );
       await toast.present();
     } catch (error) {
       console.error('Resend OTP failed:', error);
-      const toast = await this.createToast('Failed to resend OTP. Please try again.', 'danger');
+      const toast = await this.createToast(
+        'Failed to resend OTP. Please try again.',
+        'danger',
+      );
       await toast.present();
     }
   }
@@ -142,7 +156,7 @@ export class VerifyOtpPage implements OnInit, OnDestroy {
       message: message,
       duration: 3000,
       position: 'top',
-      color: color
+      color: color,
     });
   }
 

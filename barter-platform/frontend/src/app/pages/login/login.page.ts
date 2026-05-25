@@ -13,14 +13,19 @@ import {
   IonTitle,
   IonToolbar,
   IonIcon,
-  IonLabel,
   IonItem,
   IonInput,
   IonText,
   IonButton,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { logInOutline, eye, eyeOff } from 'ionicons/icons';
+import {
+  logInOutline,
+  eye,
+  eyeOff,
+  mailOutline,
+  lockClosedOutline,
+} from 'ionicons/icons';
 import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
@@ -31,7 +36,6 @@ import { AuthService } from 'src/app/services/auth.service';
   imports: [
     IonText,
     IonItem,
-    IonLabel,
     IonInput,
     IonIcon,
     IonContent,
@@ -53,7 +57,7 @@ export class LoginPage implements OnInit {
     private fb: FormBuilder,
     private authService: AuthService,
   ) {
-    addIcons({ logInOutline, eye, eyeOff });
+    addIcons({ logInOutline, eye, eyeOff, mailOutline, lockClosedOutline });
 
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],

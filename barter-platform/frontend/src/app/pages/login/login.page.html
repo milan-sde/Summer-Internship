@@ -23,32 +23,40 @@
           <ion-icon name="log-in-outline"></ion-icon>
         </div>
 
-        <ion-item lines="none" class="custom-item">
-          <ion-label position="stacked">Email</ion-label>
-          <ion-input
-            type="email"
-            formControlName="email"
-            placeholder="you@example.com"
-            [class.invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
-          </ion-input>
-        </ion-item>
+        <!-- Email Input -->
+        <div class="custom-input-group">
+          <label class="custom-input-label">Email</label>
+          <ion-item lines="none" class="custom-input-item">
+            <ion-icon name="mail-outline" slot="start" class="input-icon"></ion-icon>
+            <ion-input
+              type="email"
+              formControlName="email"
+              placeholder="you@example.com"
+              [class.invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+            </ion-input>
+          </ion-item>
+        </div>
         <div *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" class="error-container">
           <ion-text color="danger">
             <small>A valid email is required</small>
           </ion-text>
         </div>
 
-        <ion-item lines="none" class="custom-item">
-          <ion-label position="stacked">Password</ion-label>
-          <ion-input
-            [type]="showPassword ? 'text' : 'password'"
-            formControlName="password"
-            placeholder="Enter your password">
-          </ion-input>
-          <ion-button slot="end" fill="clear" (click)="togglePassword()" class="password-toggle-btn">
-            <ion-icon [name]="showPassword ? 'eye-off' : 'eye'" slot="icon-only"></ion-icon>
-          </ion-button>
-        </ion-item>
+        <!-- Password Input -->
+        <div class="custom-input-group">
+          <label class="custom-input-label">Password</label>
+          <ion-item lines="none" class="custom-input-item">
+            <ion-icon name="lock-closed-outline" slot="start" class="input-icon"></ion-icon>
+            <ion-input
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="Enter your password">
+            </ion-input>
+            <ion-button slot="end" fill="clear" (click)="togglePassword()" class="password-toggle-btn">
+              <ion-icon [name]="showPassword ? 'eye-off' : 'eye'" slot="icon-only"></ion-icon>
+            </ion-button>
+          </ion-item>
+        </div>
 
         <ion-button
           expand="block"
