@@ -36,9 +36,13 @@ export const VerifyOtpDtoSchema = z.object({
     .email("Please provide a valid email address")
     .transform((val) => val.toLowerCase().trim()),
   otp: z
-    .string()
-    .length(6, "OTP must be exactly 6 digits")
-    .regex(/^\d+$/, "OTP must contain only numbers"),
+    .preprocess(
+      (val) => (typeof val === "number" ? val.toString() : val),
+      z
+        .string()
+        .length(6, "OTP must be exactly 6 digits")
+        .regex(/^\d+$/, "OTP must contain only numbers")
+    ),
 });
 
 export type VerifyOtpDto = z.infer<typeof VerifyOtpDtoSchema>;
