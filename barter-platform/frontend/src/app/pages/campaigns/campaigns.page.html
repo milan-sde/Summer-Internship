@@ -1,0 +1,234 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="primary" class="header-toolbar">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/dashboard" text=""></ion-back-button>
+    </ion-buttons>
+    <div class="logo-container" slot="start">
+      <div class="logo-icon-box">
+        <span class="logo-letter">F</span>
+      </div>
+    </div>
+    <ion-title class="headings header-title">Campaigns</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="viewProfile()" class="profile-header-btn">
+        <ion-icon name="person-circle-outline" slot="icon-only" class="header-profile-icon"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding" [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="campaigns-container">
+
+    <!-- Subtitle Description -->
+    <div class="page-subtitle-box" *ngIf="currentUser?.role === 'INFLUENCER'">
+      <p class="subtitle-text">Discover and apply to brand campaigns</p>
+    </div>
+
+    <div class="page-subtitle-box" *ngIf="currentUser?.role === 'BRAND'">
+      <p class="subtitle-text">Create and manage your campaign offers for influencers</p>
+    </div>
+
+    <!-- ================= INFLUENCER DASHBOARD ================= -->
+    <ng-container *ngIf="currentUser?.role === 'INFLUENCER'">
+
+      <!-- Toggle Segment Tabs -->
+      <div class="segment-tabs-container">
+        <ion-segment [value]="activeSegment" (ionChange)="segmentChanged($event)" class="custom-segment">
+          <ion-segment-button value="discover" class="custom-segment-button">
+            <ion-label>Discover</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="applied" class="custom-segment-button">
+            <ion-label>Applied ({{ campaigns.length && activeSegment === 'applied' ? campaigns.length : '0' }})</ion-label>
+          </ion-segment-button>
+        </ion-segment>
+      </div>
+
+      <!-- Categories Tags Carousel (Only on Discover Segment) -->
+      <div class="categories-scroll-wrapper" *ngIf="activeSegment === 'discover'">
+        <div class="categories-scroll-container">
+          <span *ngFor="let cat of categoriesList"
+                [class.active]="selectedCategory === cat"
+                (click)="selectCategory(cat)"
+                class="category-tag">
+            {{ cat }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Dropdown Filtering Buttons -->
+      <div class="filters-dropdown-row" *ngIf="activeSegment === 'discover'">
+
+        <!-- Platform Select Button -->
+        <div class="filter-dropdown-btn">
+          <ion-icon name="funnel-outline" class="dropdown-icon"></ion-icon>
+          <ion-select [(ngModel)]="selectedPlatform" (ionChange)="onFilterChanged()" placeholder="Platform" interface="popover" class="custom-select">
+            <ion-select-option value="">All Platforms</ion-select-option>
+            <ion-select-option value="Instagram">Instagram</ion-select-option>
+            <ion-select-option value="YouTube">YouTube</ion-select-option>
+            <ion-select-option value="Twitter">X (Twitter)</ion-select-option>
+          </ion-select>
+          <ion-icon name="chevron-down-outline" class="chevron-icon"></ion-icon>
+        </div>
+
+        <!-- Budget Select Button -->
+        <div class="filter-dropdown-btn">
+          <ion-icon name="cash-outline" class="dropdown-icon"></ion-icon>
+          <ion-select [(ngModel)]="selectedBudgetSort" (ionChange)="onFilterChanged()" placeholder="Budget" interface="popover" class="custom-select">
+            <ion-select-option value="">Sort Budget</ion-select-option>
+            <ion-select-option value="desc">High to Low</ion-select-option>
+            <ion-select-option value="asc">Low to High</ion-select-option>
+          </ion-select>
+          <ion-icon name="chevron-down-outline" class="chevron-icon"></ion-icon>
+        </div>
+
+        <!-- Sort Select Button -->
+        <div class="filter-dropdown-btn">
+          <ion-icon name="swap-vertical-outline" class="dropdown-icon"></ion-icon>
+          <ion-select [(ngModel)]="selectedSort" (ionChange)="onFilterChanged()" placeholder="Sort" interface="popover" class="custom-select">
+            <ion-select-option value="newest">Newest First</ion-select-option>
+            <ion-select-option value="slots">Open Slots</ion-select-option>
+          </ion-select>
+          <ion-icon name="chevron-down-outline" class="chevron-icon"></ion-icon>
+        </div>
+
+      </div>
+
+    </ng-container>
+
+    <!-- ================= BRAND DASHBOARD HEADER ================= -->
+    <ng-container *ngIf="currentUser?.role === 'BRAND'">
+      <div class="brand-dashboard-header">
+        <h3 class="brand-section-title headings">My Campaigns</h3>
+        <ion-button (click)="onCreateCampaign()" class="create-campaign-btn">
+          <ion-icon name="add-outline" slot="start"></ion-icon>
+          Create Campaign
+        </ion-button>
+      </div>
+    </ng-container>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-state">
+      <span class="loading-text">Loading campaigns...</span>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && campaigns.length === 0" class="empty-state">
+      <ion-icon name="funnel-outline" class="empty-icon"></ion-icon>
+      <h3>No campaigns found</h3>
+      <p>There are no campaign offers matching these filters currently.</p>
+    </div>
+
+    <!-- Campaigns List -->
+    <div class="campaigns-grid-list" *ngIf="!isLoading && campaigns.length > 0">
+
+      <!-- Campaign Card Item -->
+      <div *ngFor="let campaign of campaigns" class="premium-campaign-card">
+
+        <!-- Card Header Info -->
+        <div class="card-header-row">
+
+          <!-- Avatar and brand title -->
+          <div class="brand-info-box">
+            <div class="brand-avatar-box">
+              <img *ngIf="campaign.brandLogo" [src]="campaign.brandLogo" class="brand-avatar-img">
+              <span *ngIf="!campaign.brandLogo" class="brand-avatar-initial">{{ getInitials(campaign.brandName) }}</span>
+            </div>
+            <div class="brand-names-box">
+              <h4 class="brand-title headings">{{ campaign.brandName }}</h4>
+              <p class="brand-platform-text">{{ campaign.platform }}</p>
+            </div>
+          </div>
+
+          <!-- Category Badge on Right -->
+          <div class="category-badge-box">
+            <ion-icon [name]="getCategoryIcon(campaign.category)" class="badge-icon"></ion-icon>
+            <span class="badge-text">{{ campaign.category }}</span>
+          </div>
+
+        </div>
+
+        <!-- Title & Description -->
+        <div class="card-content-box">
+          <h3 class="campaign-main-title headings">{{ campaign.title }}</h3>
+          <p class="campaign-desc-text">{{ campaign.description }}</p>
+        </div>
+
+        <!-- Details Row (Budget, Days, Slots) -->
+        <div class="card-details-metrics-row">
+
+          <!-- Budget -->
+          <div class="metric-item budget">
+            <span class="metric-label">₹ {{ campaign.budget }} per person</span>
+          </div>
+
+          <!-- Followers reach requirement if any -->
+          <div class="metric-item reach" *ngIf="campaign.followersRequired">
+            <ion-icon name="people-outline" class="metric-icon"></ion-icon>
+            <span class="metric-text">{{ campaign.followersRequired }}</span>
+          </div>
+
+          <!-- Days Left -->
+          <div class="metric-item time">
+            <ion-icon name="time-outline" class="metric-icon"></ion-icon>
+            <span class="metric-text">{{ campaign.daysLeft }}d left</span>
+          </div>
+
+          <!-- Slots count -->
+          <div class="metric-item slots">
+            <ion-icon name="people-outline" class="metric-icon"></ion-icon>
+            <span class="metric-text">{{ campaign.filledSlots }}/{{ campaign.totalSlots }}</span>
+          </div>
+
+        </div>
+
+        <!-- Filled Slots Progress Bar -->
+        <div class="progress-bar-container">
+          <div class="progress-bar" [style.width.%]="getProgress(campaign) * 100"></div>
+        </div>
+
+        <!-- Card Footer Actions (Conditional based on role & application state) -->
+        <div class="card-footer-action-row">
+
+          <!-- BRAND View Actions -->
+          <div class="brand-actions-box" *ngIf="currentUser?.role === 'BRAND'">
+            <span class="applicants-status-pill">
+              {{ campaign.filledSlots }} Applied / {{ campaign.totalSlots - campaign.filledSlots }} Open Slots
+            </span>
+          </div>
+
+          <!-- INFLUENCER View Actions -->
+          <div class="influencer-actions-box" *ngIf="currentUser?.role === 'INFLUENCER'">
+
+            <!-- Applied / Pending Hourglass badge -->
+            <span *ngIf="hasApplied(campaign)" class="pending-status-badge">
+              <ion-icon name="hourglass-outline" class="status-hourglass-icon"></ion-icon>
+              Pending
+            </span>
+
+            <!-- Apply Button -->
+            <ion-button *ngIf="!hasApplied(campaign) && campaign.filledSlots < campaign.totalSlots"
+                        (click)="applyToCampaign(campaign, $event)"
+                        class="apply-now-btn">
+              Apply Now
+            </ion-button>
+
+            <!-- Fully slots filled indicator -->
+            <span *ngIf="!hasApplied(campaign) && campaign.filledSlots >= campaign.totalSlots" class="fully-filled-badge">
+              Filled
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</ion-content>
