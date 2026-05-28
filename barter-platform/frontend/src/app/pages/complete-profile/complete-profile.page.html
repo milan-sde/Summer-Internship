@@ -21,10 +21,12 @@
         <!-- Interactive Avatar/Logo Upload Simulation -->
         <div class="avatar-picker-container">
           <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" style="display: none;">
-          <div class="avatar-picker" (click)="fileInput.click()">
-            <img *ngIf="avatarPreview" [src]="avatarPreview">
-            <span *ngIf="!avatarPreview">{{ getInitials() }}</span>
-            <div class="camera-badge">
+          <div class="avatar-picker-wrapper">
+            <div class="avatar-picker" (click)="fileInput.click()">
+              <img *ngIf="avatarPreview" [src]="avatarPreview">
+              <span *ngIf="!avatarPreview">{{ getInitials() }}</span>
+            </div>
+            <div class="camera-badge" (click)="fileInput.click()">
               <ion-icon name="camera-outline"></ion-icon>
             </div>
           </div>
