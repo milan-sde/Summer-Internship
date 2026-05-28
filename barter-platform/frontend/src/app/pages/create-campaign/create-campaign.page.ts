@@ -1,6 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { Router } from '@angular/router';
 import { CampaignService } from '../../services/campaign.service';
 import {
@@ -17,7 +22,10 @@ import {
   IonSelect,
   IonSelectOption,
   IonButton,
-  IonText
+  IonText,
+  IonCol,
+  IonRow,
+  IonGrid,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -30,7 +38,7 @@ import {
   logoYoutube,
   logoTwitter,
   optionsOutline,
-  helpCircleOutline
+  helpCircleOutline,
 } from 'ionicons/icons';
 
 @Component({
@@ -39,6 +47,9 @@ import {
   styleUrls: ['./create-campaign.page.scss'],
   standalone: true,
   imports: [
+    IonGrid,
+    IonRow,
+    IonCol,
     CommonModule,
     ReactiveFormsModule,
     IonHeader,
@@ -54,8 +65,8 @@ import {
     IonSelect,
     IonSelectOption,
     IonButton,
-    IonText
-  ]
+    IonText,
+  ],
 })
 export class CreateCampaignPage implements OnInit {
   campaignForm!: FormGroup;
@@ -67,7 +78,7 @@ export class CreateCampaignPage implements OnInit {
   constructor(
     private fb: FormBuilder,
     private campaignService: CampaignService,
-    private router: Router
+    private router: Router,
   ) {
     addIcons({
       arrowBackOutline,
@@ -79,7 +90,7 @@ export class CreateCampaignPage implements OnInit {
       logoYoutube,
       logoTwitter,
       optionsOutline,
-      helpCircleOutline
+      helpCircleOutline,
     });
   }
 
@@ -89,13 +100,27 @@ export class CreateCampaignPage implements OnInit {
 
   setupForm() {
     this.campaignForm = this.fb.group({
-      title: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
-      description: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(1000)]],
+      title: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(100),
+        ],
+      ],
+      description: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(10),
+          Validators.maxLength(1000),
+        ],
+      ],
       platform: ['Instagram', [Validators.required]],
       category: ['Tech', [Validators.required]],
       budget: [null, [Validators.required, Validators.min(0)]],
       totalSlots: [10, [Validators.required, Validators.min(1)]],
-      followersRequired: ['1K+', [Validators.required]]
+      followersRequired: ['1K+', [Validators.required]],
     });
   }
 
@@ -119,9 +144,12 @@ export class CreateCampaignPage implements OnInit {
 
   getPlatformIcon(platform: string): string {
     switch (platform) {
-      case 'YouTube': return 'logo-youtube';
-      case 'Twitter': return 'logo-twitter';
-      default: return 'logo-instagram';
+      case 'YouTube':
+        return 'logo-youtube';
+      case 'Twitter':
+        return 'logo-twitter';
+      default:
+        return 'logo-instagram';
     }
   }
 }

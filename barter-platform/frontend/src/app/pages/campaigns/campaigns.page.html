@@ -66,7 +66,7 @@
         <!-- Platform Select Button -->
         <div class="filter-dropdown-btn">
           <ion-icon name="funnel-outline" class="dropdown-icon"></ion-icon>
-          <ion-select [(ngModel)]="selectedPlatform" (ionChange)="onFilterChanged()" placeholder="Platform" interface="popover" class="custom-select">
+          <ion-select [value]="selectedPlatform" (ionChange)="selectedPlatform = $event.detail ? $event.detail.value : $event; onFilterChanged()" placeholder="Platform" interface="popover" class="custom-select">
             <ion-select-option value="">All Platforms</ion-select-option>
             <ion-select-option value="Instagram">Instagram</ion-select-option>
             <ion-select-option value="YouTube">YouTube</ion-select-option>
@@ -78,7 +78,7 @@
         <!-- Budget Select Button -->
         <div class="filter-dropdown-btn">
           <ion-icon name="cash-outline" class="dropdown-icon"></ion-icon>
-          <ion-select [(ngModel)]="selectedBudgetSort" (ionChange)="onFilterChanged()" placeholder="Budget" interface="popover" class="custom-select">
+          <ion-select [value]="selectedBudgetSort" (ionChange)="selectedBudgetSort = $event.detail ? $event.detail.value : $event; onFilterChanged()" placeholder="Budget" interface="popover" class="custom-select">
             <ion-select-option value="">Sort Budget</ion-select-option>
             <ion-select-option value="desc">High to Low</ion-select-option>
             <ion-select-option value="asc">Low to High</ion-select-option>
@@ -89,7 +89,7 @@
         <!-- Sort Select Button -->
         <div class="filter-dropdown-btn">
           <ion-icon name="swap-vertical-outline" class="dropdown-icon"></ion-icon>
-          <ion-select [(ngModel)]="selectedSort" (ionChange)="onFilterChanged()" placeholder="Sort" interface="popover" class="custom-select">
+          <ion-select [value]="selectedSort" (ionChange)="selectedSort = $event.detail ? $event.detail.value : $event; onFilterChanged()" placeholder="Sort" interface="popover" class="custom-select">
             <ion-select-option value="newest">Newest First</ion-select-option>
             <ion-select-option value="slots">Open Slots</ion-select-option>
           </ion-select>
