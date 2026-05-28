@@ -66,8 +66,6 @@ import {
     IonLabel,
     IonRefresher,
     IonRefresherContent,
-    IonItem,
-    IonInput,
     IonSelect,
     IonSelectOption
   ]
