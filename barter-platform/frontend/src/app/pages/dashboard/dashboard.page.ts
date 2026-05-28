@@ -105,7 +105,7 @@ export class DashboardPage implements OnInit {
   }
 
   exploreCollaborations() {
-    this.router.navigate(['/explore']);
+    this.router.navigate(['/campaigns']);
   }
 
   viewProfile() {

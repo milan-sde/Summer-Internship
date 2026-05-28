@@ -1,4 +1,3 @@
-// src/app/app.routes.ts
 import { Routes } from '@angular/router';
 import { GuestGuard } from './guards/guest-guard';
 import { AuthGuard } from './guards/auth-guard';
@@ -39,6 +38,16 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     loadComponent: () => import('./pages/dashboard/dashboard.page').then(m => m.DashboardPage),
+    canActivate: [AuthGuard, OnboardingGuard]
+  },
+  {
+    path: 'campaigns',
+    loadComponent: () => import('./pages/campaigns/campaigns.page').then(m => m.CampaignsPage),
+    canActivate: [AuthGuard, OnboardingGuard]
+  },
+  {
+    path: 'create-campaign',
+    loadComponent: () => import('./pages/create-campaign/create-campaign.page').then(m => m.CreateCampaignPage),
     canActivate: [AuthGuard, OnboardingGuard]
   },
   {

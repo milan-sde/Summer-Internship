@@ -1,4 +1,3 @@
-<!-- src/app/pages/dashboard/dashboard.page.html -->
 <ion-header class="ion-no-border">
   <ion-toolbar color="primary">
     <ion-title class="headings">Dashboard</ion-title>
@@ -16,7 +15,7 @@
   </ion-refresher>
 
   <div style="max-width: 800px; margin: 0 auto;">
-    
+
     <!-- Welcome Card -->
     <ion-card class="welcome-card" style="border-radius: 16px; margin: 15px 0 25px 0; box-shadow: 0 8px 24px rgba(255, 90, 54, 0.2);">
       <ion-card-header>
@@ -40,10 +39,12 @@
           <div class="glassmorphism-card ion-padding" style="cursor: pointer; display: flex; flex-direction: column; height: 100%; transition: transform 0.2s;" (click)="exploreCollaborations()">
             <div style="display: flex; align-items: center; margin-bottom: 10px;">
               <ion-icon name="people-outline" style="font-size: 2rem; color: var(--ion-color-primary); margin-right: 8px;"></ion-icon>
-              <h3 class="headings" style="font-size: 1.15rem; margin: 0; font-weight: 700; color: var(--ion-color-step-800);">Explore</h3>
+              <h3 class="headings" style="font-size: 1.15rem; margin: 0; font-weight: 700; color: var(--ion-color-step-800);">
+                {{ user?.role === 'BRAND' ? 'Manage Campaigns' : 'Explore Campaigns' }}
+              </h3>
             </div>
             <p style="font-size: 0.9rem; color: var(--ion-color-step-600); margin: 0; line-height: 1.4;">
-              Find brands and influencers to collaborate with on campaigns
+              {{ user?.role === 'BRAND' ? 'Create, monitor, and manage your active brand campaigns' : 'Discover and apply to top brand campaigns' }}
             </p>
           </div>
         </ion-col>
