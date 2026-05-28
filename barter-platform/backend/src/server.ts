@@ -10,6 +10,7 @@ import { connectDatabase } from "@shared/database/connection";
 import { authenticate, requireRole } from "@shared/middlewares/auth.middleware";
 import authRoutes from "@modules/auth/routes/auth.routes";
 import profileRoutes from "@modules/profile/routes/profile.routes";
+import campaignRoutes from "@modules/campaign/routes/campaign.routes";
 import { requireOnboarding } from "@shared/middlewares/onboarding.guard";
 
 //load environment variables:
@@ -81,7 +82,9 @@ app.get(
 
 //profile routes:
 app.use("/api/profile", profileRoutes);
-// example:
+
+//campaign routes:
+app.use("/api/campaigns", campaignRoutes);
 
 app.get(
   "/api/dashboard",
