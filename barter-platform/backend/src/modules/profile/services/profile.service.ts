@@ -41,6 +41,12 @@ export class ProfileService {
       if (!data.phoneNumber) {
         throw new ValidationError('Phone number is required for influencers');
       }
+      if (!data.categories || data.categories.length === 0) {
+        throw new ValidationError('At least one category is required');
+      }
+      if (!data.countries || data.countries.length === 0) {
+        throw new ValidationError('At least one country is required');
+      }
 
       if (!data.fullName) {
         throw new ValidationError('Full name is required');

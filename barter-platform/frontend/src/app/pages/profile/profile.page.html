@@ -117,6 +117,34 @@
             </ion-item>
           </div>
 
+          <!-- Categories/Niches chip grid selection -->
+          <div class="ion-margin-top ion-margin-bottom">
+            <h4 class="section-title">Categories / Niches *</h4>
+            <p class="section-subtitle">Select all that describe your content</p>
+            <div class="chip-grid">
+              <span *ngFor="let cat of categoriesList" 
+                    [class.selected]="selectedCategories.includes(cat)"
+                    (click)="toggleCategory(cat)"
+                    class="choice-chip">
+                {{ cat }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Country chip grid selection -->
+          <div class="ion-margin-top ion-margin-bottom">
+            <h4 class="section-title">Country *</h4>
+            <p class="section-subtitle">Select your main locations</p>
+            <div class="chip-grid">
+              <span *ngFor="let country of countriesList" 
+                    [class.selected]="selectedCountries.includes(country)"
+                    (click)="toggleCountry(country)"
+                    class="choice-chip">
+                {{ country }}
+              </span>
+            </div>
+          </div>
+
           <!-- Platforms grid -->
           <div class="social-links-box">
             <h4 class="section-title" style="color: var(--ion-color-primary);">Social Links *</h4>

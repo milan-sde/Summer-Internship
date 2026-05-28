@@ -75,6 +75,26 @@ export class CompleteProfilePage implements OnInit {
   currentUser: any;
 
   // Custom visual chips selections lists
+  categoriesList = [
+    'Fashion',
+    'Beauty & Cosmetics',
+    'Travel & Adventure',
+    'Food & Culinary',
+    'Tech & Gaming',
+    'Fitness & Wellness',
+    'Lifestyle & Decor',
+    'Business & Finance',
+  ];
+  countriesList = [
+    'United States',
+    'United Kingdom',
+    'Canada',
+    'Australia',
+    'India',
+    'Germany',
+    'France',
+    'Japan',
+  ];
   industriesList = [
     'Apparel & Fashion',
     'Beauty & Personal Care',
@@ -86,6 +106,8 @@ export class CompleteProfilePage implements OnInit {
     'Travel & Hospitality',
   ];
 
+  selectedCategories: string[] = [];
+  selectedCountries: string[] = [];
   selectedIndustries: string[] = [];
 
   // Past work links dynamic fields
@@ -177,6 +199,24 @@ export class CompleteProfilePage implements OnInit {
   }
 
   // Toggles for chips
+  toggleCategory(category: string) {
+    const idx = this.selectedCategories.indexOf(category);
+    if (idx > -1) {
+      this.selectedCategories.splice(idx, 1);
+    } else {
+      this.selectedCategories.push(category);
+    }
+  }
+
+  toggleCountry(country: string) {
+    const idx = this.selectedCountries.indexOf(country);
+    if (idx > -1) {
+      this.selectedCountries.splice(idx, 1);
+    } else {
+      this.selectedCountries.push(country);
+    }
+  }
+
   toggleIndustry(industry: string) {
     const idx = this.selectedIndustries.indexOf(industry);
     if (idx > -1) {
@@ -252,6 +292,8 @@ export class CompleteProfilePage implements OnInit {
         profileData.fullName = raw.fullName;
         profileData.username = raw.username;
         profileData.phoneNumber = raw.phoneNumber;
+        profileData.categories = this.selectedCategories;
+        profileData.countries = this.selectedCountries;
 
         // Collect platforms
         const platforms: any = {};
@@ -288,6 +330,18 @@ export class CompleteProfilePage implements OnInit {
         profileData.pastWorkLinks = this.pastWorkLinks.filter(
           (link) => link && link.trim() !== '',
         );
+
+        // Core validation checks
+        if (this.selectedCategories.length === 0) {
+          this.showValidationToast(
+            'Please select at least one Category/Niche.',
+          );
+          return;
+        }
+        if (this.selectedCountries.length === 0) {
+          this.showValidationToast('Please select at least one Country.');
+          return;
+        }
 
         const hasInstagram =
           platforms.instagram &&
