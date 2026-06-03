@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { SocialPlatform } from '../models/campaign.model';
 
 export const CreateCampaignDtoSchema = z.object({
   title: z
@@ -9,7 +10,7 @@ export const CreateCampaignDtoSchema = z.object({
     .string()
     .min(10, 'Description must be at least 10 characters')
     .max(1000, 'Description must not exceed 1000 characters'),
-  platform: z.enum(['Instagram', 'YouTube', 'Twitter']),
+  platform: z.nativeEnum(SocialPlatform),
   category: z.enum(['Tech', 'Fashion', 'Food', 'Beauty', 'Other']),
   budget: z.coerce.number().min(0, 'Budget must be positive'),
   totalSlots: z.coerce.number().min(1, 'Slots must be at least 1').default(10),
@@ -31,7 +32,7 @@ export interface CampaignResponseDto {
   brandLogo?: string;
   title: string;
   description: string;
-  platform: 'Instagram' | 'YouTube' | 'Twitter';
+  platform: SocialPlatform;
   category: 'Tech' | 'Fashion' | 'Food' | 'Beauty' | 'Other';
   budget: number;
   daysLeft: number;

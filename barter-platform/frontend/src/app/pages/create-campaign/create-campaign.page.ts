@@ -8,6 +8,7 @@ import {
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CampaignService } from '../../services/campaign.service';
+import { ProfileService } from '../../services/profile.service';
 import {
   IonHeader,
   IonToolbar,
@@ -79,6 +80,7 @@ export class CreateCampaignPage implements OnInit {
   constructor(
     private fb: FormBuilder,
     private campaignService: CampaignService,
+    private profileService: ProfileService,
     private router: Router,
   ) {
     addIcons({
@@ -96,8 +98,34 @@ export class CreateCampaignPage implements OnInit {
     });
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     this.setupForm();
+    await this.loadBrandProfileAndOrderCategories();
+  }
+
+  async loadBrandProfileAndOrderCategories() {
+    try {
+      const profile = await this.profileService.getMyProfile();
+      const brandIndustries = profile?.industries || [];
+      if (brandIndustries.length > 0) {
+        const defaultCategories = ['Tech', 'Fashion', 'Food', 'Beauty', 'Other'];
+        
+        const selected = defaultCategories.filter(cat => 
+          brandIndustries.some((ind: string) => ind.toLowerCase() === cat.toLowerCase())
+        );
+        const remaining = defaultCategories.filter(cat => 
+          !brandIndustries.some((ind: string) => ind.toLowerCase() === cat.toLowerCase())
+        );
+        
+        this.categoriesList = [...selected, ...remaining];
+        
+        if (selected.length > 0) {
+          this.campaignForm.get('category')?.setValue(selected[0]);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load brand profile for industry ordering:', error);
+    }
   }
 
   setupForm() {

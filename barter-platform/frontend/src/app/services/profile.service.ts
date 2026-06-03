@@ -53,6 +53,7 @@ export interface ProfileResponse {
     emailNotifications: boolean;
     collaborationAlerts: boolean;
   };
+  industries?: string[];
   createdAt: Date;
   updatedAt: Date;
 }

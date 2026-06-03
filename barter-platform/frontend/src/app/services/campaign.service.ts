@@ -2,6 +2,12 @@ import { Injectable } from '@angular/core';
 import { ApiService } from './api.service';
 import { LoadingController, ToastController } from '@ionic/angular/standalone';
 
+export enum SocialPlatform {
+  Instagram = 'Instagram',
+  YouTube = 'YouTube',
+  Twitter = 'Twitter'
+}
+
 export interface ICampaign {
   id: string;
   brandId: string;
@@ -9,7 +15,7 @@ export interface ICampaign {
   brandLogo?: string;
   title: string;
   description: string;
-  platform: 'Instagram' | 'YouTube' | 'Twitter';
+  platform: SocialPlatform;
   category: 'Tech' | 'Fashion' | 'Food' | 'Beauty' | 'Other';
   budget: number;
   daysLeft: number;

@@ -6,13 +6,19 @@ export interface ICampaignApplicant {
   appliedAt: Date;
 }
 
+export enum SocialPlatform {
+  Instagram = 'Instagram',
+  YouTube = 'YouTube',
+  Twitter = 'Twitter'
+}
+
 export interface ICampaign extends Document {
   brandId: mongoose.Types.ObjectId;
   brandName: string;
   brandLogo?: string;
   title: string;
   description: string;
-  platform: 'Instagram' | 'YouTube' | 'Twitter';
+  platform: SocialPlatform;
   category: 'Tech' | 'Fashion' | 'Food' | 'Beauty' | 'Other';
   budget: number;
   daysLeft: number;
@@ -59,7 +65,7 @@ const campaignSchema = new Schema<ICampaign>(
     },
     platform: {
       type: String,
-      enum: ['Instagram', 'YouTube', 'Twitter'],
+      enum: Object.values(SocialPlatform),
       required: true
     },
     category: {

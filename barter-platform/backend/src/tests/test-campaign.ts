@@ -4,7 +4,7 @@ import { UserRepository } from '@modules/users/repositories/user.repository';
 import { UserRole } from '@modules/users/models/user.model';
 import { ProfileRepository } from '@modules/profile/repositories/profile.repository';
 import { CampaignService } from '@modules/campaign/services/campaign.service';
-import { Campaign } from '@modules/campaign/models/campaign.model';
+import { Campaign, SocialPlatform } from '@modules/campaign/models/campaign.model';
 import { Profile } from '@modules/profile/models/profile.model';
 import { User } from '@modules/users/models/user.model';
 
@@ -73,7 +73,7 @@ const testCampaignSystem = async () => {
     const campaignData = {
       title: 'Spendwise Brand Campaign',
       description: 'Spendwise is an expense tracker app.',
-      platform: 'Instagram' as const,
+      platform: SocialPlatform.Instagram,
       category: 'Tech' as const,
       budget: 1000,
       totalSlots: 10,
