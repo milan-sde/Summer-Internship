@@ -7,14 +7,7 @@ interface OtpData {
   createdAt: Date;
 }
 
-/**
- * OTP Service - Handles one-time password generation and verification
- *
- * PRODUCTION NOTE: This uses in-memory Map. For production:
- * 1. Use Redis with TTL (expiration)
- * 2. Store in database with cleanup job
- * 3. Rate limit by email to prevent abuse
- */
+// OTP Service handles one-time password generation and verification in memory
 export class OtpService {
   private otpStore: Map<string, OtpData>;
   private readonly OTP_LENGTH = 6;
@@ -28,16 +21,12 @@ export class OtpService {
     setInterval(() => this.cleanupExpiredOtps(), 60 * 60 * 1000);
   }
 
-  /**
-   * Generate a 6-digit OTP
-   */
+  // Generate a random 6-digit OTP code
   private generateOtp(): string {
     return Math.floor(100000 + Math.random() * 900000).toString();
   }
 
-  /**
-   * Generate and store OTP for an email
-   */
+  // Save generated OTP code in memory map
   generateAndStoreOtp(email: string): string {
     const code = this.generateOtp();
     const expiresAt = new Date();
@@ -53,10 +42,7 @@ export class OtpService {
     return code;
   }
 
-  /**
-   * Verify OTP for an email
-   * Tracks attempts to prevent brute force
-   */
+  // Verify OTP code and check attempts/expiry
   verifyOtp(email: string, otpCode: string): boolean {
     const normalizedEmail = email.toLowerCase();
     
@@ -110,10 +96,7 @@ export class OtpService {
     return true;
   }
 
-  /**
-   * Check if OTP exists and is valid (without consuming it)
-   * Useful for resend functionality
-   */
+  // Check if a valid OTP code exists in storage
   hasValidOtp(email: string): boolean {
     const normalizedEmail = email.toLowerCase();
     const storedData = this.otpStore.get(normalizedEmail);
@@ -125,9 +108,7 @@ export class OtpService {
     return true;
   }
 
-  /**
-   * Resend OTP - generates new code, invalidates old one
-   */
+  // Resend OTP code after deleting the old one
   resendOtp(email: string): string {
     const normalizedEmail = email.toLowerCase();
 
@@ -138,9 +119,7 @@ export class OtpService {
     return this.generateAndStoreOtp(email);
   }
 
-  /**
-   * Clean up expired OTPs to prevent memory leaks
-   */
+  // Delete expired OTP codes from memory
   private cleanupExpiredOtps(): void {
     const now = new Date();
     for (const [email, data] of this.otpStore.entries()) {
@@ -153,9 +132,7 @@ export class OtpService {
     );
   }
 
-  /**
-   * Get OTP store size (for monitoring)
-   */
+  // Count how many OTPs are currently saved
   getStoreSize(): number {
     return this.otpStore.size;
   }

@@ -17,32 +17,24 @@ import {
   getOnboardingStatus
 } from '../controllers/profile.controller';
 import { authenticate } from '@shared/middlewares/auth.middleware';
-import { validate } from '@modules/auth/validators/auth.validator';
+import { validate, validateQuery } from '@modules/auth/validators/auth.validator';
 
 const router = Router();
 
-/**
- * All profile routes require authentication
- */
+// All routes in this file require user login
 router.use(authenticate);
 
-/**
- * Public profile endpoints (still need auth to view)
- */
-router.get('/search', validate(SearchProfilesQuerySchema), searchProfiles);
+// Discovery and search endpoints
+router.get('/search', validateQuery(SearchProfilesQuerySchema), searchProfiles);
 router.get('/public/:handle', getPublicProfile);
 router.get('/onboarding-status', getOnboardingStatus);
 
-/**
- * My profile endpoints
- */
+// Current user profile endpoints
 router.get('/me', getMyProfile);
 router.post('/', validate(CreateProfileDtoSchema), createProfile);
 router.put('/', validate(UpdateProfileDtoSchema), updateProfile);
 
-/**
- * Admin/user specific profile endpoints
- */
+// Admin or other user profile endpoints
 router.get('/:userId', getProfileById);
 
 export default router;

@@ -66,40 +66,30 @@ export interface UpdateProfileDto {
 }
 
 export class ProfileRepository {
-  /**
-   * Create a new profile
-   */
+  // Create a new profile record
   async create(data: CreateProfileDto): Promise<IProfile> {
     const profile = new Profile(data);
     return profile.save();
   }
 
-  /**
-   * Find profile by user ID
-   */
+  // Find profile by user ID
   async findByUserId(userId: string): Promise<IProfile | null> {
     return Profile.findOne({ userId: new mongoose.Types.ObjectId(userId) });
   }
 
-  /**
-   * Find profile by Instagram handle
-   */
+  // Find profile by Instagram handle
   async findByInstagramHandle(handle: string): Promise<IProfile | null> {
     if (!handle) return null;
     return Profile.findOne({ instagramHandle: handle.toLowerCase() });
   }
 
-  /**
-   * Find profile by Fluencr username
-   */
+  // Find profile by username
   async findByUsername(username: string): Promise<IProfile | null> {
     if (!username) return null;
     return Profile.findOne({ username: username.toLowerCase() });
   }
 
-  /**
-   * Update profile by user ID
-   */
+  // Update profile by user ID
   async updateByUserId(
     userId: string,
     data: UpdateProfileDto,
@@ -107,7 +97,7 @@ export class ProfileRepository {
     const profile = await Profile.findOneAndUpdate(
       { userId: new mongoose.Types.ObjectId(userId) },
       { $set: data },
-      { new: true, runValidators: true },
+      { returnDocument: "after", runValidators: true },
     );
 
     if (!profile) {
@@ -117,9 +107,7 @@ export class ProfileRepository {
     return profile;
   }
 
-  /**
-   * Check if profile exists for user
-   */
+  // Check if user has a profile
   async exists(userId: string): Promise<boolean> {
     const count = await Profile.countDocuments({
       userId: new mongoose.Types.ObjectId(userId),
@@ -127,9 +115,7 @@ export class ProfileRepository {
     return count > 0;
   }
 
-  /**
-   * Search profiles (for brand discovery)
-   */
+  // Search profiles by query keyword and role
   async searchProfiles(
     query: string,
     role?: string,
@@ -154,9 +140,7 @@ export class ProfileRepository {
     return { profiles, total };
   }
 
-  /**
-   * Get profile with user details (aggregation)
-   */
+  // Get profile data aggregated with user email and role
   async getProfileWithUser(userId: string): Promise<any> {
     const result = await Profile.aggregate([
       {
@@ -190,9 +174,7 @@ export class ProfileRepository {
     return result[0] || null;
   }
 
-  /**
-   * Delete profile (when user is deleted)
-   */
+  // Delete profile record by user ID
   async deleteByUserId(userId: string): Promise<boolean> {
     const result = await Profile.deleteOne({
       userId: new mongoose.Types.ObjectId(userId),
@@ -200,9 +182,7 @@ export class ProfileRepository {
     return result.deletedCount > 0;
   }
 
-  /**
-   * Update profile stats (for influencer metrics)
-   */
+  // Update stats fields like followers and engagement rate
   async updateStats(
     userId: string,
     stats: Partial<IProfile["stats"]>,
@@ -210,7 +190,7 @@ export class ProfileRepository {
     const profile = await Profile.findOneAndUpdate(
       { userId: new mongoose.Types.ObjectId(userId) },
       { $set: { stats } },
-      { new: true },
+      { returnDocument: "after" },
     );
 
     if (!profile) {

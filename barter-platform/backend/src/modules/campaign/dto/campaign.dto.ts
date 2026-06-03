@@ -38,3 +38,14 @@ export interface CampaignResponseDto {
   createdAt: Date;
   updatedAt: Date;
 }
+
+// Schema for campaigns discovery filter parameters
+export const GetCampaignsQuerySchema = z.object({
+  category: z.string().optional(),
+  platform: z.string().optional(),
+  search: z.string().optional(),
+  minBudget: z.coerce.number().min(0, 'Minimum budget must be positive').optional(),
+  maxBudget: z.coerce.number().min(0, 'Maximum budget must be positive').optional()
+});
+
+export type GetCampaignsQueryDto = z.infer<typeof GetCampaignsQuerySchema>;

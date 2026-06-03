@@ -1,8 +1,6 @@
 import { z } from 'zod';
 
-/**
- * Create Profile DTO - First time profile creation
- */
+// Schema for profile onboarding registration
 export const CreateProfileDtoSchema = z.object({
   fullName: z
     .string()
@@ -92,16 +90,12 @@ export const CreateProfileDtoSchema = z.object({
 
 export type CreateProfileDto = z.infer<typeof CreateProfileDtoSchema>;
 
-/**
- * Update Profile DTO - All fields optional for partial updates
- */
+// Schema for updating profile data (all fields optional)
 export const UpdateProfileDtoSchema = CreateProfileDtoSchema.partial();
 
 export type UpdateProfileDto = z.infer<typeof UpdateProfileDtoSchema>;
 
-/**
- * Profile Response DTO - What we send to client
- */
+// Schema for sending profile details back to the client
 export interface ProfileResponseDto {
   id: string;
   userId: string;
@@ -148,9 +142,7 @@ export interface ProfileResponseDto {
   budgetMax?: number;
 }
 
-/**
- * Search Profiles Query DTO
- */
+// Schema for validating profile search query parameters
 export const SearchProfilesQuerySchema = z.object({
   q: z.string().min(1).optional(),
   role: z.enum(['INFLUENCER', 'BRAND']).optional(),

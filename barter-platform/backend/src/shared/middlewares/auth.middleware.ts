@@ -5,12 +5,7 @@ import { asyncHandler } from "./async-handler";
 
 const jwtService = new JwtService();
 
-/**
- * Authentication Middleware
- * Verifies JWT token and attaches user to request
- *
- * Usage: app.get('/protected', authenticate, (req, res) => {...})
- */
+// Verify JWT token from Authorization header
 export const authenticate = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     // Get token from Authorization header
@@ -34,12 +29,7 @@ export const authenticate = asyncHandler(
   },
 );
 
-/**
- * Role-Based Access Control (RBAC) Middleware
- * Checks if authenticated user has required role
- *
- * Usage: app.get('/admin-only', authenticate, requireRole('ADMIN'), handler)
- */
+// Check if user role is allowed
 export const requireRole = (...allowedRoles: string[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
@@ -64,27 +54,9 @@ export const requireRole = (...allowedRoles: string[]) => {
   };
 };
 
-/**
- * Onboarding Guard
- * Checks if user has completed onboarding
- *
- * Usage: app.get('/dashboard', authenticate, requireOnboarding, handler)
- */
-export const requireOnboarding = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
-    // This requires fetching user from database
-    // We'll implement this in the profile module
-    // For now, it's a placeholder
-    next();
-  },
-);
+export { requireOnboarding } from "./onboarding.guard";
 
-/**
- * Optional Authentication
- * Doesn't throw if no token, but attaches user if token is valid
- *
- * Usage: app.get('/public-but-with-user', optionalAuth, handler)
- */
+// Attach user if JWT is valid, but do not block if it is missing
 export const optionalAuth = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;

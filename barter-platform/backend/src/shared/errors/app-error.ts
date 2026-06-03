@@ -1,7 +1,4 @@
-/**
- * Base error class for all application errors
- * Every error we throw extends this
- */
+// Base class for all application errors
 export abstract class AppError extends Error {
   public readonly statusCode: number;
   public readonly isOperational: boolean;
@@ -25,40 +22,28 @@ export abstract class AppError extends Error {
   }
 }
 
-/**
- * 400 - Validation Error
- * Use when request data is invalid
- */
+// 400 - Validation Error (invalid request data)
 export class ValidationError extends AppError {
   constructor(message: string, details?: any) {
     super(message, 400, "VALIDATION_ERROR", details);
   }
 }
 
-/**
- * 401 - Unauthorized
- * Use when user is not authenticated
- */
+// 401 - Unauthorized (user not authenticated)
 export class UnauthorizedError extends AppError {
   constructor(message: string = "Unauthorized access") {
     super(message, 401, "UNAUTHORIZED");
   }
 }
 
-/**
- * 403 - Forbidden
- * Use when authenticated user lacks permission
- */
+// 403 - Forbidden (user lacks permission)
 export class ForbiddenError extends AppError {
   constructor(message: string = "Insufficient permissions") {
     super(message, 403, "FORBIDDEN");
   }
 }
 
-/**
- * 404 - Not Found
- * Use when resource doesn't exist
- */
+// 404 - Not Found (resource does not exist)
 export class NotFoundError extends AppError {
   constructor(resource: string, id?: string) {
     const message = id
@@ -68,20 +53,14 @@ export class NotFoundError extends AppError {
   }
 }
 
-/**
- * 409 - Conflict
- * Use when resource already exists
- */
+// 409 - Conflict (resource already exists)
 export class ConflictError extends AppError {
   constructor(message: string) {
     super(message, 409, "CONFLICT");
   }
 }
 
-/**
- * 429 - Too Many Requests
- * Use with rate limiting
- */
+// 429 - Too Many Requests (rate limiting)
 export class TooManyRequestsError extends AppError {
   constructor(message: string = "Too many requests, please try again later") {
     super(message, 429, "TOO_MANY_REQUESTS");

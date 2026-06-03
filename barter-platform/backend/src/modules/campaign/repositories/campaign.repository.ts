@@ -79,7 +79,7 @@ export class CampaignRepository {
         $push: { applicants: new mongoose.Types.ObjectId(influencerId) },
         $inc: { filledSlots: 1 }
       },
-      { new: true }
+      { returnDocument: 'after' }
     );
   }
 }

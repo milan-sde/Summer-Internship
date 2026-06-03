@@ -55,7 +55,7 @@ export class UserRepository implements IRepository<IUser> {
     const user = await User.findByIdAndUpdate(
       id,
       { $set: updatedData },
-      { new: true, runValidators: true },
+      { returnDocument: "after", runValidators: true },
     );
 
     if (!user) {

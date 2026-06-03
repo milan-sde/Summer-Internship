@@ -1,10 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { UserRole } from '@modules/users/models/user.model';
 
-/**
- * Profile Interface
- * Extends Document for Mongoose compatibility
- */
+// Profile document fields and type interface
 export interface IProfile extends Document {
   userId: mongoose.Types.ObjectId;
   fullName: string;

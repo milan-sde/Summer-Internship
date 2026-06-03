@@ -14,10 +14,7 @@ declare global {
 
 const authService = new AuthService();
 
-/**
- * Register - Step 1: Send OTP
- * POST /api/auth/register
- */
+// Register: Send OTP to user email
 export const register = asyncHandler(async (req: Request, res: Response) => {
   await authService.register(req.body);
 
@@ -27,10 +24,7 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
-/**
- * Verify OTP - Step 2: Confirm email
- * POST /api/auth/verify-otp
- */
+// Verify OTP: Confirm email address
 export const verifyOtp = asyncHandler(async (req: Request, res: Response) => {
   await authService.verifyOtp(req.body);
 
@@ -40,10 +34,7 @@ export const verifyOtp = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
-/**
- * Create Password - Step 3: Set password after verification
- * POST /api/auth/create-password
- */
+// Create Password: Set password after OTP verification
 export const createPassword = asyncHandler(
   async (req: Request, res: Response) => {
     await authService.createPassword(req.body);
@@ -55,10 +46,7 @@ export const createPassword = asyncHandler(
   },
 );
 
-/**
- * Login - Step 4: Authenticate and get tokens
- * POST /api/auth/login
- */
+// Login: Authenticate and get tokens
 export const login = asyncHandler(async (req: Request, res: Response) => {
   const result = await authService.login(req.body);
 
@@ -75,19 +63,17 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
     data: {
       user: result.data.user,
       accessToken: result.data.accessToken,
-      refreshToken: result.data.refreshToken,
+      refreshToken: result.data.refreshToken, // Send refresh token in JSON body for frontend storage
     },
   });
 });
 
-/**
- * Refresh Token - Get new access token
- * POST /api/auth/refresh
- */
+// Refresh Token: Get new access token using refresh token
 export const refresh = asyncHandler(async (req: Request, res: Response) => {
   // Get refresh token from cookie or body
   let refreshToken = req.cookies.refreshToken || req.body.refreshToken;
 
+  // Convert stringified "undefined" or "null" from frontend back to undefined
   if (refreshToken === "undefined" || refreshToken === "null") {
     refreshToken = undefined;
   }
@@ -117,15 +103,12 @@ export const refresh = asyncHandler(async (req: Request, res: Response) => {
     data: {
       user: result.data.user,
       accessToken: result.data.accessToken,
-      refreshToken: result.data.refreshToken,
+      refreshToken: result.data.refreshToken, // Send new refresh token in JSON body for frontend storage
     },
   });
 });
 
-/**
- * Logout - Invalidate refresh token
- * POST /api/auth/logout
- */
+// Logout: Invalidate refresh token
 export const logout = asyncHandler(async (req: Request, res: Response) => {
   const userId = req.user?.userId;
 
@@ -142,10 +125,7 @@ export const logout = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
-/**
- * Resend OTP
- * POST /api/auth/resend-otp
- */
+// Resend OTP to user email
 export const resendOtp = asyncHandler(async (req: Request, res: Response) => {
   await authService.resendOtp(req.body.email);
 
@@ -155,10 +135,7 @@ export const resendOtp = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
-/**
- * Get current user
- * GET /api/auth/me
- */
+// Get currently logged in user profile details
 export const getMe = asyncHandler(async (req: Request, res: Response) => {
   const user = await authService.getUserById(req.user!.userId);
 

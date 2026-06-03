@@ -1,14 +1,7 @@
 import { z } from "zod";
 import { UserRole } from "@modules/users/models/user.model";
 
-// ============================================
-// 1. REGISTER DTO
-// ============================================
-/**
- * Register Request DTO
- * Step 1: User provides email and selects role
- * OTP is sent to the provided email
- */
+// Register request schema (email and role)
 export const RegisterDtoSchema = z.object({
   email: z
     .string()
@@ -22,14 +15,7 @@ export const RegisterDtoSchema = z.object({
 
 export type RegisterDto = z.infer<typeof RegisterDtoSchema>;
 
-// ============================================
-// 2. VERIFY OTP DTO
-// ============================================
-/**
- * Verify OTP Request DTO
- * Step 2: User enters OTP received via email
- * Validates the 6-digit code
- */
+// Verify OTP request schema (6-digit code)
 export const VerifyOtpDtoSchema = z.object({
   email: z
     .string()
@@ -47,14 +33,7 @@ export const VerifyOtpDtoSchema = z.object({
 
 export type VerifyOtpDto = z.infer<typeof VerifyOtpDtoSchema>;
 
-// ============================================
-// 3. CREATE PASSWORD DTO (MISSING - ADDED NOW)
-// ============================================
-/**
- * Create Password Request DTO
- * Step 3: After email verification, user creates password
- * Password must meet security requirements
- */
+// Create Password request schema (after OTP verification)
 export const CreatePasswordDtoSchema = z
   .object({
     email: z
@@ -80,14 +59,7 @@ export const CreatePasswordDtoSchema = z
 
 export type CreatePasswordDto = z.infer<typeof CreatePasswordDtoSchema>;
 
-// ============================================
-// 4. LOGIN DTO (MISSING - ADDED NOW)
-// ============================================
-/**
- * Login Request DTO
- * Step 4: User provides credentials to get tokens
- * Returns access token and refresh token
- */
+// Login request credentials schema
 export const LoginDtoSchema = z.object({
   email: z
     .string()
@@ -98,26 +70,14 @@ export const LoginDtoSchema = z.object({
 
 export type LoginDto = z.infer<typeof LoginDtoSchema>;
 
-// ============================================
-// 5. REFRESH TOKEN DTO
-// ============================================
-/**
- * Refresh Token Request DTO
- * Used to get new access token when old one expires
- */
+// Refresh token request schema
 export const RefreshTokenDtoSchema = z.object({
   refreshToken: z.string().min(1, "Refresh token is required"),
 });
 
 export type RefreshTokenDto = z.infer<typeof RefreshTokenDtoSchema>;
 
-// ============================================
-// 6. RESEND OTP DTO
-// ============================================
-/**
- * Resend OTP Request DTO
- * When user doesn't receive OTP or it expires
- */
+// Resend OTP request schema
 export const ResendOtpDtoSchema = z.object({
   email: z
     .string()
@@ -127,13 +87,7 @@ export const ResendOtpDtoSchema = z.object({
 
 export type ResendOtpDto = z.infer<typeof ResendOtpDtoSchema>;
 
-// ============================================
-// 7. FORGOT PASSWORD DTO (Bonus - for future feature)
-// ============================================
-/**
- * Forgot Password Request DTO
- * User requests password reset link
- */
+// Forgot password email request schema
 export const ForgotPasswordDtoSchema = z.object({
   email: z
     .string()
@@ -143,13 +97,7 @@ export const ForgotPasswordDtoSchema = z.object({
 
 export type ForgotPasswordDto = z.infer<typeof ForgotPasswordDtoSchema>;
 
-// ============================================
-// 8. RESET PASSWORD DTO (Bonus - for future feature)
-// ============================================
-/**
- * Reset Password Request DTO
- * User sets new password using reset token
- */
+// Reset password token and password schema
 export const ResetPasswordDtoSchema = z
   .object({
     token: z.string().min(1, "Reset token is required"),
@@ -172,13 +120,7 @@ export const ResetPasswordDtoSchema = z
 
 export type ResetPasswordDto = z.infer<typeof ResetPasswordDtoSchema>;
 
-// ============================================
-// 9. RESPONSE DTOS
-// ============================================
-/**
- * User Response DTO (what we send to client)
- * Excludes sensitive data like password
- */
+// Interfaces for responses
 export interface UserResponseDto {
   id: string;
   email: string;
@@ -214,12 +156,7 @@ export interface MessageResponseDto {
   message: string;
 }
 
-// ============================================
-// 10. TYPE GUARDS (for runtime type checking)
-// ============================================
-/**
- * Type guard to check if object is a valid AuthResponseDto
- */
+// Check if object is a valid AuthResponseDto
 export function isAuthResponse(obj: any): obj is AuthResponseDto {
   return (
     obj &&
@@ -230,9 +167,7 @@ export function isAuthResponse(obj: any): obj is AuthResponseDto {
   );
 }
 
-/**
- * Type guard to check if object is a valid error response
- */
+// Check if object is an error response
 export function isErrorResponse(
   obj: any,
 ): obj is { success: false; error: { code: string; message: string } } {

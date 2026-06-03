@@ -13,10 +13,7 @@ export class ProfileService {
     this.userRepository = new UserRepository();
   }
 
-  /**
-   * Create user profile and complete onboarding
-   * This is the final step of registration
-   */
+  // Create profile and complete user onboarding registration
   async createProfile(
     userId: string,
     data: CreateProfileDto
@@ -147,9 +144,7 @@ export class ProfileService {
     return this.toResponseDto(profile);
   }
 
-  /**
-   * Get profile by user ID
-   */
+  // Find profile details by user ID
   async getProfile(userId: string): Promise<ProfileResponseDto> {
     const profile = await this.profileRepository.findByUserId(userId);
     
@@ -160,9 +155,7 @@ export class ProfileService {
     return this.toResponseDto(profile);
   }
 
-  /**
-   * Get public profile by Instagram handle (for discovery)
-   */
+  // Retrieve limited public info by Instagram handle
   async getPublicProfile(instagramHandle: string): Promise<any> {
     const profile = await this.profileRepository.findByInstagramHandle(instagramHandle);
     
@@ -181,9 +174,7 @@ export class ProfileService {
     };
   }
 
-  /**
-   * Update profile
-   */
+  // Update profile details and recalculate brand names if needed
   async updateProfile(
     userId: string,
     data: UpdateProfileDto
@@ -227,9 +218,7 @@ export class ProfileService {
     return this.toResponseDto(updatedProfile);
   }
 
-  /**
-   * Search profiles (for brand discovery)
-   */
+  // Search matching profiles with paginated results
   async searchProfiles(
     query: string,
     role?: string,
@@ -264,24 +253,18 @@ export class ProfileService {
     };
   }
 
-  /**
-   * Check if user has completed onboarding
-   */
+  // Check onboarding completion status
   async isOnboardingComplete(userId: string): Promise<boolean> {
     const user = await this.userRepository.findById(userId);
     return user?.onBoardingCompleted || false;
   }
 
-  /**
-   * Delete profile (when user account is deleted)
-   */
+  // Delete profile by user ID
   async deleteProfile(userId: string): Promise<void> {
     await this.profileRepository.deleteByUserId(userId);
   }
 
-  /**
-   * Convert profile model to response DTO
-   */
+  // Map Mongoose model fields to response DTO format
   private toResponseDto(profile: any): ProfileResponseDto {
     return {
       id: profile.id || profile._id,

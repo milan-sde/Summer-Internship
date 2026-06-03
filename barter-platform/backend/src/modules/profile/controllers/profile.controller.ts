@@ -6,10 +6,7 @@ import { asyncHandler } from "@shared/middlewares/async-handler";
 
 const profileService = new ProfileService();
 
-/**
- * Create profile (complete onboarding)
- * POST /api/profile
- */
+// Create user profile and complete onboarding registration
 export const createProfile = asyncHandler(
   async (req: Request, res: Response) => {
     const userId = req.user!.userId;
@@ -23,10 +20,7 @@ export const createProfile = asyncHandler(
   },
 );
 
-/**
- * Get my profile
- * GET /api/profile/me
- */
+// Retrieve currently authenticated user's profile
 export const getMyProfile = asyncHandler(
   async (req: Request, res: Response) => {
     const userId = req.user!.userId;
@@ -39,10 +33,7 @@ export const getMyProfile = asyncHandler(
   },
 );
 
-/**
- * Get profile by ID (for admin or viewing other profiles)
- * GET /api/profile/:userId
- */
+// Retrieve user profile by user ID
 export const getProfileById = asyncHandler(
   async (req: Request, res: Response) => {
     const userId = Array.isArray(req.params.userId)
@@ -57,10 +48,7 @@ export const getProfileById = asyncHandler(
   },
 );
 
-/**
- * Get public profile by Instagram handle
- * GET /api/profile/public/:handle
- */
+// Retrieve public profile details by Instagram handle
 export const getPublicProfile = asyncHandler(
   async (req: Request, res: Response) => {
     const handle = Array.isArray(req.params.handle)
@@ -75,10 +63,7 @@ export const getPublicProfile = asyncHandler(
   },
 );
 
-/**
- * Update my profile
- * PUT /api/profile
- */
+// Update currently authenticated user's profile details
 export const updateProfile = asyncHandler(
   async (req: Request, res: Response) => {
     const userId = req.user!.userId;
@@ -92,10 +77,7 @@ export const updateProfile = asyncHandler(
   },
 );
 
-/**
- * Search profiles
- * GET /api/profile/search?q=keyword&role=INFLUENCER&page=1&limit=20
- */
+// Search profiles with search query parameters
 export const searchProfiles = asyncHandler(
   async (req: Request, res: Response) => {
     const { q, role, page, limit } = req.query;
@@ -115,10 +97,7 @@ export const searchProfiles = asyncHandler(
   },
 );
 
-/**
- * Check onboarding status
- * GET /api/profile/onboarding-status
- */
+// Check if user onboarding steps are complete
 export const getOnboardingStatus = asyncHandler(
   async (req: Request, res: Response) => {
     const userId = req.user!.userId;

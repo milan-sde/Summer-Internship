@@ -22,9 +22,7 @@ import { authenticate } from '@shared/middlewares/auth.middleware';
 
 const router = Router();
 
-/**
- * Public routes (no authentication required)
- */
+// Public routes
 router.post('/register', validate(RegisterDtoSchema), register);
 router.post('/verify-otp', validate(VerifyOtpDtoSchema), verifyOtp);
 router.post('/create-password', validate(CreatePasswordDtoSchema), createPassword);
@@ -32,9 +30,7 @@ router.post('/login', validate(LoginDtoSchema), login);
 router.post('/refresh', validate(RefreshTokenDtoSchema), refresh);
 router.post('/resend-otp', validate(ResendOtpDtoSchema), resendOtp);
 
-/**
- * Protected routes (authentication required)
- */
+// Protected routes
 router.get('/me', authenticate, getMe);
 router.post('/logout', authenticate, logout);
 

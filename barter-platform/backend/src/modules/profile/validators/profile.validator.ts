@@ -3,9 +3,7 @@ import { ZodObject, ZodError } from 'zod';
 import { ValidationError } from '@shared/errors/app-error';
 import { asyncHandler } from '@shared/middlewares/async-handler';
 
-/**
- * Enhanced validation middleware that supports body, query, and params
- */
+// Validation middleware supporting body, query, or params validation
 export const validate = (
   schema: ZodObject,
   source: 'body' | 'query' | 'params' = 'body'

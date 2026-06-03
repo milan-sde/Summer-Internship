@@ -5,12 +5,7 @@ import { asyncHandler } from './async-handler';
 
 const profileService = new ProfileService();
 
-/**
- * Onboarding Guard Middleware
- * Prevents access to dashboard until user completes profile
- * 
- * Usage: app.get('/dashboard', authenticate, requireOnboarding, dashboardHandler)
- */
+// Block access until user completes onboarding setup
 export const requireOnboarding = asyncHandler(async (
   req: Request,
   res: Response,
@@ -33,10 +28,7 @@ export const requireOnboarding = asyncHandler(async (
   next();
 });
 
-/**
- * Optional Onboarding Check
- * Attaches onboarding status to request but doesn't block
- */
+// Read onboarding status without blocking access
 export const optionalOnboarding = asyncHandler(async (
   req: Request,
   res: Response,

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { authenticate } from '@shared/middlewares/auth.middleware';
-import { validate } from '@modules/auth/validators/auth.validator';
-import { CreateCampaignDtoSchema } from '../dto/campaign.dto';
+import { validate, validateQuery } from '@modules/auth/validators/auth.validator';
+import { CreateCampaignDtoSchema, GetCampaignsQuerySchema } from '../dto/campaign.dto';
 import {
   createCampaign,
   getCampaigns,
@@ -16,7 +16,7 @@ const router = Router();
 router.use(authenticate);
 
 // Discovery campaign routes
-router.get('/', getCampaigns);
+router.get('/', validateQuery(GetCampaignsQuerySchema), getCampaigns);
 router.get('/applied', getAppliedCampaigns);
 router.get('/my-campaigns', getMyCampaigns);
 

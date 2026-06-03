@@ -20,15 +20,7 @@ dotenv.config();
 const app: Application = express();
 const PORT = process.env.PORT || 3000;
 
-/**
- * MIDDLEWARE REGISTRATION
- * Order matters! Express executes in sequence:
- * 1. Security middleware (helmet, cors)
- * 2. Parsers (json, cookie)
- * 3. Logging
- * 4. Routes
- * 5. Error handling (last!)
- */
+// Register middleware in order: security, parsers, logs, routes, then error handling
 
 app.use(helmet());
 app.use(

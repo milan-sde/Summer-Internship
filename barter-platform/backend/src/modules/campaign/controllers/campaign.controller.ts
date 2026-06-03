@@ -4,10 +4,7 @@ import { asyncHandler } from '@shared/middlewares/async-handler';
 
 const campaignService = new CampaignService();
 
-/**
- * Create campaign
- * POST /api/campaigns
- */
+// Create a new campaign (Brands only)
 export const createCampaign = asyncHandler(
   async (req: Request, res: Response) => {
     const userId = req.user!.userId;
@@ -21,10 +18,7 @@ export const createCampaign = asyncHandler(
   }
 );
 
-/**
- * Get all active campaigns (discovery feed)
- * GET /api/campaigns
- */
+// Get all active campaigns for discovery feed
 export const getCampaigns = asyncHandler(
   async (req: Request, res: Response) => {
     const { category, platform, search, minBudget, maxBudget } = req.query;
@@ -44,10 +38,7 @@ export const getCampaigns = asyncHandler(
   }
 );
 
-/**
- * Apply to campaign
- * POST /api/campaigns/:id/apply
- */
+// Apply to a campaign (Influencers only)
 export const applyToCampaign = asyncHandler(
   async (req: Request, res: Response) => {
     const userId = req.user!.userId;
@@ -62,10 +53,7 @@ export const applyToCampaign = asyncHandler(
   }
 );
 
-/**
- * Get my campaigns (for Brands)
- * GET /api/campaigns/my-campaigns
- */
+// Get campaigns created by the brand user
 export const getMyCampaigns = asyncHandler(
   async (req: Request, res: Response) => {
     const userId = req.user!.userId;
@@ -78,10 +66,7 @@ export const getMyCampaigns = asyncHandler(
   }
 );
 
-/**
- * Get applied campaigns (for Influencers)
- * GET /api/campaigns/applied
- */
+// Get campaigns applied to by the influencer user
 export const getAppliedCampaigns = asyncHandler(
   async (req: Request, res: Response) => {
     const userId = req.user!.userId;

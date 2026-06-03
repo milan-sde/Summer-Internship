@@ -30,9 +30,7 @@ export class AuthService {
     this.emailService = new EmailService();
   }
 
-  /**
-   * Step 1: Register - Send OTP to email
-   */
+  // Register a new user and send verification OTP
   async register(data: RegisterDto): Promise<void> {
     const { email, role } = data;
 
@@ -61,17 +59,13 @@ export class AuthService {
     await this.sendOtp(email);
   }
 
-  /**
-   * Helper: Generate and send OTP
-   */
+  // Helper: Generate and send OTP email
   private async sendOtp(email: string): Promise<void> {
     const otp = this.otpService.generateAndStoreOtp(email);
     await this.emailService.sendOtpEmail(email, otp);
   }
 
-  /**
-   * Step 2: Verify OTP - Mark email as verified
-   */
+  // Verify email using the OTP code
   async verifyOtp(data: VerifyOtpDto): Promise<void> {
     const { email, otp } = data;
 
@@ -100,9 +94,7 @@ export class AuthService {
     console.log(`✅ Email verified for ${email}`);
   }
 
-  /**
-   * Step 3: Create Password - Set password for verified user
-   */
+  // Set password after email verification
   async createPassword(data: CreatePasswordDto): Promise<void> {
     const { email, password } = data;
 
@@ -131,9 +123,7 @@ export class AuthService {
     console.log(`🔐 Password set for ${email}`);
   }
 
-  /**
-   * Step 4: Login - Generate tokens
-   */
+  // Authenticate user credentials and generate tokens
   async login(data: LoginDto): Promise<AuthResponseDto> {
     const { email, password } = data;
 
@@ -181,9 +171,7 @@ export class AuthService {
     };
   }
 
-  /**
-   * Generate access and refresh tokens for a user
-   */
+  // Create access and refresh JWTs
   private async generateTokens(user: IUser): Promise<{
     accessToken: string;
     refreshToken: string;
@@ -203,10 +191,7 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  /**
-   * Refresh tokens - Get new access token using refresh token
-   * Implements refresh token rotation for security
-   */
+  // Invalidate old refresh token and rotate new ones
   async refreshTokens(refreshToken: string): Promise<AuthResponseDto> {
     // Verify refresh token
     const payload = this.jwtService.verifyRefreshToken(refreshToken);
@@ -259,9 +244,7 @@ export class AuthService {
     };
   }
 
-  /**
-   * Logout - Invalidate refresh token
-   */
+  // Invalidate refresh token for the user
   async logout(userId: string): Promise<void> {
     const user = await this.userRepository.findById(userId);
     if (user) {
@@ -270,9 +253,7 @@ export class AuthService {
     }
   }
 
-  /**
-   * Resend OTP
-   */
+  // Re-generate and send verification OTP
   async resendOtp(email: string): Promise<void> {
     // Check if user exists
     const user = await this.userRepository.findByEmail(email);
@@ -291,9 +272,7 @@ export class AuthService {
     console.log(`📧 OTP resent to ${email}`);
   }
 
-  /**
-   * Get user by ID (for profile module)
-   */
+  // Find user by ID
   async getUserById(userId: string): Promise<IUser | null> {
     return this.userRepository.findById(userId);
   }

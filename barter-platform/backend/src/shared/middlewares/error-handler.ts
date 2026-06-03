@@ -8,16 +8,16 @@ export const errorHandler = (
   next: NextFunction,
 ) => {
   // Log error for debugging
-  console.error("Error occured : ", {
+  console.error("Error occurred: ", {
     name: error.name,
     message: error.message,
-    stack: process.env.NODE_ENV === "devlopment" ? error.stack : undefined,
+    stack: process.env.NODE_ENV === "development" ? error.stack : undefined,
     path: req.path,
     method: req.method,
     ip: req.ip,
   });
 
-  // handle our custom Apprrors
+  // handle our custom AppErrors
   if (error instanceof AppError) {
     return res.status(error.statusCode).json({
       success: false,
@@ -30,7 +30,7 @@ export const errorHandler = (
     });
   }
 
-  //handling mongosse duplicate key error:
+  // handling mongoose duplicate key error:
   if (error.name === "MongoServerError" && (error as any).code === 11000) {
     const field = Object.keys((error as any).keyPattern)[0];
     return res.status(409).json({
@@ -45,7 +45,7 @@ export const errorHandler = (
     });
   }
 
-  //hanndling mongoose validation error:
+  // handling mongoose validation error:
   if (error.name === "ValidationError") {
     const errors = Object.values((error as any).errors).map(
       (err: any) => err.message,
@@ -67,7 +67,7 @@ export const errorHandler = (
       success: false,
       error: {
         code: "INVALID_TOKEN",
-        message: "Invalid authnetication token",
+        message: "Invalid authentication token",
       },
     });
   }
@@ -83,14 +83,14 @@ export const errorHandler = (
     });
   }
 
-  //default  error for unexpected issues:
+  // default error for unexpected issues:
   return res.status(500).json({
     success: false,
     error: {
       code: "INTERNAL_SERVER_ERROR",
       message:
         process.env.NODE_ENV === "production"
-          ? "something went wroong"
+          ? "something went wrong"
           : error.message,
     },
   });

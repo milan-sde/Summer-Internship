@@ -1,10 +1,7 @@
 import jwt from "jsonwebtoken";
 import { UnauthorizedError } from "@shared/errors/app-error";
 
-/**
- * Payload that goes inside our JWT tokens
- * This is the "claims" - information about the user
- */
+// User details stored inside the JWT token payload
 
 export interface TokenPayload {
   userId: string;
@@ -12,9 +9,7 @@ export interface TokenPayload {
   role: string;
 }
 
-/**
- * Extended payload for refresh tokens (includes version for rotation)
- */
+// Refresh token payload including security version
 export interface RefreshTokenPayload extends TokenPayload {
   version: number;
 }

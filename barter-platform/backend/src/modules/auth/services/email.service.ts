@@ -7,20 +7,9 @@ interface EmailOptions {
   html?: string;
 }
 
-/**
- * Email Service - Handles all email communications
- *
- * PRODUCTION NOTE: Integrate with:
- * - SendGrid
- * - AWS SES
- * - Resend.com
- * - Nodemailer with SMTP
- */
+// Email Service to simulate sending emails
 export class EmailService {
-  /**
-   * Send OTP email
-   * In production, this would actually send an email
-   */
+  // Send email containing the verification OTP code
   async sendOtpEmail(email: string, otp: string): Promise<void> {
     // Validate email format
     const emailRegex = /^\S+@\S+\.\S+$/;
@@ -56,9 +45,7 @@ If you didn't request this, please ignore this email.
     // });
   }
 
-  /**
-   * Send welcome email after successful registration
-   */
+  // Send welcome email after registration completes
   async sendWelcomeEmail(email: string, name?: string): Promise<void> {
     if (process.env.NODE_ENV === "development") {
       console.log(`
@@ -79,9 +66,7 @@ Barter Platform Team
     }
   }
 
-  /**
-   * Send password set confirmation
-   */
+  // Send password creation confirmation email
   async sendPasswordSetConfirmation(email: string): Promise<void> {
     if (process.env.NODE_ENV === "development") {
       console.log(`
