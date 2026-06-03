@@ -47,7 +47,7 @@ import { AuthService } from '../../services/auth.service';
   ],
 })
 export class VerifyOtpPage implements OnInit, OnDestroy {
-  verifyOtpForm: FormGroup;
+  verifyOtpForm!: FormGroup;
   isSubmitting = false;
   email: string = '';
   timer: number = 60; // 60 seconds countdown
@@ -61,7 +61,9 @@ export class VerifyOtpPage implements OnInit, OnDestroy {
     private route: ActivatedRoute,
   ) {
     addIcons({ mailUnreadOutline, checkmarkCircleOutline });
+  }
 
+  ngOnInit() {
     this.verifyOtpForm = this.fb.group({
       otp: [
         '',
@@ -73,9 +75,7 @@ export class VerifyOtpPage implements OnInit, OnDestroy {
         ],
       ],
     });
-  }
 
-  ngOnInit() {
     // Get email from navigation state or query params
     this.route.queryParams.subscribe((params) => {
       this.email = params['email'] || '';

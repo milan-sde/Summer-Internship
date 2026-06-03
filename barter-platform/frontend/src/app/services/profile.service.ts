@@ -1,9 +1,8 @@
 // src/app/services/profile.service.ts
 import { Injectable } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
 import { ApiService } from './api.service';
 import { StorageService } from './storage.service';
-import { LoadingController, ToastController } from '@ionic/angular';
+import { LoadingController, ToastController } from '@ionic/angular/standalone';
 
 export interface CreateProfileDto {
   fullName: string;
@@ -79,8 +78,7 @@ export class ProfileService {
     await loading.present();
 
     try {
-      const authPost = await this.apiService.authPost('profile', profileData);
-      const response: any = await firstValueFrom(authPost);
+      const response: any = await this.apiService.authPost('profile', profileData);
 
       if (response.success) {
         await this.showToast('Profile created successfully! Welcome aboard!', 'success');
@@ -100,8 +98,7 @@ export class ProfileService {
    */
   async getMyProfile(): Promise<ProfileResponse> {
     try {
-      const authGet = await this.apiService.authGet('profile/me');
-      const response: any = await firstValueFrom(authGet);
+      const response: any = await this.apiService.authGet('profile/me');
 
       if (response.success) {
         return response.data.profile;
@@ -123,8 +120,7 @@ export class ProfileService {
     await loading.present();
 
     try {
-      const authPut = await this.apiService.authPut('profile', profileData);
-      const response: any = await firstValueFrom(authPut);
+      const response: any = await this.apiService.authPut('profile', profileData);
 
       if (response.success) {
         await this.showToast('Profile updated successfully!', 'success');
@@ -144,8 +140,7 @@ export class ProfileService {
    */
   async getProfileById(userId: string): Promise<ProfileResponse> {
     try {
-      const authGet = await this.apiService.authGet(`profile/${userId}`);
-      const response: any = await firstValueFrom(authGet);
+      const response: any = await this.apiService.authGet(`profile/${userId}`);
 
       if (response.success) {
         return response.data.profile;
@@ -162,8 +157,7 @@ export class ProfileService {
    */
   async getPublicProfile(instagramHandle: string): Promise<any> {
     try {
-      const authGet = await this.apiService.authGet(`profile/public/${instagramHandle}`);
-      const response: any = await firstValueFrom(authGet);
+      const response: any = await this.apiService.authGet(`profile/public/${instagramHandle}`);
 
       if (response.success) {
         return response.data.profile;
@@ -193,8 +187,7 @@ export class ProfileService {
         url += `&role=${role}`;
       }
 
-      const authGet = await this.apiService.authGet(url);
-      const response: any = await firstValueFrom(authGet);
+      const response: any = await this.apiService.authGet(url);
 
       if (response.success) {
         return {
@@ -214,8 +207,7 @@ export class ProfileService {
    */
   async getOnboardingStatus(): Promise<boolean> {
     try {
-      const authGet = await this.apiService.authGet('profile/onboarding-status');
-      const response: any = await firstValueFrom(authGet);
+      const response: any = await this.apiService.authGet('profile/onboarding-status');
 
       if (response.success) {
         return response.data.onboardingCompleted;
@@ -243,8 +235,7 @@ export class ProfileService {
       // Note: You'll need to add a custom endpoint for file uploads
       // Or modify the update profile endpoint to handle multipart/form-data
 
-      const authPost = await this.apiService.authPost('profile/upload-avatar', formData);
-      const response: any = await firstValueFrom(authPost);
+      const response: any = await this.apiService.authPost('profile/upload-avatar', formData);
 
       if (response.success) {
         await this.showToast('Avatar uploaded successfully!', 'success');

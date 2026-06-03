@@ -1,17 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { firstValueFrom } from 'rxjs';
 import { ApiService } from './api.service';
 import { StorageService } from './storage.service';
-import { LoadingController, ToastController } from '@ionic/angular';
+import { LoadingController, ToastController } from '@ionic/angular/standalone';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private currentUserSubject = new BehaviorSubject<any>(null);
-  public currentUser$ = this.currentUserSubject.asObservable();
+  private currentUser: any = null;
 
   constructor(
     private apiService: ApiService,
@@ -24,31 +21,12 @@ export class AuthService {
   }
 
   private async loadUser() {
-    const user = await this.storage.getUser();
-    this.currentUserSubject.next(user);
+    this.currentUser = await this.storage.getUser();
   }
 
-  async register(email: string, role: string): Promise<void> {
-    const loading = await this.loadingController.create({
-      message: 'Sending verification code...',
-    });
-    await loading.present();
-
-    try {
-      const response: any = await firstValueFrom(
-        this.apiService.post('auth/register', { email, role }),
-      );
-
-      await this.showToast('Verification code sent to your email!', 'success');
-      await this.router.navigate(['/verify-otp'], {
-        queryParams: { email },
-      });
-    } catch (error: any) {
-      await this.showToast(error.message, 'danger');
-      throw error;
-    } finally {
-      await loading.dismiss();
-    }
+  // Send verification email to register a new user
+  register(email: string, role: string): Promise<any> {
+    return this.apiService.post('auth/register', { email, role });
   }
 
   async verifyOtp(email: string, otp: string): Promise<void> {
@@ -58,9 +36,7 @@ export class AuthService {
     await loading.present();
 
     try {
-      const response: any = await firstValueFrom(
-        this.apiService.post('auth/verify-otp', { email, otp }),
-      );
+      const response: any = await this.apiService.post('auth/verify-otp', { email, otp });
 
       await this.showToast('Email verified! Now set your password.', 'success');
       await this.router.navigate(['/create-password'], {
@@ -85,13 +61,11 @@ export class AuthService {
     await loading.present();
 
     try {
-      const response: any = await firstValueFrom(
-        this.apiService.post('auth/create-password', {
-          email,
-          password,
-          confirmPassword,
-        }),
-      );
+      const response: any = await this.apiService.post('auth/create-password', {
+        email,
+        password,
+        confirmPassword,
+      });
 
       await this.showToast('Password created! Please login.', 'success');
       await this.router.navigate(['/login']);
@@ -110,9 +84,7 @@ export class AuthService {
     await loading.present();
 
     try {
-      const response: any = await firstValueFrom(
-        this.apiService.post('auth/resend-otp', { email }),
-      );
+      const response: any = await this.apiService.post('auth/resend-otp', { email });
 
       await this.showToast(
         'Verification code resent to your email!',
@@ -126,38 +98,17 @@ export class AuthService {
     }
   }
 
-  async login(email: string, password: string): Promise<void> {
-    const loading = await this.loadingController.create({
-      message: 'Logging in...',
-    });
-    await loading.present();
+  // Authenticate user credentials, returns Promise
+  login(email: string, password: string): Promise<any> {
+    return this.apiService.post('auth/login', { email, password });
+  }
 
-    try {
-      const response: any = await firstValueFrom(
-        this.apiService.post('auth/login', { email, password }),
-      );
-
-      if (response.success) {
-        await this.storage.setAccessToken(response.data.accessToken);
-        await this.storage.setRefreshToken(response.data.refreshToken);
-        await this.storage.setUser(response.data.user);
-        this.currentUserSubject.next(response.data.user);
-
-        await this.showToast('Login successful!', 'success');
-
-        // Redirect based on onboarding status
-        if (response.data.user.onboardingCompleted) {
-          await this.router.navigate(['/dashboard']);
-        } else {
-          await this.router.navigate(['/complete-profile']);
-        }
-      }
-    } catch (error: any) {
-      await this.showToast(error.message, 'danger');
-      throw error;
-    } finally {
-      await loading.dismiss();
-    }
+  // Save authentication tokens and update user state
+  async saveUserSession(accessToken: string, refreshToken: string, user: any): Promise<void> {
+    await this.storage.setAccessToken(accessToken);
+    await this.storage.setRefreshToken(refreshToken);
+    await this.storage.setUser(user);
+    this.currentUser = user;
   }
 
   async logout(): Promise<void> {
@@ -168,14 +119,13 @@ export class AuthService {
 
     try {
       // Call logout API
-      const authPost = await this.apiService.authPost('auth/logout', {});
-      await firstValueFrom(authPost);
+      await this.apiService.authPost('auth/logout', {});
     } catch (error) {
       console.error('Logout API error:', error);
     } finally {
       // Clear local storage regardless
       await this.storage.clear();
-      this.currentUserSubject.next(null);
+      this.currentUser = null;
       await loading.dismiss();
       await this.router.navigate(['/login']);
       await this.showToast('Logged out successfully', 'success');
@@ -184,12 +134,10 @@ export class AuthService {
 
   async refreshToken(): Promise<string | null> {
     const refreshToken = await this.storage.getRefreshToken();
-    if (!refreshToken) return null;
+    if (!refreshToken || refreshToken === 'undefined' || refreshToken === 'null') return null;
 
     try {
-      const response: any = await firstValueFrom(
-        this.apiService.post('auth/refresh', { refreshToken }),
-      );
+      const response: any = await this.apiService.post('auth/refresh', { refreshToken });
 
       if (response.success) {
         await this.storage.setAccessToken(response.data.accessToken);
@@ -204,8 +152,10 @@ export class AuthService {
   }
 
   async getCurrentUser(): Promise<any> {
-    const user = await this.storage.getUser();
-    return user;
+    if (!this.currentUser) {
+      this.currentUser = await this.storage.getUser();
+    }
+    return this.currentUser;
   }
 
   private async showToast(message: string, color: string = 'primary') {

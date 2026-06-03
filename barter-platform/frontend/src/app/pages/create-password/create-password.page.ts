@@ -58,7 +58,7 @@ import { AuthService } from '../../services/auth.service';
   ],
 })
 export class CreatePasswordPage implements OnInit {
-  createPasswordForm: FormGroup;
+  createPasswordForm!: FormGroup;
   isSubmitting = false;
   email: string = '';
   showPassword = false;
@@ -87,7 +87,9 @@ export class CreatePasswordPage implements OnInit {
       closeCircle,
       saveOutline,
     });
+  }
 
+  ngOnInit() {
     this.createPasswordForm = this.fb.group(
       {
         password: [
@@ -102,9 +104,7 @@ export class CreatePasswordPage implements OnInit {
       },
       { validator: this.passwordMatchValidator },
     );
-  }
 
-  ngOnInit() {
     // Get email from query params or navigation state
     this.route.queryParams.subscribe((params) => {
       this.email = params['email'] || '';

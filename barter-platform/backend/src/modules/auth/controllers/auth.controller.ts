@@ -75,6 +75,7 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
     data: {
       user: result.data.user,
       accessToken: result.data.accessToken,
+      refreshToken: result.data.refreshToken,
     },
   });
 });
@@ -85,7 +86,11 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
  */
 export const refresh = asyncHandler(async (req: Request, res: Response) => {
   // Get refresh token from cookie or body
-  const refreshToken = req.cookies.refreshToken || req.body.refreshToken;
+  let refreshToken = req.cookies.refreshToken || req.body.refreshToken;
+
+  if (refreshToken === "undefined" || refreshToken === "null") {
+    refreshToken = undefined;
+  }
 
   if (!refreshToken) {
     return res.status(401).json({
@@ -112,6 +117,7 @@ export const refresh = asyncHandler(async (req: Request, res: Response) => {
     data: {
       user: result.data.user,
       accessToken: result.data.accessToken,
+      refreshToken: result.data.refreshToken,
     },
   });
 });

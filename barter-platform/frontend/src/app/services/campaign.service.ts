@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
 import { ApiService } from './api.service';
 import { LoadingController, ToastController } from '@ionic/angular/standalone';
 
@@ -51,8 +50,7 @@ export class CampaignService {
     await loading.present();
 
     try {
-      const authPost = await this.apiService.authPost('campaigns', campaignData);
-      const response: any = await firstValueFrom(authPost);
+      const response: any = await this.apiService.authPost('campaigns', campaignData);
 
       if (response.success) {
         await this.showToast('Campaign created successfully!', 'success');
@@ -98,8 +96,7 @@ export class CampaignService {
       }
 
       const queryString = queryParams.length > 0 ? `?${queryParams.join('&')}` : '';
-      const authGet = await this.apiService.authGet(`campaigns${queryString}`);
-      const response: any = await firstValueFrom(authGet);
+      const response: any = await this.apiService.authGet(`campaigns${queryString}`);
 
       if (response.success) {
         return response.data.campaigns;
@@ -121,8 +118,7 @@ export class CampaignService {
     await loading.present();
 
     try {
-      const authPost = await this.apiService.authPost(`campaigns/${campaignId}/apply`, {});
-      const response: any = await firstValueFrom(authPost);
+      const response: any = await this.apiService.authPost(`campaigns/${campaignId}/apply`, {});
 
       if (response.success) {
         await this.showToast('Applied successfully! Application is pending brand review.', 'success');
@@ -142,8 +138,7 @@ export class CampaignService {
    */
   async getMyCampaigns(): Promise<ICampaign[]> {
     try {
-      const authGet = await this.apiService.authGet('campaigns/my-campaigns');
-      const response: any = await firstValueFrom(authGet);
+      const response: any = await this.apiService.authGet('campaigns/my-campaigns');
 
       if (response.success) {
         return response.data.campaigns;
@@ -160,8 +155,7 @@ export class CampaignService {
    */
   async getAppliedCampaigns(): Promise<ICampaign[]> {
     try {
-      const authGet = await this.apiService.authGet('campaigns/applied');
-      const response: any = await firstValueFrom(authGet);
+      const response: any = await this.apiService.authGet('campaigns/applied');
 
       if (response.success) {
         return response.data.campaigns;
