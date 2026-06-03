@@ -6,7 +6,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { CampaignService } from '../../services/campaign.service';
 import { ProfileService } from '../../services/profile.service';
 import {
@@ -54,6 +54,7 @@ import {
     IonCol,
     CommonModule,
     ReactiveFormsModule,
+    RouterLink,
     IonHeader,
     IonToolbar,
     IonTitle,

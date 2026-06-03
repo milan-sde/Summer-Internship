@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { CampaignService, ICampaign } from '../../services/campaign.service';
 import { StorageService } from '../../services/storage.service';
 import { ProfileService } from '../../services/profile.service';
@@ -56,6 +56,7 @@ import {
   standalone: true,
   imports: [
     CommonModule,
+    RouterLink,
     IonHeader,
     IonToolbar,
     IonTitle,
