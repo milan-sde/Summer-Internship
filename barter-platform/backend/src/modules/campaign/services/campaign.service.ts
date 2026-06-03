@@ -87,7 +87,7 @@ export class CampaignService {
     }
 
     const alreadyApplied = campaign.applicants.some(
-      id => id.toString() === userId
+      app => app && app.influencerId && app.influencerId.toString() === userId
     );
 
     if (alreadyApplied) {
@@ -109,12 +109,95 @@ export class CampaignService {
     }
 
     const campaigns = await this.campaignRepository.findByBrandId(profile._id.toString());
-    return campaigns.map(c => this.toResponseDto(c));
+    return await this.populateCampaignApplicants(campaigns);
   }
 
   async getAppliedCampaigns(userId: string): Promise<CampaignResponseDto[]> {
     const campaigns = await this.campaignRepository.findAppliedByInfluencerId(userId);
     return campaigns.map(c => this.toResponseDto(c));
+  }
+
+  async populateCampaignApplicants(campaigns: ICampaign[]): Promise<CampaignResponseDto[]> {
+    const responseCampaigns: CampaignResponseDto[] = [];
+    
+    for (const campaign of campaigns) {
+      const populatedApplicants = [];
+      for (const app of campaign.applicants) {
+        if (!app || !app.influencerId) continue;
+        const influencerIdStr = app.influencerId.toString();
+        const profile = await this.profileRepository.findByUserId(influencerIdStr);
+        populatedApplicants.push({
+          influencerId: influencerIdStr,
+          status: app.status,
+          appliedAt: app.appliedAt,
+          fullName: profile?.fullName || 'Anonymous Influencer',
+          username: profile?.username || '',
+          avatarUrl: profile?.avatarUrl || '',
+          followers: profile?.stats?.followers || 0
+        });
+      }
+      
+      responseCampaigns.push({
+        ...this.toResponseDto(campaign),
+        applicants: populatedApplicants
+      });
+    }
+    
+    return responseCampaigns;
+  }
+
+  async updateApplicationStatus(
+    campaignId: string,
+    brandUserId: string,
+    influencerId: string,
+    status: 'APPROVED' | 'REJECTED'
+  ): Promise<CampaignResponseDto> {
+    const brandProfile = await this.profileRepository.findByUserId(brandUserId);
+    if (!brandProfile) {
+      throw new NotFoundError('Brand profile details not found. Please complete profile setup first.');
+    }
+
+    const campaign = await this.campaignRepository.findById(campaignId);
+    if (!campaign) {
+      throw new NotFoundError('Campaign');
+    }
+
+    // Check if brand owns this campaign
+    if (campaign.brandId.toString() !== brandProfile._id.toString()) {
+      throw new ValidationError('You do not own this campaign');
+    }
+
+    // Find the applicant
+    const applicantIndex = campaign.applicants.findIndex(
+      app => app && app.influencerId && app.influencerId.toString() === influencerId
+    );
+
+    if (applicantIndex === -1) {
+      throw new NotFoundError('Application not found for this influencer');
+    }
+
+    const currentStatus = campaign.applicants[applicantIndex].status;
+    if (currentStatus === status) {
+      throw new ConflictError(`Application is already ${status}`);
+    }
+
+    // Update status
+    campaign.applicants[applicantIndex].status = status;
+
+    // Handle slots
+    if (status === 'APPROVED') {
+      if (campaign.filledSlots >= campaign.totalSlots) {
+        throw new ValidationError('All campaign slots are fully filled');
+      }
+      campaign.filledSlots += 1;
+    } else if (status === 'REJECTED' && currentStatus === 'APPROVED') {
+      campaign.filledSlots = Math.max(0, campaign.filledSlots - 1);
+    }
+
+    await campaign.save();
+
+    const populated = await this.populateCampaignApplicants([campaign]);
+    return populated[0];
   }
 
   private toResponseDto(campaign: ICampaign): CampaignResponseDto {
@@ -132,7 +215,20 @@ export class CampaignService {
       totalSlots: campaign.totalSlots,
       filledSlots: campaign.filledSlots,
       followersRequired: campaign.followersRequired,
-      applicants: campaign.applicants.map(id => id.toString()),
+      applicants: campaign.applicants.map(app => {
+        if (app && app.influencerId) {
+          return {
+            influencerId: app.influencerId.toString(),
+            status: app.status,
+            appliedAt: app.appliedAt
+          };
+        }
+        return {
+          influencerId: app ? app.toString() : '',
+          status: 'PENDING',
+          appliedAt: new Date()
+        };
+      }),
       status: campaign.status,
       createdAt: campaign.createdAt,
       updatedAt: campaign.updatedAt

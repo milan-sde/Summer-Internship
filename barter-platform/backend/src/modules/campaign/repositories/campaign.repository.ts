@@ -20,7 +20,7 @@ export class CampaignRepository {
   async findAppliedByInfluencerId(influencerId: string): Promise<ICampaign[]> {
     if (!mongoose.Types.ObjectId.isValid(influencerId)) return [];
     return await Campaign.find({
-      applicants: new mongoose.Types.ObjectId(influencerId)
+      'applicants.influencerId': new mongoose.Types.ObjectId(influencerId)
     }).sort({ createdAt: -1 });
   }
 
@@ -73,11 +73,16 @@ export class CampaignRepository {
     return await Campaign.findOneAndUpdate(
       {
         _id: new mongoose.Types.ObjectId(campaignId),
-        applicants: { $ne: new mongoose.Types.ObjectId(influencerId) } // Avoid duplicate applications
+        'applicants.influencerId': { $ne: new mongoose.Types.ObjectId(influencerId) } // Avoid duplicate applications
       },
       {
-        $push: { applicants: new mongoose.Types.ObjectId(influencerId) },
-        $inc: { filledSlots: 1 }
+        $push: {
+          applicants: {
+            influencerId: new mongoose.Types.ObjectId(influencerId),
+            status: 'PENDING',
+            appliedAt: new Date()
+          }
+        }
       },
       { returnDocument: 'after' }
     );

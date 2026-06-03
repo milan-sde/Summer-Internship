@@ -16,7 +16,7 @@ export interface ICampaign {
   totalSlots: number;
   filledSlots: number;
   followersRequired: string;
-  applicants: string[];
+  applicants: any[];
   status: 'ACTIVE' | 'PAST';
   createdAt: string;
   updatedAt: string;
@@ -164,6 +164,31 @@ export class CampaignService {
     } catch (error: any) {
       console.error('Get applied campaigns error:', error);
       throw error;
+    }
+  }
+
+  /**
+   * Update the status of an applicant (Brands only)
+   */
+  async updateApplicantStatus(campaignId: string, influencerId: string, status: 'APPROVED' | 'REJECTED'): Promise<ICampaign> {
+    const loading = await this.loadingController.create({
+      message: 'Updating application...'
+    });
+    await loading.present();
+
+    try {
+      const response: any = await this.apiService.authPost(`campaigns/${campaignId}/applicants/${influencerId}/status`, { status });
+
+      if (response.success) {
+        await this.showToast(`Application successfully ${status.toLowerCase()}!`, 'success');
+        return response.data.campaign;
+      }
+      throw new Error('Failed to update status');
+    } catch (error: any) {
+      await this.showToast(error.message || 'Failed to update application', 'danger');
+      throw error;
+    } finally {
+      await loading.dismiss();
     }
   }
 

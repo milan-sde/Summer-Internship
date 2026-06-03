@@ -1,5 +1,11 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
+export interface ICampaignApplicant {
+  influencerId: mongoose.Types.ObjectId;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  appliedAt: Date;
+}
+
 export interface ICampaign extends Document {
   brandId: mongoose.Types.ObjectId;
   brandName: string;
@@ -13,7 +19,7 @@ export interface ICampaign extends Document {
   totalSlots: number;
   filledSlots: number;
   followersRequired: string;
-  applicants: mongoose.Types.ObjectId[];
+  applicants: ICampaignApplicant[];
   status: 'ACTIVE' | 'PAST';
   createdAt: Date;
   updatedAt: Date;
@@ -85,9 +91,20 @@ const campaignSchema = new Schema<ICampaign>(
     },
     applicants: [
       {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-        index: true
+        influencerId: {
+          type: Schema.Types.ObjectId,
+          ref: 'User',
+          required: true
+        },
+        status: {
+          type: String,
+          enum: ['PENDING', 'APPROVED', 'REJECTED'],
+          default: 'PENDING'
+        },
+        appliedAt: {
+          type: Date,
+          default: Date.now
+        }
       }
     ],
     status: {

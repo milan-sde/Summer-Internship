@@ -7,7 +7,8 @@ import {
   getCampaigns,
   applyToCampaign,
   getMyCampaigns,
-  getAppliedCampaigns
+  getAppliedCampaigns,
+  updateApplicationStatus
 } from '../controllers/campaign.controller';
 
 const router = Router();
@@ -22,6 +23,9 @@ router.get('/my-campaigns', getMyCampaigns);
 
 // Application route
 router.post('/:id/apply', applyToCampaign);
+
+// Brand status decision route
+router.post('/:id/applicants/:influencerId/status', updateApplicationStatus);
 
 // Campaign creation route
 router.post('/', validate(CreateCampaignDtoSchema), createCampaign);

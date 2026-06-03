@@ -35,7 +35,10 @@ export const validateQuery = (schema: ZodObject) => {
       try {
         // Parse and check URL query parameters
         const validatedQuery = await schema.parseAsync(req.query);
-        req.query = validatedQuery as any;
+        for (const key of Object.keys(req.query)) {
+          delete req.query[key];
+        }
+        Object.assign(req.query, validatedQuery);
         next();
       } catch (error) {
         if (error instanceof ZodError) {

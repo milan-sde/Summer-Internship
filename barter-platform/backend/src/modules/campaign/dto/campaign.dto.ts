@@ -33,7 +33,7 @@ export interface CampaignResponseDto {
   totalSlots: number;
   filledSlots: number;
   followersRequired: string;
-  applicants: string[];
+  applicants: any[];
   status: 'ACTIVE' | 'PAST';
   createdAt: Date;
   updatedAt: Date;

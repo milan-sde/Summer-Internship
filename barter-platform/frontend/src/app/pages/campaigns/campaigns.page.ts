@@ -18,8 +18,6 @@ import {
   IonLabel,
   IonRefresher,
   IonRefresherContent,
-  IonItem,
-  IonInput,
   IonSelect,
   IonSelectOption
 } from '@ionic/angular/standalone';
@@ -43,7 +41,12 @@ import {
   sparklesOutline,
   ellipsisHorizontalOutline,
   chevronDownOutline,
-  swapVerticalOutline
+  swapVerticalOutline,
+  checkmarkCircleOutline,
+  closeCircleOutline,
+  personOutline,
+  chevronUpOutline,
+  playCircleOutline
 } from 'ionicons/icons';
 
 @Component({
@@ -58,7 +61,6 @@ import {
     IonTitle,
     IonContent,
     IonButtons,
-    IonBackButton,
     IonButton,
     IonIcon,
     IonSegment,
@@ -84,6 +86,9 @@ export class CampaignsPage implements OnInit {
   selectedPlatform: string = '';
   selectedBudgetSort: string = '';
   selectedSort: string = 'newest';
+
+  // Toggle for applicants view (Brands only)
+  showApplicants: { [key: string]: boolean } = {};
 
   categoriesList = ['All', 'Fashion', 'Tech', 'Food', 'Beauty'];
 
@@ -112,7 +117,12 @@ export class CampaignsPage implements OnInit {
       sparklesOutline,
       ellipsisHorizontalOutline,
       chevronDownOutline,
-      swapVerticalOutline
+      swapVerticalOutline,
+      checkmarkCircleOutline,
+      closeCircleOutline,
+      personOutline,
+      chevronUpOutline,
+      playCircleOutline
     });
   }
 
@@ -167,11 +177,11 @@ export class CampaignsPage implements OnInit {
       result.sort((a, b) => b.budget - a.budget);
     }
 
-    // Reach/Sorting
+    // Sort by newest or open slots
     if (this.selectedSort === 'newest') {
       result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     } else if (this.selectedSort === 'slots') {
-      result.sort((a, b) => (b.totalSlots - b.filledSlots) - (a.totalSlots - a.filledSlots)); // most slots open
+      result.sort((a, b) => (b.totalSlots - b.filledSlots) - (a.totalSlots - a.filledSlots));
     }
 
     return result;
@@ -192,7 +202,10 @@ export class CampaignsPage implements OnInit {
   }
 
   async applyToCampaign(campaign: ICampaign, event: Event) {
-    event.stopPropagation();
+    if (event) {
+      event.stopPropagation();
+    }
+
     try {
       const updated = await this.campaignService.applyToCampaign(campaign.id);
       // update item in local list
@@ -207,12 +220,44 @@ export class CampaignsPage implements OnInit {
   }
 
   hasApplied(campaign: ICampaign): boolean {
-    if (!this.currentUser) return false;
-    return campaign.applicants.includes(this.currentUser.id || this.currentUser._id);
+    if (!this.currentUser || !campaign.applicants) return false;
+    const userId = this.currentUser.id || this.currentUser._id;
+    return campaign.applicants.some(
+      (app: any) => (app && app.influencerId === userId) || (app === userId)
+    );
+  }
+
+  getApplicationStatus(campaign: ICampaign): string {
+    if (!this.currentUser || !campaign.applicants) return '';
+    const userId = this.currentUser.id || this.currentUser._id;
+    const app = campaign.applicants.find(
+      (a: any) => (a && a.influencerId === userId) || (a === userId)
+    );
+    if (app === userId) {
+      return 'PENDING';
+    }
+    return app ? app.status : '';
+  }
+
+  toggleApplicants(campaignId: string) {
+    this.showApplicants[campaignId] = !this.showApplicants[campaignId];
+  }
+
+  async updateStatus(campaignId: string, influencerId: string, status: 'APPROVED' | 'REJECTED') {
+    try {
+      const updated = await this.campaignService.updateApplicantStatus(campaignId, influencerId, status);
+      const idx = this.campaigns.findIndex(c => c.id === campaignId);
+      if (idx > -1) {
+        this.campaigns[idx] = updated;
+      }
+    } catch (error) {
+      console.error('Failed to update status:', error);
+    }
   }
 
   getInitials(name: string): string {
-    return name ? name.charAt(0).toUpperCase() : 'B';
+    if (!name) return 'B';
+    return name.charAt(0).toUpperCase();
   }
 
   getCategoryIcon(category: string): string {

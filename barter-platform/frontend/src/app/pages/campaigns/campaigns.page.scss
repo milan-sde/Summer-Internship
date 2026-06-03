@@ -1,16 +1,16 @@
-
 /* Root container spacing */
 .campaigns-container {
   max-width: 800px;
   margin: 0 auto;
   padding: 10px 0 30px 0;
-  font-family: var(--font-family-body);
+  font-family: var(--ion-font-family, 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
 }
 
 /* Header style modifications */
 .header-toolbar {
-  --background: var(--ion-color-primary);
-  --color: white;
+  --background: #ffffff;
+  --color: #1f2937;
+  border-bottom: 1px solid #f3f4f6;
 }
 
 .logo-container {
@@ -20,37 +20,43 @@
 }
 
 .logo-icon-box {
-  width: 32px;
-  height: 32px;
-  background: linear-gradient(135deg, #ffffff, rgba(255, 255, 255, 0.7));
+  width: 36px;
+  height: 36px;
+  background: transparent;
   border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
 .logo-letter {
-  font-size: 1.25rem;
+  font-size: 1.8rem;
   font-weight: 900;
+  font-style: italic;
   background: linear-gradient(135deg, #ff5a36, #ff7e47);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .header-title {
   font-weight: 800;
-  font-size: 1.45rem;
-  color: white;
+  font-size: 1.5rem;
+  color: #1f2937;
   margin-left: 10px;
 }
 
 .profile-header-btn {
-  --color: white;
+  --color: #374151;
+  --background: #f3f4f6;
+  --border-radius: 14px;
+  width: 40px;
+  height: 40px;
+  margin-right: 8px;
 }
 
 .header-profile-icon {
-  font-size: 2.1rem;
+  font-size: 1.5rem;
 }
 
 /* Subtitle and Description text */
@@ -61,7 +67,7 @@
 
 .subtitle-text {
   font-size: 0.95rem;
-  color: var(--ion-color-step-600);
+  color: #6c757d;
   font-weight: 500;
   margin: 0;
 }
@@ -73,67 +79,68 @@
 }
 
 .custom-segment {
-  --background: #f0f0f5;
-  border-radius: 14px;
+  --background: #f3f4f6;
+  border-radius: 16px;
   padding: 4px;
-  height: 48px;
+  height: 52px;
 }
 
 .custom-segment-button {
-  --color: var(--ion-color-step-700);
-  --color-checked: white;
-  --background-checked: var(--ion-color-primary);
-  --border-radius: 10px;
+  --color: #6b7280;
+  --color-checked: #ffffff;
+  --background: transparent;
+  --background-checked: #ff5a36;
+  --border-radius: 12px;
   font-weight: 700;
   font-size: 0.95rem;
   text-transform: none;
   --indicator-color: transparent;
   transition: all 0.3s ease;
+}
 
-  &::part(indicator) {
-    background: var(--ion-color-primary) !important;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(255, 90, 54, 0.3);
-  }
+.custom-segment-button::part(indicator) {
+  background: #ff5a36 !important;
+  border-radius: 12px;
 }
 
 /* Category Tags Scroll Carousel */
 .categories-scroll-wrapper {
   margin-bottom: 20px;
   width: 100%;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.categories-scroll-wrapper::-webkit-scrollbar {
+  display: none;
 }
 
 .categories-scroll-container {
-  display: flex;
-  overflow-x: auto;
+  display: inline-flex;
   padding: 4px 8px;
   gap: 10px;
-  -webkit-overflow-scrolling: touch;
-
-  &::-webkit-scrollbar {
-    display: none; /* Hide scrollbar for clean app mockup look */
-  }
+  white-space: nowrap;
 }
 
 .category-tag {
-  flex: 0 0 auto;
-  padding: 10px 22px;
+  display: inline-flex;
+  padding: 8px 22px;
   background: #f0f0f5;
-  color: var(--ion-color-step-700);
+  color: #374151;
   font-weight: 700;
-  font-size: 0.9rem;
-  border-radius: 20px;
+  font-size: 0.85rem;
+  border-radius: 40px;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  white-space: nowrap;
 
   &:hover {
     transform: translateY(-1px);
   }
 
   &.active {
-    background: var(--ion-color-primary);
+    background: #ff5a36;
     color: white;
     box-shadow: 0 4px 12px rgba(255, 90, 54, 0.25);
   }
@@ -145,29 +152,45 @@
   padding: 0 8px;
   gap: 10px;
   margin-bottom: 25px;
+  flex-wrap: wrap;
 }
 
 .filter-dropdown-btn {
   flex: 1;
+  min-width: 100px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #f0f0f5;
-  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
   padding: 8px 12px;
-  height: 40px;
+  height: 44px;
   position: relative;
   cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:active {
+    transform: scale(0.98);
+  }
 
   .dropdown-icon {
-    font-size: 1.1rem;
-    color: var(--ion-color-step-700);
+    font-size: 1.2rem;
+    color: #ff5a36;
     margin-right: 4px;
+  }
+
+  .dropdown-rupee-icon {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #ff5a36;
+    margin-right: 6px;
+    display: inline-block;
   }
 
   .chevron-icon {
     font-size: 0.95rem;
-    color: var(--ion-color-step-600);
+    color: #9ca3af;
     pointer-events: none;
   }
 
@@ -176,11 +199,13 @@
     --padding-start: 4px;
     --padding-end: 4px;
     font-size: 0.85rem;
-    font-weight: 700;
-    color: var(--ion-color-step-700);
-    --placeholder-color: var(--ion-color-step-700);
+    font-weight: 600;
+    color: #374151;
+    --placeholder-color: #9ca3af;
     --placeholder-opacity: 1;
     text-transform: capitalize;
+    --arrow-display: none;
+    max-width: calc(100% - 30px);
   }
 }
 
@@ -191,19 +216,21 @@
   justify-content: space-between;
   padding: 0 8px;
   margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .brand-section-title {
   font-size: 1.35rem;
   font-weight: 800;
-  color: var(--ion-color-step-800);
+  color: #1f2937;
   margin: 0;
 }
 
 .create-campaign-btn {
-  --background: var(--ion-color-primary);
-  --border-radius: 12px;
-  --box-shadow: 0 4px 12px rgba(255, 90, 54, 0.2);
+  --background: #ff5a36;
+  --border-radius: 40px;
+  --box-shadow: 0 4px 12px rgba(255, 90, 54, 0.25);
   font-weight: 700;
   font-size: 0.85rem;
   margin: 0;
@@ -212,19 +239,18 @@
 
 /* Premium Glassmorphic Cards Styling */
 .premium-campaign-card {
-  background: white;
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  background: #ffffff;
+  border: none;
   border-radius: 24px;
   padding: 20px;
   margin-bottom: 18px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.02);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
 
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  &:active {
+    transform: scale(0.99);
   }
 }
 
@@ -233,18 +259,22 @@
   align-items: flex-start;
   justify-content: space-between;
   margin-bottom: 15px;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .brand-info-box {
   display: flex;
   align-items: center;
   gap: 12px;
+  flex: 1;
+  min-width: 150px;
 }
 
 .brand-avatar-box {
   width: 48px;
   height: 48px;
-  background: var(--ion-color-primary);
+  background: linear-gradient(135deg, #ff5a36, #ff7e47);
   border-radius: 16px;
   display: flex;
   align-items: center;
@@ -268,18 +298,19 @@
 .brand-names-box {
   display: flex;
   flex-direction: column;
+  flex: 1;
 }
 
 .brand-title {
   font-size: 1rem;
-  font-weight: 750;
-  color: var(--ion-color-step-800);
+  font-weight: 800;
+  color: #1f2937;
   margin: 0;
 }
 
 .brand-platform-text {
-  font-size: 0.8rem;
-  color: var(--ion-color-step-500);
+  font-size: 0.75rem;
+  color: #6b7280;
   margin: 2px 0 0 0;
   font-weight: 600;
 }
@@ -289,19 +320,20 @@
   display: flex;
   align-items: center;
   background: rgba(255, 90, 54, 0.08);
-  border-radius: 8px;
-  padding: 6px 10px;
-  gap: 4px;
+  border-radius: 40px;
+  padding: 6px 12px;
+  gap: 6px;
+  flex-shrink: 0;
 
   .badge-icon {
-    font-size: 0.95rem;
-    color: var(--ion-color-primary);
+    font-size: 0.9rem;
+    color: #ff5a36;
   }
 
   .badge-text {
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: var(--ion-color-primary);
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: #ff5a36;
   }
 }
 
@@ -313,14 +345,14 @@
 .campaign-main-title {
   font-size: 1.15rem;
   font-weight: 800;
-  color: var(--ion-color-step-800);
+  color: #1f2937;
   margin: 0 0 6px 0;
   line-height: 1.35;
 }
 
 .campaign-desc-text {
-  font-size: 0.9rem;
-  color: var(--ion-color-step-600);
+  font-size: 0.85rem;
+  color: #6b7280;
   margin: 0;
   line-height: 1.45;
 }
@@ -330,28 +362,40 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 15px;
+  gap: 12px;
   margin-bottom: 12px;
   padding: 4px 0;
+  width: 100%;
 }
 
 .metric-item {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 4px;
-  font-size: 0.85rem;
-  font-weight: 650;
-  color: var(--ion-color-step-600);
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #4b5563;
+  padding: 4px 0;
 
   .metric-icon {
     font-size: 1rem;
-    color: var(--ion-color-step-500);
+    color: #9ca3af;
   }
 
   &.budget {
-    color: var(--ion-color-step-800);
+    background: rgba(255, 90, 54, 0.1);
+    padding: 4px 12px;
+    border-radius: 40px;
+    color: #ff5a36;
     font-weight: 800;
-    font-size: 0.9rem;
+
+    .metric-icon {
+      color: #ff5a36;
+    }
+  }
+
+  .metric-label {
+    font-weight: 800;
   }
 }
 
@@ -359,7 +403,7 @@
 .progress-bar-container {
   width: 100%;
   height: 6px;
-  background: #f0f0f5;
+  background: #e5e7eb;
   border-radius: 3px;
   margin-bottom: 16px;
   overflow: hidden;
@@ -367,7 +411,7 @@
 
 .progress-bar {
   height: 100%;
-  background: var(--ion-color-primary);
+  background: #ff5a36;
   border-radius: 3px;
   transition: width 0.4s ease-out;
 }
@@ -375,65 +419,270 @@
 /* Card footer application status / action button */
 .card-footer-action-row {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
+  width: 100%;
 }
 
 .brand-actions-box {
+  width: 100%;
+
+  .brand-applicants-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
   .applicants-status-pill {
-    background: #f0f0f5;
-    color: var(--ion-color-step-700);
+    background: #f3f4f6;
+    color: #4b5563;
     font-weight: 700;
     font-size: 0.8rem;
     padding: 6px 12px;
-    border-radius: 8px;
+    border-radius: 40px;
+  }
+
+  .view-applicants-toggle-btn {
+    margin: 0;
+    --color: #ff5a36;
+    font-weight: 700;
+    font-size: 0.8rem;
   }
 }
 
 .influencer-actions-box {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
+  width: 100%;
 
   .apply-now-btn {
-    --background: var(--ion-color-primary);
-    --border-radius: 12px;
-    --box-shadow: 0 4px 12px rgba(255, 90, 54, 0.2);
-    font-weight: 750;
+    --background: #ff5a36;
+    --border-radius: 40px;
+    --box-shadow: 0 4px 12px rgba(255, 90, 54, 0.25);
+    font-weight: 700;
     font-size: 0.85rem;
-    height: 36px;
+    height: 38px;
     margin: 0;
   }
 
-  /* Custom Golden warning hourglass badge styled exactly as 'Pending' in mockup */
-  .pending-status-badge {
+  .app-status-badge {
     display: inline-flex;
     align-items: center;
-    background: #fef4e8;
-    color: #e28a1a;
-    font-weight: 750;
-    font-size: 0.85rem;
+    font-weight: 700;
+    font-size: 0.8rem;
     padding: 6px 14px;
-    border-radius: 8px;
-    gap: 5px;
+    border-radius: 40px;
+    gap: 6px;
 
-    .status-hourglass-icon {
+    .status-icon {
       font-size: 0.95rem;
-      color: #e28a1a;
+    }
+
+    &.pending {
+      background: #fef3c7;
+      color: #d97706;
+    }
+
+    &.approved {
+      background: #d1fae5;
+      color: #059669;
+    }
+
+    &.rejected {
+      background: #fee2e2;
+      color: #dc2626;
     }
   }
 
   .fully-filled-badge {
-    background: var(--color-step-200, #f0f0f0);
-    color: var(--color-step-500, #888);
+    background: #f3f4f6;
+    color: #9ca3af;
     font-weight: 700;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     padding: 6px 14px;
-    border-radius: 8px;
+    border-radius: 40px;
   }
 }
 
-/* Empty, Loading, and generic states */
-.loading-state, .empty-state {
+/* BRAND Collapsible Applicants Panel */
+.brand-applicants-panel {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #f3f4f6;
+  width: 100%;
+
+  .panel-header {
+    margin-bottom: 12px;
+
+    h4 {
+      margin: 0;
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: #374151;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  .no-applicants-placeholder {
+    font-size: 0.85rem;
+    color: #9ca3af;
+    padding: 15px 0;
+    text-align: center;
+  }
+
+  .applicant-item-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #f3f4f6;
+    flex-wrap: wrap;
+    gap: 12px;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  .applicant-profile-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 180px;
+  }
+
+  .applicant-avatar-circle {
+    width: 38px;
+    height: 38px;
+    background: linear-gradient(135deg, #ff5a36, #ff7e47);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+
+    .applicant-avatar-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .applicant-avatar-initial {
+      color: white;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+  }
+
+  .applicant-text-info {
+    flex: 1;
+
+    .applicant-full-name {
+      margin: 0;
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #1f2937;
+    }
+
+    .applicant-username-stats {
+      margin: 2px 0 0 0;
+      font-size: 0.7rem;
+      color: #6b7280;
+
+      .handle {
+        font-weight: 600;
+        color: #4b5563;
+      }
+
+      .separator {
+        margin: 0 4px;
+      }
+    }
+  }
+
+  .applicant-status-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+
+    .action-btn {
+      margin: 0;
+      --border-radius: 40px;
+      font-weight: 700;
+      font-size: 0.7rem;
+      height: 32px;
+
+      &.approve {
+        --background: #10b981;
+      }
+
+      &.reject {
+        --background: #ef4444;
+      }
+    }
+
+    .status-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 40px;
+
+      &.approved {
+        background: #d1fae5;
+        color: #059669;
+      }
+
+      &.rejected {
+        background: #fee2e2;
+        color: #dc2626;
+      }
+    }
+  }
+}
+
+/* Loading State */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 50px 20px;
+  text-align: center;
+  gap: 16px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f3f4f6;
+  border-top-color: #ff5a36;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-weight: 600;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+/* Empty State */
+.empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -442,29 +691,123 @@
   text-align: center;
 }
 
-.loading-text {
-  font-weight: 600;
-  color: var(--ion-color-step-500);
-  font-size: 0.95rem;
-}
-
 .empty-icon {
   font-size: 3rem;
-  color: var(--ion-color-step-300);
+  color: #d1d5db;
   margin-bottom: 12px;
 }
 
 .empty-state h3 {
-  font-size: 1.15rem;
+  font-size: 1.1rem;
   font-weight: 700;
-  color: var(--ion-color-step-700);
+  color: #374151;
   margin: 0 0 6px 0;
 }
 
 .empty-state p {
-  font-size: 0.9rem;
-  color: var(--ion-color-step-500);
+  font-size: 0.85rem;
+  color: #6b7280;
   margin: 0;
-  max-width: 300px;
+  max-width: 280px;
   line-height: 1.4;
+}
+
+/* Responsive Design for Mobile */
+@media (max-width: 480px) {
+  .campaigns-container {
+    padding: 5px 0 20px 0;
+  }
+
+  .page-subtitle-box {
+    padding: 0 4px;
+  }
+
+  .segment-tabs-container {
+    padding: 0 4px;
+  }
+
+  .filters-dropdown-row {
+    padding: 0 4px;
+    gap: 8px;
+  }
+
+  .filter-dropdown-btn {
+    min-width: 80px;
+    padding: 6px 10px;
+    height: 40px;
+
+    .custom-select {
+      font-size: 0.75rem;
+    }
+  }
+
+  .category-tag {
+    padding: 6px 18px;
+    font-size: 0.8rem;
+  }
+
+  .premium-campaign-card {
+    padding: 16px;
+    margin-bottom: 14px;
+    border-radius: 20px;
+  }
+
+  .brand-avatar-box {
+    width: 40px;
+    height: 40px;
+  }
+
+  .brand-avatar-initial {
+    font-size: 1.2rem;
+  }
+
+  .brand-title {
+    font-size: 0.9rem;
+  }
+
+  .campaign-main-title {
+    font-size: 1rem;
+  }
+
+  .campaign-desc-text {
+    font-size: 0.8rem;
+  }
+
+  .card-details-metrics-row {
+    gap: 8px;
+  }
+
+  .metric-item {
+    font-size: 0.7rem;
+
+    &.budget {
+      padding: 3px 10px;
+    }
+  }
+
+  .apply-now-btn,
+  .app-status-badge,
+  .fully-filled-badge {
+    font-size: 0.75rem;
+    height: 34px;
+  }
+
+  .brand-dashboard-header {
+    padding: 0 4px;
+  }
+
+  .brand-section-title {
+    font-size: 1.2rem;
+  }
+}
+
+/* Tablet and small desktop adjustments */
+@media (min-width: 481px) and (max-width: 768px) {
+  .campaigns-container {
+    padding: 10px 16px 30px 16px;
+  }
+
+  .premium-campaign-card {
+    padding: 18px;
+  }
 }

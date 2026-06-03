@@ -78,3 +78,26 @@ export const getAppliedCampaigns = asyncHandler(
     });
   }
 );
+
+// Update status of an applicant (Approve/Reject - Brands only)
+export const updateApplicationStatus = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.user!.userId;
+    const campaignId = req.params.id as string;
+    const influencerId = req.params.influencerId as string;
+    const { status } = req.body;
+
+    const campaign = await campaignService.updateApplicationStatus(
+      campaignId,
+      userId,
+      influencerId,
+      status
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `Successfully updated application to ${status}!`,
+      data: { campaign }
+    });
+  }
+);
