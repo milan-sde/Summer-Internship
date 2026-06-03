@@ -74,6 +74,7 @@ export class CampaignsPage implements OnInit {
   currentUser: any;
   campaigns: ICampaign[] = [];
   isLoading = true;
+  appliedCount = 0;
 
   // Active filters and segment
   activeSegment: 'discover' | 'applied' = 'discover';
@@ -131,6 +132,10 @@ export class CampaignsPage implements OnInit {
         // Brands manage their created campaigns
         this.campaigns = await this.campaignService.getMyCampaigns();
       } else {
+        // Fetch applied campaigns to keep count updated
+        const appliedCampaigns = await this.campaignService.getAppliedCampaigns();
+        this.appliedCount = appliedCampaigns.length;
+
         // Influencers discover or view applied campaigns
         if (this.activeSegment === 'discover') {
           const rawCampaigns = await this.campaignService.getCampaigns({
@@ -142,8 +147,7 @@ export class CampaignsPage implements OnInit {
           this.campaigns = this.applyClientSideFilters(rawCampaigns);
         } else {
           // Applied
-          const rawCampaigns = await this.campaignService.getAppliedCampaigns();
-          this.campaigns = this.applyClientSideFilters(rawCampaigns);
+          this.campaigns = this.applyClientSideFilters(appliedCampaigns);
         }
       }
     } catch (error) {

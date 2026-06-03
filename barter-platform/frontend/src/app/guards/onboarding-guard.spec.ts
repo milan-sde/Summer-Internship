@@ -1,17 +1,25 @@
 import { TestBed } from '@angular/core/testing';
-import { CanActivateFn } from '@angular/router';
+import { Router } from '@angular/router';
+import { OnboardingGuard } from './onboarding-guard';
+import { StorageService } from '../services/storage.service';
 
-import { onboardingGuard } from './onboarding-guard';
-
-describe('onboardingGuard', () => {
-  const executeGuard: CanActivateFn = (...guardParameters) => 
-      TestBed.runInInjectionContext(() => onboardingGuard(...guardParameters));
+describe('OnboardingGuard', () => {
+  let guard: OnboardingGuard;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    TestBed.configureTestingModule({
+      providers: [
+        OnboardingGuard,
+        StorageService,
+        { provide: Router, useValue: routerSpy }
+      ]
+    });
+    guard = TestBed.inject(OnboardingGuard);
   });
 
   it('should be created', () => {
-    expect(executeGuard).toBeTruthy();
+    expect(guard).toBeTruthy();
   });
 });
+

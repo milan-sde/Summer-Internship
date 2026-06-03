@@ -1,17 +1,25 @@
 import { TestBed } from '@angular/core/testing';
-import { CanActivateFn } from '@angular/router';
+import { Router } from '@angular/router';
+import { GuestGuard } from './guest-guard';
+import { StorageService } from '../services/storage.service';
 
-import { guestGuard } from './guest-guard';
-
-describe('guestGuard', () => {
-  const executeGuard: CanActivateFn = (...guardParameters) => 
-      TestBed.runInInjectionContext(() => guestGuard(...guardParameters));
+describe('GuestGuard', () => {
+  let guard: GuestGuard;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    TestBed.configureTestingModule({
+      providers: [
+        GuestGuard,
+        StorageService,
+        { provide: Router, useValue: routerSpy }
+      ]
+    });
+    guard = TestBed.inject(GuestGuard);
   });
 
   it('should be created', () => {
-    expect(executeGuard).toBeTruthy();
+    expect(guard).toBeTruthy();
   });
 });
+
