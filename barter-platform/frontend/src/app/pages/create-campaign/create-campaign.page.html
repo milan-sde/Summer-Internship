@@ -78,6 +78,48 @@
           </ion-row>
         </ion-grid>
 
+        <!-- Start & End Date Row -->
+        <ion-grid class="ion-no-padding">
+          <ion-row>
+
+            <!-- Start Date -->
+            <ion-col size="6" class="ion-no-padding padding-right-sm">
+              <div class="custom-input-group">
+                <label class="custom-input-label">Start Date *</label>
+                <ion-item lines="none" class="custom-input-item">
+                  <ion-icon name="calendar-outline" slot="start" class="input-icon"></ion-icon>
+                  <ion-input type="date" formControlName="startDate"></ion-input>
+                </ion-item>
+                <div *ngIf="campaignForm.get('startDate')?.touched && campaignForm.get('startDate')?.invalid" class="validation-error">
+                  <ion-text color="danger"><small>Start date is required.</small></ion-text>
+                </div>
+              </div>
+            </ion-col>
+
+            <!-- End Date -->
+            <ion-col size="6" class="ion-no-padding padding-left-sm">
+              <div class="custom-input-group">
+                <label class="custom-input-label">End Date *</label>
+                <ion-item lines="none" class="custom-input-item">
+                  <ion-icon name="calendar-outline" slot="start" class="input-icon"></ion-icon>
+                  <ion-input type="date" formControlName="endDate"></ion-input>
+                </ion-item>
+                <div *ngIf="campaignForm.get('endDate')?.touched && campaignForm.get('endDate')?.invalid" class="validation-error">
+                  <ion-text color="danger"><small>End date is required.</small></ion-text>
+                </div>
+              </div>
+            </ion-col>
+
+          </ion-row>
+        </ion-grid>
+
+        <!-- Date Validation Error -->
+        <div *ngIf="campaignForm.errors?.['dateInvalid'] && (campaignForm.get('startDate')?.touched || campaignForm.get('endDate')?.touched)" class="validation-error" style="margin-top: -10px; margin-bottom: 20px;">
+          <ion-text color="danger">
+            <small style="font-weight: 600;">End date must be strictly after the start date.</small>
+          </ion-text>
+        </div>
+
         <!-- Budget Input -->
         <div class="custom-input-group">
           <label class="custom-input-label">Budget Per Person (₹) *</label>

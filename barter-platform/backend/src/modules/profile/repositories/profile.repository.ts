@@ -11,6 +11,11 @@ export interface CreateProfileDto {
   avatarUrl?: string;
   website?: string;
   location?: string;
+  stats?: {
+    followers?: number;
+    engagementRate?: number;
+    totalPosts?: number;
+  };
 
   // Influencer-specific fields
   username?: string;

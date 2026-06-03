@@ -2,7 +2,7 @@ import { CampaignRepository } from '../repositories/campaign.repository';
 import { ProfileRepository } from '@modules/profile/repositories/profile.repository';
 import { UserRepository } from '@modules/users/repositories/user.repository';
 import { ValidationError, NotFoundError, ConflictError } from '@shared/errors/app-error';
-import { CreateCampaignDto, CampaignResponseDto } from '../dto/campaign.dto';
+import { CreateCampaignDto, CampaignResponseDto, CreateCampaignDtoSchema } from '../dto/campaign.dto';
 import { ICampaign } from '../models/campaign.model';
 import mongoose from 'mongoose';
 
@@ -32,18 +32,22 @@ export class CampaignService {
       throw new NotFoundError('Brand profile details not found. Please complete profile setup first.');
     }
 
+    const validatedData = CreateCampaignDtoSchema.parse(data);
+
     const campaign = await this.campaignRepository.create({
       brandId: profile._id as mongoose.Types.ObjectId,
       brandName: profile.fullName,
       brandLogo: profile.avatarUrl || '',
-      title: data.title,
-      description: data.description,
-      platform: data.platform,
-      category: data.category,
-      budget: data.budget,
-      totalSlots: data.totalSlots,
-      followersRequired: data.followersRequired,
-      daysLeft: data.daysLeft,
+      title: validatedData.title,
+      description: validatedData.description,
+      platform: validatedData.platform,
+      category: validatedData.category,
+      budget: validatedData.budget,
+      totalSlots: validatedData.totalSlots,
+      followersRequired: validatedData.followersRequired,
+      daysLeft: validatedData.daysLeft || 35,
+      startDate: validatedData.startDate,
+      endDate: validatedData.endDate,
       filledSlots: 0,
       applicants: [],
       status: 'ACTIVE'
@@ -126,6 +130,23 @@ export class CampaignService {
         if (!app || !app.influencerId) continue;
         const influencerIdStr = app.influencerId.toString();
         const profile = await this.profileRepository.findByUserId(influencerIdStr);
+        
+        let followersCount = 0;
+        if (profile?.platforms) {
+          const platform = campaign.platform?.toLowerCase();
+          if (platform === 'instagram') {
+            followersCount = profile.platforms.instagram?.followers || 0;
+          } else if (platform === 'youtube') {
+            followersCount = profile.platforms.youtube?.followers || 0;
+          } else if (platform === 'twitter') {
+            followersCount = profile.platforms.twitter?.followers || 0;
+          }
+        }
+        
+        if (!followersCount && profile?.stats?.followers) {
+          followersCount = profile.stats.followers;
+        }
+
         populatedApplicants.push({
           influencerId: influencerIdStr,
           status: app.status,
@@ -133,7 +154,7 @@ export class CampaignService {
           fullName: profile?.fullName || 'Anonymous Influencer',
           username: profile?.username || '',
           avatarUrl: profile?.avatarUrl || '',
-          followers: profile?.stats?.followers || 0
+          followers: followersCount
         });
       }
       
@@ -201,6 +222,21 @@ export class CampaignService {
   }
 
   private toResponseDto(campaign: ICampaign): CampaignResponseDto {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+
+    const start = campaign.startDate ? new Date(campaign.startDate) : new Date(campaign.createdAt || Date.now());
+    start.setHours(0, 0, 0, 0);
+
+    const end = campaign.endDate ? new Date(campaign.endDate) : new Date(start.getTime() + (campaign.daysLeft || 35) * 24 * 60 * 60 * 1000);
+    end.setHours(0, 0, 0, 0);
+
+    let calculatedDaysLeft = campaign.daysLeft;
+    if (campaign.endDate) {
+      const diffTime = end.getTime() - now.getTime();
+      calculatedDaysLeft = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+    }
+
     return {
       id: campaign._id.toString(),
       brandId: campaign.brandId.toString(),
@@ -211,7 +247,9 @@ export class CampaignService {
       platform: campaign.platform,
       category: campaign.category,
       budget: campaign.budget,
-      daysLeft: campaign.daysLeft,
+      daysLeft: calculatedDaysLeft,
+      startDate: start,
+      endDate: end,
       totalSlots: campaign.totalSlots,
       filledSlots: campaign.filledSlots,
       followersRequired: campaign.followersRequired,

@@ -39,6 +39,7 @@ import {
   logoTwitter,
   optionsOutline,
   helpCircleOutline,
+  calendarOutline,
 } from 'ionicons/icons';
 
 @Component({
@@ -91,6 +92,7 @@ export class CreateCampaignPage implements OnInit {
       logoTwitter,
       optionsOutline,
       helpCircleOutline,
+      calendarOutline,
     });
   }
 
@@ -99,6 +101,9 @@ export class CreateCampaignPage implements OnInit {
   }
 
   setupForm() {
+    const todayStr = new Date().toISOString().substring(0, 10);
+    const futureStr = new Date(Date.now() + 35 * 24 * 60 * 60 * 1000).toISOString().substring(0, 10);
+
     this.campaignForm = this.fb.group({
       title: [
         '',
@@ -121,7 +126,18 @@ export class CreateCampaignPage implements OnInit {
       budget: [null, [Validators.required, Validators.min(0)]],
       totalSlots: [10, [Validators.required, Validators.min(1)]],
       followersRequired: ['1K+', [Validators.required]],
-    });
+      startDate: [todayStr, [Validators.required]],
+      endDate: [futureStr, [Validators.required]],
+    }, { validators: this.dateLessThanValidator });
+  }
+
+  dateLessThanValidator(group: any): { [key: string]: boolean } | null {
+    const start = group.get('startDate')?.value;
+    const end = group.get('endDate')?.value;
+    if (start && end && new Date(start) >= new Date(end)) {
+      return { 'dateInvalid': true };
+    }
+    return null;
   }
 
   async onSubmit() {

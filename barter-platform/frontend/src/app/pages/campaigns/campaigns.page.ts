@@ -275,6 +275,33 @@ export class CampaignsPage implements OnInit {
     return campaign.filledSlots / campaign.totalSlots;
   }
 
+  getCampaignTimeLabel(campaign: ICampaign): string {
+    if (!campaign.startDate || !campaign.endDate) {
+      return `${campaign.daysLeft}d left`;
+    }
+
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+
+    const start = new Date(campaign.startDate);
+    start.setHours(0, 0, 0, 0);
+
+    const end = new Date(campaign.endDate);
+    end.setHours(0, 0, 0, 0);
+
+    if (now < start) {
+      const diffTime = start.getTime() - now.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return `Starting in ${diffDays}d`;
+    } else if (now > end) {
+      return 'Ended';
+    } else {
+      const diffTime = end.getTime() - now.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return `${diffDays}d left`;
+    }
+  }
+
   onCreateCampaign() {
     this.router.navigate(['/create-campaign']);
   }

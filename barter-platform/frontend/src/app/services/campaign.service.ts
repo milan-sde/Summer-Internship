@@ -13,6 +13,8 @@ export interface ICampaign {
   category: 'Tech' | 'Fashion' | 'Food' | 'Beauty' | 'Other';
   budget: number;
   daysLeft: number;
+  startDate?: string;
+  endDate?: string;
   totalSlots: number;
   filledSlots: number;
   followersRequired: string;
@@ -43,6 +45,8 @@ export class CampaignService {
     budget: number;
     totalSlots: number;
     followersRequired: string;
+    startDate?: string;
+    endDate?: string;
   }): Promise<ICampaign> {
     const loading = await this.loadingController.create({
       message: 'Creating campaign...'

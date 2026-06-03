@@ -14,10 +14,15 @@ export const CreateCampaignDtoSchema = z.object({
   budget: z.coerce.number().min(0, 'Budget must be positive'),
   totalSlots: z.coerce.number().min(1, 'Slots must be at least 1').default(10),
   followersRequired: z.string().min(1, 'Reach requirement is required').default('1K+'),
-  daysLeft: z.coerce.number().min(1).default(35)
+  daysLeft: z.coerce.number().min(1).default(35).optional(),
+  startDate: z.preprocess((val) => typeof val === 'string' ? new Date(val) : val, z.date()).default(() => new Date()),
+  endDate: z.preprocess((val) => typeof val === 'string' ? new Date(val) : val, z.date()).default(() => new Date(Date.now() + 35 * 24 * 60 * 60 * 1000))
+}).refine((data) => data.endDate > data.startDate, {
+  message: 'End date must be after start date',
+  path: ['endDate']
 });
 
-export type CreateCampaignDto = z.infer<typeof CreateCampaignDtoSchema>;
+export type CreateCampaignDto = z.input<typeof CreateCampaignDtoSchema>;
 
 export interface CampaignResponseDto {
   id: string;
@@ -30,6 +35,8 @@ export interface CampaignResponseDto {
   category: 'Tech' | 'Fashion' | 'Food' | 'Beauty' | 'Other';
   budget: number;
   daysLeft: number;
+  startDate?: Date;
+  endDate?: Date;
   totalSlots: number;
   filledSlots: number;
   followersRequired: string;

@@ -16,6 +16,8 @@ export interface ICampaign extends Document {
   category: 'Tech' | 'Fashion' | 'Food' | 'Beauty' | 'Other';
   budget: number;
   daysLeft: number;
+  startDate?: Date;
+  endDate?: Date;
   totalSlots: number;
   filledSlots: number;
   followersRequired: string;
@@ -74,6 +76,16 @@ const campaignSchema = new Schema<ICampaign>(
     daysLeft: {
       type: Number,
       default: 35
+    },
+    startDate: {
+      type: Date,
+      required: true,
+      default: Date.now
+    },
+    endDate: {
+      type: Date,
+      required: true,
+      default: () => new Date(Date.now() + 35 * 24 * 60 * 60 * 1000)
     },
     totalSlots: {
       type: Number,

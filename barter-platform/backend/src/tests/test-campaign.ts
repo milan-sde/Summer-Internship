@@ -102,11 +102,30 @@ const testCampaignSystem = async () => {
     console.log('📥 Test 5: Influencer applies to Campaign...');
     const appliedCampaign = await campaignService.applyToCampaign(createdCampaign.id, influencerUser._id.toString());
     console.log(`✅ Application successful!`);
-    console.log(`   Updated Slots: ${appliedCampaign.filledSlots}/${appliedCampaign.totalSlots}`);
-    console.log(`   Applicants: ${appliedCampaign.applicants.join(', ')}\n`);
+    console.log(`   Updated Slots (Pending): ${appliedCampaign.filledSlots}/${appliedCampaign.totalSlots}`);
+    console.log(`   Applicants: ${JSON.stringify(appliedCampaign.applicants)}\n`);
 
-    if (appliedCampaign.filledSlots !== 1 || !appliedCampaign.applicants.includes(influencerUser._id.toString())) {
+    const hasApplicant = appliedCampaign.applicants.some(
+      (app: any) => app.influencerId === influencerUser._id.toString()
+    );
+
+    if (!hasApplicant) {
       throw new Error('Application verification failed!');
+    }
+
+    // 5.5 Brand approves the application to increment slots
+    console.log('👍 Test 5.5: Brand approves the application...');
+    const approvedCampaign = await campaignService.updateApplicationStatus(
+      createdCampaign.id,
+      brandUser._id.toString(),
+      influencerUser._id.toString(),
+      'APPROVED'
+    );
+    console.log(`✅ Application approved!`);
+    console.log(`   Updated Slots (Approved): ${approvedCampaign.filledSlots}/${approvedCampaign.totalSlots}`);
+
+    if (approvedCampaign.filledSlots !== 1) {
+      throw new Error('Approval slot increment verification failed!');
     }
 
     // 6. Fetch Brand Created Campaigns & Influencer Applied Campaigns

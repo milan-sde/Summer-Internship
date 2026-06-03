@@ -108,6 +108,16 @@ export class ProfileService {
       data.fullName = `${data.firstName} ${data.lastName}`;
     }
 
+    // Calculate stats.followers as max of platform followers
+    let initialFollowers = 0;
+    if (data.platforms) {
+      initialFollowers = Math.max(
+        data.platforms.instagram?.followers || 0,
+        data.platforms.youtube?.followers || 0,
+        data.platforms.twitter?.followers || 0
+      );
+    }
+
     // Create profile
     const profile = await this.profileRepository.create({
       userId: new mongoose.Types.ObjectId(userId),
@@ -118,6 +128,11 @@ export class ProfileService {
       avatarUrl: data.avatarUrl,
       website: data.website,
       location: data.location,
+      stats: {
+        followers: initialFollowers,
+        engagementRate: 0,
+        totalPosts: 0
+      },
 
       // Influencer fields
       username: data.username,
@@ -203,17 +218,39 @@ export class ProfileService {
       }
     }
 
+    // Copy payload to a new mutable object of type any to prevent DTO schema type constraints
+    const updateData: any = { ...data };
+
     // Dynamic brand logic for full name construction on update
     if (profile.role === 'BRAND') {
       const firstName = data.firstName !== undefined ? data.firstName : profile.firstName;
       const lastName = data.lastName !== undefined ? data.lastName : profile.lastName;
       if (firstName || lastName) {
-        data.fullName = `${firstName || ''} ${lastName || ''}`.trim();
+        updateData.fullName = `${firstName || ''} ${lastName || ''}`.trim();
       }
     }
 
+    if (profile.role === 'INFLUENCER' && data.platforms) {
+      const instagramFollowers = data.platforms.instagram?.followers !== undefined 
+        ? data.platforms.instagram.followers 
+        : profile.platforms?.instagram?.followers || 0;
+      const youtubeFollowers = data.platforms.youtube?.followers !== undefined 
+        ? data.platforms.youtube.followers 
+        : profile.platforms?.youtube?.followers || 0;
+      const twitterFollowers = data.platforms.twitter?.followers !== undefined 
+        ? data.platforms.twitter.followers 
+        : profile.platforms?.twitter?.followers || 0;
+        
+      const maxFollowers = Math.max(instagramFollowers, youtubeFollowers, twitterFollowers);
+      
+      updateData.stats = {
+        ...profile.stats,
+        followers: maxFollowers
+      };
+    }
+
     // Update profile
-    const updatedProfile = await this.profileRepository.updateByUserId(userId, data);
+    const updatedProfile = await this.profileRepository.updateByUserId(userId, updateData);
     
     return this.toResponseDto(updatedProfile);
   }
