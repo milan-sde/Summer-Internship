@@ -2,7 +2,7 @@
   <ion-toolbar color="primary">
     <ion-title class="headings">Dashboard</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="logout()" style="--color: white;">
+      <ion-button (click)="logout()" style="--color: var(--ion-color-white);">
         <ion-icon name="log-out-outline" slot="icon-only"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -17,12 +17,12 @@
   <div style="max-width: 800px; margin: 0 auto;">
 
     <!-- Welcome Card -->
-    <ion-card class="welcome-card" style="border-radius: 16px; margin: 15px 0 25px 0; box-shadow: 0 8px 24px rgba(255, 90, 54, 0.2);">
+    <ion-card class="welcome-card" style="border-radius: 16px; margin: 15px 0 25px 0; box-shadow: 0 8px 24px rgba(var(--ion-color-primary-rgb), 0.2);">
       <ion-card-header>
         <ion-card-title class="headings" style="font-size: 1.5rem; font-weight: 800;">
           Welcome back, {{ user?.fullName || user?.email }}!
         </ion-card-title>
-        <ion-card-subtitle style="color: rgba(255, 255, 255, 0.8); font-weight: 600; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; margin-top: 5px;">
+        <ion-card-subtitle style="color: rgba(var(--ion-color-white-rgb), 0.8); font-weight: 600; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; margin-top: 5px;">
           Logged in as a {{ user?.role | lowercase }}
         </ion-card-subtitle>
       </ion-card-header>
@@ -70,11 +70,11 @@
         Quick Stats
       </h3>
       <ion-list lines="none" style="background: transparent;">
-        <ion-item style="--background: transparent; margin-bottom: 6px; border-bottom: 1px solid var(--ion-color-step-100, #f0f0f0); padding-bottom: 4px;">
+        <ion-item style="--background: transparent; margin-bottom: 6px; border-bottom: 1px solid var(--ion-color-step-100); padding-bottom: 4px;">
           <ion-label style="font-weight: 600; color: var(--ion-color-step-700);">Profile Views</ion-label>
           <ion-badge slot="end" color="primary" style="font-weight: 700; border-radius: 8px; padding: 6px 12px;">0</ion-badge>
         </ion-item>
-        <ion-item style="--background: transparent; margin-bottom: 6px; border-bottom: 1px solid var(--ion-color-step-100, #f0f0f0); padding-bottom: 4px;">
+        <ion-item style="--background: transparent; margin-bottom: 6px; border-bottom: 1px solid var(--ion-color-step-100); padding-bottom: 4px;">
           <ion-label style="font-weight: 600; color: var(--ion-color-step-700);">Collaboration Requests</ion-label>
           <ion-badge slot="end" color="success" style="font-weight: 700; border-radius: 8px; padding: 6px 12px;">0</ion-badge>
         </ion-item>

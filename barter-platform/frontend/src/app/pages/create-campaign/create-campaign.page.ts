@@ -54,7 +54,6 @@ import {
     IonCol,
     CommonModule,
     ReactiveFormsModule,
-    RouterLink,
     IonHeader,
     IonToolbar,
     IonTitle,
@@ -110,16 +109,16 @@ export class CreateCampaignPage implements OnInit {
       const brandIndustries = profile?.industries || [];
       if (brandIndustries.length > 0) {
         const defaultCategories = ['Tech', 'Fashion', 'Food', 'Beauty', 'Other'];
-        
-        const selected = defaultCategories.filter(cat => 
+
+        const selected = defaultCategories.filter(cat =>
           brandIndustries.some((ind: string) => ind.toLowerCase() === cat.toLowerCase())
         );
-        const remaining = defaultCategories.filter(cat => 
+        const remaining = defaultCategories.filter(cat =>
           !brandIndustries.some((ind: string) => ind.toLowerCase() === cat.toLowerCase())
         );
-        
+
         this.categoriesList = [...selected, ...remaining];
-        
+
         if (selected.length > 0) {
           this.campaignForm.get('category')?.setValue(selected[0]);
         }

@@ -43,8 +43,8 @@
   justify-content: center;
   margin-bottom: 10px;
   --box-border-radius: 8px;
-  --box-background: white;
-  --box-border-color: var(--ion-color-step-300, #ccc);
+  --box-background: var(--ion-color-white);
+  --box-border-color: var(--ion-color-step-300, var(--ion-color-light-shade));
 
   // Style the slotted text directly below the boxes
   text-align: center;

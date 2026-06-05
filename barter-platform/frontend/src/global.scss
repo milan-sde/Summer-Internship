@@ -39,21 +39,7 @@
 
 
 
-:root {
-  /* Fonts */
-  --font-family-headings: 'Outfit', -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
-  --font-family-body: 'Inter', -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
-
-  /* Premium Coral Palette */
-  --ion-color-primary: #FF5A36;
-  --ion-color-primary-rgb: 255,90,54;
-  --ion-color-primary-contrast: #ffffff;
-  --ion-color-primary-contrast-rgb: 255,255,255;
-  --ion-color-primary-shade: #e04f2f;
-  --ion-color-primary-tint: #ff6a4a;
-
-  --ion-font-family: var(--font-family-body);
-}
+/* Root variables are defined in theme/variables.scss */
 
 h1, h2, h3, h4, h5, h6, ion-title, .headings {
   font-family: var(--font-family-headings) !important;
@@ -152,7 +138,7 @@ ion-card[button] {
     background: var(--ion-color-primary);
     color: white;
     border-color: var(--ion-color-primary);
-    box-shadow: 0 4px 12px rgba(255, 90, 54, 0.3);
+    box-shadow: 0 4px 12px rgba(var(--ion-color-primary-rgb), 0.3);
   }
 }
 
@@ -186,7 +172,7 @@ ion-card[button] {
   justify-content: center;
   position: relative;
   cursor: pointer;
-  box-shadow: 0 6px 20px rgba(255, 90, 54, 0.25);
+  box-shadow: 0 6px 20px rgba(var(--ion-color-primary-rgb), 0.25);
   transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   overflow: hidden;
 
@@ -295,7 +281,7 @@ ion-card[button] {
 
   &:focus-within {
     border-color: var(--ion-color-primary);
-    box-shadow: 0 0 0 3px rgba(255, 90, 54, 0.15);
+    box-shadow: 0 0 0 3px rgba(var(--ion-color-primary-rgb), 0.15);
     --background: white;
   }
 
@@ -454,7 +440,7 @@ ion-card[button] {
 
 .submit-btn {
   --border-radius: 12px;
-  --box-shadow: 0 4px 16px rgba(255, 90, 54, 0.25);
+  --box-shadow: 0 4px 16px rgba(var(--ion-color-primary-rgb), 0.25);
   font-weight: 700;
   height: 48px;
   margin-top: 30px;
@@ -527,7 +513,7 @@ ion-card[button] {
   &.selected {
     background: rgba(var(--ion-color-primary-rgb), 0.05);
     border-color: var(--ion-color-primary);
-    box-shadow: 0 4px 16px rgba(255, 90, 54, 0.15);
+    box-shadow: 0 4px 16px rgba(var(--ion-color-primary-rgb), 0.15);
 
     ion-icon {
       color: var(--ion-color-primary);

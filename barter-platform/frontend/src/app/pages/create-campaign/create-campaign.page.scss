@@ -15,14 +15,14 @@
   h2 {
     font-size: 1.65rem;
     font-weight: 800;
-    color: #1f2937;
+    color: var(--ion-color-dark);
     margin: 0 0 10px 0;
     letter-spacing: -0.3px;
   }
 
   p {
     font-size: 0.9rem;
-    color: #6b7280;
+    color: var(--ion-color-medium);
     margin: 0;
     line-height: 1.5;
     font-weight: 500;
@@ -31,10 +31,10 @@
 
 /* Glassmorphic Card - Matching campaign card design */
 .glassmorphism-card {
-  background: #ffffff;
+  background: var(--ion-color-white);
   border-radius: 28px;
   padding: 24px 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.02);
+  box-shadow: 0 2px 8px rgba(var(--ion-color-black-rgb), 0.04), 0 4px 16px rgba(var(--ion-color-black-rgb), 0.02);
   transition: all 0.3s ease;
 }
 
@@ -48,7 +48,7 @@
   display: block;
   font-size: 0.8rem;
   font-weight: 700;
-  color: #374151;
+  color: var(--ion-color-dark);
   margin-bottom: 8px;
   margin-left: 4px;
   text-transform: uppercase;
@@ -56,11 +56,11 @@
 }
 
 .custom-input-item {
-  --background: #f8fafc;
+  --background: var(--ion-color-light);
   --border-radius: 16px;
   --border-width: 1.5px;
   --border-style: solid;
-  --border-color: #e5e7eb;
+  --border-color: var(--ion-color-light-shade);
   --inner-border-width: 0;
   --padding-start: 12px;
   --padding-end: 12px;
@@ -70,21 +70,21 @@
   transition: all 0.2s ease;
 
   &:focus-within {
-    --border-color: #ff5a36;
-    --background: #ffffff;
-    box-shadow: 0 0 0 3px rgba(255, 90, 54, 0.08);
+    --border-color: var(--ion-color-primary);
+    --background: var(--ion-color-white);
+    box-shadow: 0 0 0 3px rgba(var(--ion-color-primary-rgb), 0.08);
   }
 }
 
 /* Input icon styling */
 .input-icon {
-  color: #9ca3af;
+  color: var(--ion-color-medium);
   font-size: 1.2rem;
   transition: color 0.2s ease;
 }
 
 .custom-input-item:focus-within .input-icon {
-  color: #ff5a36;
+  color: var(--ion-color-primary);
 }
 
 /* Textarea specific styling */
@@ -95,7 +95,7 @@ ion-textarea {
   --padding-bottom: 12px;
   font-size: 0.9rem;
   font-weight: 500;
-  --placeholder-color: #9ca3af;
+  --placeholder-color: var(--ion-color-medium);
   --placeholder-opacity: 1;
 }
 
@@ -107,7 +107,7 @@ ion-input {
   --padding-bottom: 12px;
   font-size: 0.9rem;
   font-weight: 500;
-  --placeholder-color: #9ca3af;
+  --placeholder-color: var(--ion-color-medium);
   --placeholder-opacity: 1;
 }
 
@@ -118,12 +118,12 @@ ion-input {
   --padding-end: 0;
   font-weight: 600;
   font-size: 0.9rem;
-  color: #1f2937;
-  --placeholder-color: #9ca3af;
+  color: var(--ion-color-dark);
+  --placeholder-color: var(--ion-color-medium);
   --placeholder-opacity: 1;
 
   &::part(icon) {
-    color: #ff5a36;
+    color: var(--ion-color-primary);
   }
 }
 
@@ -149,12 +149,12 @@ ion-input {
 
 /* Submit Button - Matching campaigns page primary button */
 .submit-btn {
-  --background: #ff5a36;
-  --background-hover: #e04e2e;
-  --background-activated: #e04e2e;
+  --background: var(--ion-color-primary);
+  --background-hover: var(--ion-color-primary-shade);
+  --background-activated: var(--ion-color-primary-shade);
   --border-radius: 40px;
-  --box-shadow: 0 4px 12px rgba(255, 90, 54, 0.3);
-  --box-shadow-activated: 0 6px 16px rgba(255, 90, 54, 0.35);
+  --box-shadow: 0 4px 12px rgba(var(--ion-color-primary-rgb), 0.3);
+  --box-shadow-activated: 0 6px 16px rgba(var(--ion-color-primary-rgb), 0.35);
   height: 52px;
   margin-top: 16px;
   font-weight: 800;
@@ -168,7 +168,7 @@ ion-input {
   }
 
   &[disabled] {
-    --background: #d1d5db;
+    --background: var(--ion-color-light-shade);
     --box-shadow: none;
     opacity: 0.7;
   }
@@ -311,7 +311,7 @@ ion-text[color="danger"] {
     font-weight: 500;
 
     &.option-selected {
-      --color: #ff5a36;
+      --color: var(--ion-color-primary);
       font-weight: 700;
     }
   }
@@ -325,20 +325,20 @@ ion-text[color="danger"] {
 /* Placeholder styling */
 ion-input::part(placeholder),
 ion-textarea::part(placeholder) {
-  color: #9ca3af;
+  color: var(--ion-color-medium);
   font-weight: 400;
   font-size: 0.85rem;
 }
 
 /* Make the back button consistent with campaigns page */
 ion-back-button {
-  --color: #ffffff;
+  --color: var(--ion-color-white);
   --icon-font-size: 1.4rem;
 }
 
 /* Optional: Add micro-interactions */
 .custom-input-item:hover {
-  --border-color: #d1d5db;
+  --border-color: var(--ion-color-light-shade);
 }
 
 /* Validation summary styling */
@@ -378,30 +378,30 @@ ion-back-button {
 
   .alert-title {
     font-weight: 800 !important;
-    color: #1f2937 !important;
+    color: var(--ion-color-dark) !important;
     font-size: 1.1rem !important;
   }
 
   .alert-radio-group {
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid var(--ion-color-light-shade);
   }
 
   .alert-radio-label {
     font-weight: 500 !important;
-    color: #374151 !important;
+    color: var(--ion-color-dark) !important;
   }
 
   .alert-radio-icon {
-    border-color: #d1d5db !important;
+    border-color: var(--ion-color-light-shade) !important;
   }
 
   .alert-radio-checked {
-    border-color: #ff5a36 !important;
-    background-color: #ff5a36 !important;
+    border-color: var(--ion-color-primary) !important;
+    background-color: var(--ion-color-primary) !important;
   }
 
   .alert-button {
-    color: #ff5a36 !important;
+    color: var(--ion-color-primary) !important;
     font-weight: 700 !important;
   }
 }

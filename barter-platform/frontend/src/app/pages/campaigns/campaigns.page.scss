@@ -8,9 +8,9 @@
 
 /* Header style modifications */
 .header-toolbar {
-  --background: #ffffff;
-  --color: #1f2937;
-  border-bottom: 1px solid #f3f4f6;
+  --background: var(--ion-color-white);
+  --color: var(--ion-color-dark);
+  border-bottom: 1px solid var(--ion-color-light-shade);
 }
 
 .logo-container {
@@ -33,7 +33,7 @@
   font-size: 1.8rem;
   font-weight: 900;
   font-style: italic;
-  background: linear-gradient(135deg, #ff5a36, #ff7e47);
+  background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-primary-tint));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -42,13 +42,13 @@
 .header-title {
   font-weight: 800;
   font-size: 1.5rem;
-  color: #1f2937;
+  color: var(--ion-color-dark);
   margin-left: 10px;
 }
 
 .profile-header-btn {
-  --color: #374151;
-  --background: #f3f4f6;
+  --color: var(--ion-color-dark);
+  --background: var(--ion-color-light);
   --border-radius: 14px;
   width: 40px;
   height: 40px;
@@ -67,7 +67,7 @@
 
 .subtitle-text {
   font-size: 0.95rem;
-  color: #6c757d;
+  color: var(--ion-color-medium);
   font-weight: 500;
   margin: 0;
 }
@@ -79,17 +79,17 @@
 }
 
 .custom-segment {
-  --background: #f3f4f6;
+  --background: var(--ion-color-light);
   border-radius: 16px;
   padding: 4px;
   height: 52px;
 }
 
 .custom-segment-button {
-  --color: #6b7280;
-  --color-checked: #ffffff;
+  --color: var(--ion-color-medium);
+  --color-checked: var(--ion-color-white);
   --background: transparent;
-  --background-checked: #ff5a36;
+  --background-checked: var(--ion-color-primary);
   --border-radius: 12px;
   font-weight: 700;
   font-size: 0.95rem;
@@ -99,7 +99,7 @@
 }
 
 .custom-segment-button::part(indicator) {
-  background: #ff5a36 !important;
+  background: var(--ion-color-primary) !important;
   border-radius: 12px;
 }
 
@@ -126,8 +126,8 @@
 .category-tag {
   display: inline-flex;
   padding: 8px 22px;
-  background: #f0f0f5;
-  color: #374151;
+  background: var(--ion-color-light);
+  color: var(--ion-color-dark);
   font-weight: 700;
   font-size: 0.85rem;
   border-radius: 40px;
@@ -140,9 +140,9 @@
   }
 
   &.active {
-    background: #ff5a36;
-    color: white;
-    box-shadow: 0 4px 12px rgba(255, 90, 54, 0.25);
+    background: var(--ion-color-primary);
+    color: var(--ion-color-white);
+    box-shadow: 0 4px 12px rgba(var(--ion-color-primary-rgb), 0.25);
   }
 }
 
@@ -161,8 +161,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
+  background: var(--ion-color-white);
+  border: 1px solid var(--ion-color-light-shade);
   border-radius: 14px;
   padding: 8px 12px;
   height: 44px;
@@ -176,21 +176,21 @@
 
   .dropdown-icon {
     font-size: 1.2rem;
-    color: #ff5a36;
+    color: var(--ion-color-primary);
     margin-right: 4px;
   }
 
   .dropdown-rupee-icon {
     font-size: 1.1rem;
     font-weight: 800;
-    color: #ff5a36;
+    color: var(--ion-color-primary);
     margin-right: 6px;
     display: inline-block;
   }
 
   .chevron-icon {
     font-size: 0.95rem;
-    color: #9ca3af;
+    color: var(--ion-color-medium);
     pointer-events: none;
   }
 
@@ -200,8 +200,8 @@
     --padding-end: 4px;
     font-size: 0.85rem;
     font-weight: 600;
-    color: #374151;
-    --placeholder-color: #9ca3af;
+    color: var(--ion-color-dark);
+    --placeholder-color: var(--ion-color-medium);
     --placeholder-opacity: 1;
     text-transform: capitalize;
     --arrow-display: none;
@@ -223,14 +223,14 @@
 .brand-section-title {
   font-size: 1.35rem;
   font-weight: 800;
-  color: #1f2937;
+  color: var(--ion-color-dark);
   margin: 0;
 }
 
 .create-campaign-btn {
-  --background: #ff5a36;
+  --background: var(--ion-color-primary);
   --border-radius: 40px;
-  --box-shadow: 0 4px 12px rgba(255, 90, 54, 0.25);
+  --box-shadow: 0 4px 12px rgba(var(--ion-color-primary-rgb), 0.25);
   font-weight: 700;
   font-size: 0.85rem;
   margin: 0;
@@ -239,12 +239,12 @@
 
 /* Premium Glassmorphic Cards Styling */
 .premium-campaign-card {
-  background: #ffffff;
+  background: var(--ion-color-white);
   border: none;
   border-radius: 24px;
   padding: 20px;
   margin-bottom: 18px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.02);
+  box-shadow: 0 2px 8px rgba(var(--ion-color-black-rgb), 0.04), 0 4px 16px rgba(var(--ion-color-black-rgb), 0.02);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
@@ -274,13 +274,13 @@
 .brand-avatar-box {
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, #ff5a36, #ff7e47);
+  background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-primary-tint));
   border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  box-shadow: 0 4px 10px rgba(255, 90, 54, 0.15);
+  box-shadow: 0 4px 10px rgba(var(--ion-color-primary-rgb), 0.15);
 }
 
 .brand-avatar-img {
@@ -290,7 +290,7 @@
 }
 
 .brand-avatar-initial {
-  color: white;
+  color: var(--ion-color-white);
   font-size: 1.5rem;
   font-weight: 800;
 }
@@ -304,13 +304,13 @@
 .brand-title {
   font-size: 1rem;
   font-weight: 800;
-  color: #1f2937;
+  color: var(--ion-color-dark);
   margin: 0;
 }
 
 .brand-platform-text {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--ion-color-medium);
   margin: 2px 0 0 0;
   font-weight: 600;
 }
@@ -319,7 +319,7 @@
 .category-badge-box {
   display: flex;
   align-items: center;
-  background: rgba(255, 90, 54, 0.08);
+  background: rgba(var(--ion-color-primary-rgb), 0.08);
   border-radius: 40px;
   padding: 6px 12px;
   gap: 6px;
@@ -327,13 +327,13 @@
 
   .badge-icon {
     font-size: 0.9rem;
-    color: #ff5a36;
+    color: var(--ion-color-primary);
   }
 
   .badge-text {
     font-size: 0.7rem;
     font-weight: 800;
-    color: #ff5a36;
+    color: var(--ion-color-primary);
   }
 }
 
@@ -345,14 +345,14 @@
 .campaign-main-title {
   font-size: 1.15rem;
   font-weight: 800;
-  color: #1f2937;
+  color: var(--ion-color-dark);
   margin: 0 0 6px 0;
   line-height: 1.35;
 }
 
 .campaign-desc-text {
   font-size: 0.85rem;
-  color: #6b7280;
+  color: var(--ion-color-medium);
   margin: 0;
   line-height: 1.45;
 }
@@ -374,23 +374,23 @@
   gap: 6px;
   font-size: 0.8rem;
   font-weight: 600;
-  color: #4b5563;
+  color: var(--ion-color-medium);
   padding: 4px 0;
 
   .metric-icon {
     font-size: 1rem;
-    color: #9ca3af;
+    color: var(--ion-color-medium);
   }
 
   &.budget {
-    background: rgba(255, 90, 54, 0.1);
+    background: rgba(var(--ion-color-primary-rgb), 0.1);
     padding: 4px 12px;
     border-radius: 40px;
-    color: #ff5a36;
+    color: var(--ion-color-primary);
     font-weight: 800;
 
     .metric-icon {
-      color: #ff5a36;
+      color: var(--ion-color-primary);
     }
   }
 
@@ -403,7 +403,7 @@
 .progress-bar-container {
   width: 100%;
   height: 6px;
-  background: #e5e7eb;
+  background: var(--ion-color-light-shade);
   border-radius: 3px;
   margin-bottom: 16px;
   overflow: hidden;
@@ -411,7 +411,7 @@
 
 .progress-bar {
   height: 100%;
-  background: #ff5a36;
+  background: var(--ion-color-primary);
   border-radius: 3px;
   transition: width 0.4s ease-out;
 }
@@ -437,8 +437,8 @@
   }
 
   .applicants-status-pill {
-    background: #f3f4f6;
-    color: #4b5563;
+    background: var(--ion-color-light);
+    color: var(--ion-color-medium);
     font-weight: 700;
     font-size: 0.8rem;
     padding: 6px 12px;
@@ -447,7 +447,7 @@
 
   .view-applicants-toggle-btn {
     margin: 0;
-    --color: #ff5a36;
+    --color: var(--ion-color-primary);
     font-weight: 700;
     font-size: 0.8rem;
   }
@@ -460,9 +460,9 @@
   width: 100%;
 
   .apply-now-btn {
-    --background: #ff5a36;
+    --background: var(--ion-color-primary);
     --border-radius: 40px;
-    --box-shadow: 0 4px 12px rgba(255, 90, 54, 0.25);
+    --box-shadow: 0 4px 12px rgba(var(--ion-color-primary-rgb), 0.25);
     font-weight: 700;
     font-size: 0.85rem;
     height: 38px;
@@ -483,24 +483,24 @@
     }
 
     &.pending {
-      background: #fef3c7;
-      color: #d97706;
+      background: rgba(var(--ion-color-warning-rgb), 0.15);
+      color: var(--ion-color-warning-shade);
     }
 
     &.approved {
-      background: #d1fae5;
-      color: #059669;
+      background: rgba(var(--ion-color-success-rgb), 0.15);
+      color: var(--ion-color-success-shade);
     }
 
     &.rejected {
-      background: #fee2e2;
-      color: #dc2626;
+      background: rgba(var(--ion-color-danger-rgb), 0.15);
+      color: var(--ion-color-danger);
     }
   }
 
   .fully-filled-badge {
-    background: #f3f4f6;
-    color: #9ca3af;
+    background: var(--ion-color-light);
+    color: var(--ion-color-medium);
     font-weight: 700;
     font-size: 0.8rem;
     padding: 6px 14px;
@@ -512,7 +512,7 @@
 .brand-applicants-panel {
   margin-top: 15px;
   padding-top: 15px;
-  border-top: 1px solid #f3f4f6;
+  border-top: 1px solid var(--ion-color-light-shade);
   width: 100%;
 
   .panel-header {
@@ -522,7 +522,7 @@
       margin: 0;
       font-size: 0.9rem;
       font-weight: 800;
-      color: #374151;
+      color: var(--ion-color-dark);
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
@@ -530,7 +530,7 @@
 
   .no-applicants-placeholder {
     font-size: 0.85rem;
-    color: #9ca3af;
+    color: var(--ion-color-medium);
     padding: 15px 0;
     text-align: center;
   }
@@ -540,7 +540,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 12px 0;
-    border-bottom: 1px solid #f3f4f6;
+    border-bottom: 1px solid var(--ion-color-light-shade);
     flex-wrap: wrap;
     gap: 12px;
 
@@ -560,7 +560,7 @@
   .applicant-avatar-circle {
     width: 38px;
     height: 38px;
-    background: linear-gradient(135deg, #ff5a36, #ff7e47);
+    background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-primary-tint));
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -575,7 +575,7 @@
     }
 
     .applicant-avatar-initial {
-      color: white;
+      color: var(--ion-color-white);
       font-weight: bold;
       font-size: 1rem;
     }
@@ -588,17 +588,17 @@
       margin: 0;
       font-size: 0.85rem;
       font-weight: 800;
-      color: #1f2937;
+      color: var(--ion-color-dark);
     }
 
     .applicant-username-stats {
       margin: 2px 0 0 0;
       font-size: 0.7rem;
-      color: #6b7280;
+      color: var(--ion-color-medium);
 
       .handle {
         font-weight: 600;
-        color: #4b5563;
+        color: var(--ion-color-medium);
       }
 
       .separator {
@@ -621,11 +621,11 @@
       height: 32px;
 
       &.approve {
-        --background: #10b981;
+        --background: var(--ion-color-success);
       }
 
       &.reject {
-        --background: #ef4444;
+        --background: var(--ion-color-danger);
       }
     }
 
@@ -639,13 +639,13 @@
       border-radius: 40px;
 
       &.approved {
-        background: #d1fae5;
-        color: #059669;
+        background: rgba(var(--ion-color-success-rgb), 0.15);
+        color: var(--ion-color-success-shade);
       }
 
       &.rejected {
-        background: #fee2e2;
-        color: #dc2626;
+        background: rgba(var(--ion-color-danger-rgb), 0.15);
+        color: var(--ion-color-danger);
       }
     }
   }
@@ -665,8 +665,8 @@
 .loading-spinner {
   width: 40px;
   height: 40px;
-  border: 3px solid #f3f4f6;
-  border-top-color: #ff5a36;
+  border: 3px solid var(--ion-color-light);
+  border-top-color: var(--ion-color-primary);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -677,7 +677,7 @@
 
 .loading-text {
   font-weight: 600;
-  color: #6b7280;
+  color: var(--ion-color-medium);
   font-size: 0.9rem;
 }
 
@@ -693,20 +693,20 @@
 
 .empty-icon {
   font-size: 3rem;
-  color: #d1d5db;
+  color: var(--ion-color-light-shade);
   margin-bottom: 12px;
 }
 
 .empty-state h3 {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #374151;
+  color: var(--ion-color-dark);
   margin: 0 0 6px 0;
 }
 
 .empty-state p {
   font-size: 0.85rem;
-  color: #6b7280;
+  color: var(--ion-color-medium);
   margin: 0;
   max-width: 280px;
   line-height: 1.4;
