@@ -1,39 +1,87 @@
-// src/app/services/profile.service.ts
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 import { ApiService } from './api.service';
 import { StorageService } from './storage.service';
-import { LoadingController, ToastController } from '@ionic/angular/standalone';
 
 export interface CreateProfileDto {
-  fullName: string;
-  instagramHandle: string;
+  fullName?: string;
+  instagramHandle?: string;
   bio: string;
+  avatarUrl?: string;
   website?: string;
   location?: string;
-  stats?: {
-    followers?: number;
-    engagementRate?: number;
-  };
   socialLinks?: {
     twitter?: string;
+    linkedin?: string;
     tiktok?: string;
   };
+  preferences?: {
+    emailNotifications?: boolean;
+    collaborationAlerts?: boolean;
+  };
+
+  // Influencer-specific fields
+  username?: string;
+  phoneNumber?: string;
+  categories?: string[];
+  countries?: string[];
+  platforms?: {
+    instagram?: { username?: string; followers?: number };
+    youtube?: { username?: string; followers?: number };
+    twitter?: { username?: string; followers?: number };
+  };
+  pastWorkLinks?: string[];
+
+  // Brand-specific fields
+  firstName?: string;
+  lastName?: string;
+  industries?: string[];
+  budgetMin?: number;
+  budgetMax?: number;
 }
 
 export interface UpdateProfileDto {
   fullName?: string;
   instagramHandle?: string;
   bio?: string;
+  avatarUrl?: string;
   website?: string;
   location?: string;
-  avatarUrl?: string;
+  socialLinks?: {
+    twitter?: string;
+    linkedin?: string;
+    tiktok?: string;
+  };
+  preferences?: {
+    emailNotifications?: boolean;
+    collaborationAlerts?: boolean;
+  };
+
+  // Influencer-specific fields
+  username?: string;
+  phoneNumber?: string;
+  categories?: string[];
+  countries?: string[];
+  platforms?: {
+    instagram?: { username?: string; followers?: number };
+    youtube?: { username?: string; followers?: number };
+    twitter?: { username?: string; followers?: number };
+  };
+  pastWorkLinks?: string[];
+
+  // Brand-specific fields
+  firstName?: string;
+  lastName?: string;
+  industries?: string[];
+  budgetMin?: number;
+  budgetMax?: number;
 }
 
 export interface ProfileResponse {
   id: string;
   userId: string;
   fullName: string;
-  instagramHandle: string;
+  instagramHandle?: string;
   bio: string;
   avatarUrl?: string;
   website?: string;
@@ -53,9 +101,26 @@ export interface ProfileResponse {
     emailNotifications: boolean;
     collaborationAlerts: boolean;
   };
-  industries?: string[];
   createdAt: Date;
   updatedAt: Date;
+
+  // New fields
+  username?: string;
+  phoneNumber?: string;
+  categories?: string[];
+  countries?: string[];
+  platforms?: {
+    instagram?: { username?: string; followers?: number };
+    youtube?: { username?: string; followers?: number };
+    twitter?: { username?: string; followers?: number };
+  };
+  pastWorkLinks?: string[];
+  isVerified?: boolean;
+  firstName?: string;
+  lastName?: string;
+  industries?: string[];
+  budgetMin?: number;
+  budgetMax?: number;
 }
 
 @Injectable({
@@ -64,204 +129,52 @@ export interface ProfileResponse {
 export class ProfileService {
   constructor(
     private apiService: ApiService,
-    private storage: StorageService,
-    private loadingController: LoadingController,
-    private toastController: ToastController
+    private storage: StorageService
   ) {}
 
-  /**
-   * Create profile (completes onboarding)
-   */
-  async createProfile(profileData: CreateProfileDto): Promise<ProfileResponse> {
-    const loading = await this.loadingController.create({
-      message: 'Creating your profile...'
-    });
-    await loading.present();
-
-    try {
-      const response: any = await this.apiService.authPost('profile', profileData);
-
-      if (response.success) {
-        await this.showToast('Profile created successfully! Welcome aboard!', 'success');
-        return response.data.profile;
-      }
-      throw new Error('Profile creation failed');
-    } catch (error: any) {
-      await this.showToast(error.message || 'Failed to create profile', 'danger');
-      throw error;
-    } finally {
-      await loading.dismiss();
-    }
+  // Create a new user profile on onboarding completion via API
+  createProfile(profileData: CreateProfileDto): Observable<any> {
+    return this.apiService.authPost('profile', profileData);
   }
 
-  /**
-   * Get my profile
-   */
-  async getMyProfile(): Promise<ProfileResponse> {
-    try {
-      const response: any = await this.apiService.authGet('profile/me');
-
-      if (response.success) {
-        return response.data.profile;
-      }
-      throw new Error('Failed to load profile');
-    } catch (error: any) {
-      console.error('Get profile error:', error);
-      throw error;
-    }
+  // Get current user's profile details via API
+  getMyProfile(): Observable<any> {
+    return this.apiService.authGet('profile/me');
   }
 
-  /**
-   * Update profile
-   */
-  async updateProfile(profileData: UpdateProfileDto): Promise<ProfileResponse> {
-    const loading = await this.loadingController.create({
-      message: 'Updating your profile...'
-    });
-    await loading.present();
-
-    try {
-      const response: any = await this.apiService.authPut('profile', profileData);
-
-      if (response.success) {
-        await this.showToast('Profile updated successfully!', 'success');
-        return response.data.profile;
-      }
-      throw new Error('Profile update failed');
-    } catch (error: any) {
-      await this.showToast(error.message || 'Failed to update profile', 'danger');
-      throw error;
-    } finally {
-      await loading.dismiss();
-    }
+  // Update current user's profile details via API
+  updateProfile(profileData: UpdateProfileDto): Observable<any> {
+    return this.apiService.authPut('profile', profileData);
   }
 
-  /**
-   * Get profile by user ID (for viewing other profiles)
-   */
-  async getProfileById(userId: string): Promise<ProfileResponse> {
-    try {
-      const response: any = await this.apiService.authGet(`profile/${userId}`);
-
-      if (response.success) {
-        return response.data.profile;
-      }
-      throw new Error('Failed to load profile');
-    } catch (error: any) {
-      console.error('Get profile by ID error:', error);
-      throw error;
-    }
+  // Get profile details by user ID via API
+  getProfileById(userId: string): Observable<any> {
+    return this.apiService.authGet(`profile/${userId}`);
   }
 
-  /**
-   * Get public profile by Instagram handle
-   */
-  async getPublicProfile(instagramHandle: string): Promise<any> {
-    try {
-      const response: any = await this.apiService.authGet(`profile/public/${instagramHandle}`);
-
-      if (response.success) {
-        return response.data.profile;
-      }
-      throw new Error('Failed to load public profile');
-    } catch (error: any) {
-      console.error('Get public profile error:', error);
-      throw error;
-    }
+  // Get public profile details by Instagram handle via API
+  getPublicProfile(instagramHandle: string): Observable<any> {
+    return this.apiService.authGet(`profile/public/${instagramHandle}`);
   }
 
-  /**
-   * Search profiles
-   */
-  async searchProfiles(query: string, role?: string, page: number = 1, limit: number = 20): Promise<{
-    profiles: ProfileResponse[];
-    pagination: {
-      page: number;
-      limit: number;
-      total: number;
-      pages: number;
-    };
-  }> {
-    try {
-      let url = `profile/search?q=${encodeURIComponent(query)}&page=${page}&limit=${limit}`;
-      if (role) {
-        url += `&role=${role}`;
-      }
-
-      const response: any = await this.apiService.authGet(url);
-
-      if (response.success) {
-        return {
-          profiles: response.data,
-          pagination: response.pagination
-        };
-      }
-      throw new Error('Failed to search profiles');
-    } catch (error: any) {
-      console.error('Search profiles error:', error);
-      throw error;
+  // Search profiles with optional filters and pagination via API
+  searchProfiles(query: string, role?: string, page: number = 1, limit: number = 20): Observable<any> {
+    let url = `profile/search?q=${encodeURIComponent(query)}&page=${page}&limit=${limit}`;
+    if (role) {
+      url += `&role=${role}`;
     }
+    return this.apiService.authGet(url);
   }
 
-  /**
-   * Check if user has completed onboarding
-   */
-  async getOnboardingStatus(): Promise<boolean> {
-    try {
-      const response: any = await this.apiService.authGet('profile/onboarding-status');
-
-      if (response.success) {
-        return response.data.onboardingCompleted;
-      }
-      return false;
-    } catch (error) {
-      console.error('Get onboarding status error:', error);
-      return false;
-    }
+  // Check if onboarding is completed by requesting onboarding status via API
+  getOnboardingStatus(): Observable<any> {
+    return this.apiService.authGet('profile/onboarding-status');
   }
 
-  /**
-   * Upload profile picture
-   */
-  async uploadAvatar(file: File): Promise<string> {
-    const loading = await this.loadingController.create({
-      message: 'Uploading image...'
-    });
-    await loading.present();
-
-    try {
-      const formData = new FormData();
-      formData.append('avatar', file);
-
-      // Note: You'll need to add a custom endpoint for file uploads
-      // Or modify the update profile endpoint to handle multipart/form-data
-
-      const response: any = await this.apiService.authPost('profile/upload-avatar', formData);
-
-      if (response.success) {
-        await this.showToast('Avatar uploaded successfully!', 'success');
-        return response.data.avatarUrl;
-      }
-      throw new Error('Avatar upload failed');
-    } catch (error: any) {
-      await this.showToast(error.message || 'Failed to upload avatar', 'danger');
-      throw error;
-    } finally {
-      await loading.dismiss();
-    }
-  }
-
-  /**
-   * Show toast message
-   */
-  private async showToast(message: string, color: string = 'primary') {
-    const toast = await this.toastController.create({
-      message: message,
-      duration: 3000,
-      position: 'bottom',
-      color: color,
-      buttons: ['OK']
-    });
-    await toast.present();
+  // Upload user avatar image using multipart/form-data via API
+  uploadAvatar(file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('avatar', file);
+    return this.apiService.authPostFormData('profile/upload-avatar', formData);
   }
 }

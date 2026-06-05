@@ -18,6 +18,8 @@ import {
   IonInputOtp,
   IonButtons,
   IonBackButton,
+  LoadingController,
+  ToastController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { mailUnreadOutline, checkmarkCircleOutline } from 'ionicons/icons';
@@ -59,6 +61,8 @@ export class VerifyOtpPage implements OnInit, OnDestroy {
     private authService: AuthService,
     private router: Router,
     private route: ActivatedRoute,
+    private loadingController: LoadingController,
+    private toastController: ToastController,
   ) {
     addIcons({ mailUnreadOutline, checkmarkCircleOutline });
   }
@@ -104,60 +108,73 @@ export class VerifyOtpPage implements OnInit, OnDestroy {
     }, 1000);
   }
 
-  async onSubmit() {
+  // Submit OTP verification code and redirect to password setting
+  onSubmit() {
     if (this.verifyOtpForm.valid && !this.isSubmitting) {
       this.isSubmitting = true;
       const { otp } = this.verifyOtpForm.value;
 
-      try {
-        await this.authService.verifyOtp(this.email, otp);
-        // Navigate to create password page
-        await this.router.navigate(['/create-password'], {
-          queryParams: { email: this.email },
-          state: { email: this.email },
+      this.loadingController.create({
+        message: 'Verifying...',
+      }).then((loading) => {
+        loading.present();
+
+        this.authService.verifyOtp(this.email, otp).subscribe({
+          next: (response: any) => {
+            loading.dismiss();
+            this.showToast('Email verified! Now set your password.', 'success');
+            this.router.navigate(['/create-password'], {
+              queryParams: { email: this.email },
+              state: { email: this.email },
+            });
+            this.isSubmitting = false;
+          },
+          error: (error: any) => {
+            loading.dismiss();
+            console.error('OTP verification failed:', error);
+            this.showToast(error.message || 'OTP verification failed', 'danger');
+            this.verifyOtpForm.patchValue({ otp: '' });
+            this.isSubmitting = false;
+          }
         });
-      } catch (error) {
-        console.error('OTP verification failed:', error);
-        // Clear OTP field on error
-        this.verifyOtpForm.patchValue({ otp: '' });
-      } finally {
-        this.isSubmitting = false;
-      }
+      });
     }
   }
 
-  async resendOtp() {
+  // Resend OTP code to registration email via API
+  resendOtp() {
     if (!this.canResend) return;
 
-    try {
-      await this.authService.resendOtp(this.email);
-      // Reset timer
-      this.startTimer();
-      // Show success message
-      const toast = await this.createToast(
-        'New OTP sent to your email!',
-        'success',
-      );
-      await toast.present();
-    } catch (error) {
-      console.error('Resend OTP failed:', error);
-      const toast = await this.createToast(
-        'Failed to resend OTP. Please try again.',
-        'danger',
-      );
-      await toast.present();
-    }
+    this.loadingController.create({
+      message: 'Resending verification code...',
+    }).then((loading) => {
+      loading.present();
+
+      this.authService.resendOtp(this.email).subscribe({
+        next: (response: any) => {
+          loading.dismiss();
+          this.startTimer();
+          this.showToast('New OTP sent to your email!', 'success');
+        },
+        error: (error: any) => {
+          loading.dismiss();
+          console.error('Resend OTP failed:', error);
+          this.showToast(error.message || 'Failed to resend OTP. Please try again.', 'danger');
+        }
+      });
+    });
   }
 
-  async createToast(message: string, color: string) {
-    const { ToastController } = await import('@ionic/angular/standalone');
-    const toastController = new ToastController();
-    return await toastController.create({
+  // Display toast feedback messages
+  async showToast(message: string, color: string = 'primary') {
+    const toast = await this.toastController.create({
       message: message,
       duration: 3000,
       position: 'top',
       color: color,
+      buttons: ['OK'],
     });
+    await toast.present();
   }
 
   ngOnDestroy() {

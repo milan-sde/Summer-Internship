@@ -27,6 +27,8 @@ import {
   IonCol,
   IonRow,
   IonGrid,
+  LoadingController,
+  ToastController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -82,6 +84,8 @@ export class CreateCampaignPage implements OnInit {
     private campaignService: CampaignService,
     private profileService: ProfileService,
     private router: Router,
+    private loadingController: LoadingController,
+    private toastController: ToastController,
   ) {
     addIcons({
       arrowBackOutline,
@@ -98,34 +102,37 @@ export class CreateCampaignPage implements OnInit {
     });
   }
 
-  async ngOnInit() {
+  ngOnInit() {
     this.setupForm();
-    await this.loadBrandProfileAndOrderCategories();
+    this.loadBrandProfileAndOrderCategories();
   }
 
-  async loadBrandProfileAndOrderCategories() {
-    try {
-      const profile = await this.profileService.getMyProfile();
-      const brandIndustries = profile?.industries || [];
-      if (brandIndustries.length > 0) {
-        const defaultCategories = ['Tech', 'Fashion', 'Food', 'Beauty', 'Other'];
+  // Load the brand profile to prioritize categories relevant to their industries
+  loadBrandProfileAndOrderCategories() {
+    this.profileService.getMyProfile().subscribe({
+      next: (profile: any) => {
+        const brandIndustries = profile?.industries;
+        if (brandIndustries && brandIndustries.length > 0) {
+          const defaultCategories = ['Tech', 'Fashion', 'Food', 'Beauty', 'Other'];
 
-        const selected = defaultCategories.filter(cat =>
-          brandIndustries.some((ind: string) => ind.toLowerCase() === cat.toLowerCase())
-        );
-        const remaining = defaultCategories.filter(cat =>
-          !brandIndustries.some((ind: string) => ind.toLowerCase() === cat.toLowerCase())
-        );
+          const selected = defaultCategories.filter(cat =>
+            brandIndustries.some((ind: string) => ind.toLowerCase() === cat.toLowerCase())
+          );
+          const remaining = defaultCategories.filter(cat =>
+            !brandIndustries.some((ind: string) => ind.toLowerCase() === cat.toLowerCase())
+          );
 
-        this.categoriesList = [...selected, ...remaining];
+          this.categoriesList = [...selected, ...remaining];
 
-        if (selected.length > 0) {
-          this.campaignForm.get('category')?.setValue(selected[0]);
+          if (selected.length > 0) {
+            this.campaignForm.get('category')?.setValue(selected[0]);
+          }
         }
+      },
+      error: (error: any) => {
+        console.error('Failed to load brand profile for industry ordering:', error);
       }
-    } catch (error) {
-      console.error('Failed to load brand profile for industry ordering:', error);
-    }
+    });
   }
 
   setupForm() {
@@ -168,22 +175,49 @@ export class CreateCampaignPage implements OnInit {
     return null;
   }
 
-  async onSubmit() {
+  // Submit and create new campaign details via subscribe
+  onSubmit() {
     if (!this.campaignForm) return;
 
     if (this.campaignForm.valid && !this.isSubmitting) {
       this.isSubmitting = true;
-      try {
-        await this.campaignService.createCampaign(this.campaignForm.value);
-        await this.router.navigate(['/campaigns']);
-      } catch (error) {
-        console.error('Failed to create campaign:', error);
-      } finally {
-        this.isSubmitting = false;
-      }
+
+      // Show loading spinner
+      this.loadingController.create({
+        message: 'Creating campaign...'
+      }).then((loading) => {
+        loading.present();
+
+        this.campaignService.createCampaign(this.campaignForm.value).subscribe({
+          next: (response: any) => {
+            loading.dismiss();
+            this.showToast('Campaign created successfully!', 'success');
+            this.router.navigate(['/campaigns']);
+            this.isSubmitting = false;
+          },
+          error: (error: any) => {
+            loading.dismiss();
+            console.error('Failed to create campaign:', error);
+            this.showToast(error.message || 'Failed to create campaign', 'danger');
+            this.isSubmitting = false;
+          }
+        });
+      });
     } else {
       this.campaignForm.markAllAsTouched();
     }
+  }
+
+  // Display toast feedback messages
+  async showToast(message: string, color: string = 'primary') {
+    const toast = await this.toastController.create({
+      message: message,
+      duration: 3500,
+      position: 'bottom',
+      color: color,
+      buttons: ['OK']
+    });
+    await toast.present();
   }
 
   getPlatformIcon(platform: string): string {

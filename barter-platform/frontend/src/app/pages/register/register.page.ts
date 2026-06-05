@@ -93,36 +93,38 @@ export class RegisterPage implements OnInit {
     await toast.present();
   }
 
-  // Submit registration request
-  async onSubmit() {
+  // Submit registration request via subscribe pattern
+  onSubmit() {
     if (this.registerForm.valid && !this.isSubmitting) {
       this.isSubmitting = true;
 
-      // Show loading spinner
-      const loading = await this.loadingController.create({
+      // Show loading spinner while requesting verification code
+      this.loadingController.create({
         message: 'Sending verification code...',
-      });
-      await loading.present();
+      }).then((loading) => {
+        loading.present();
 
-      const { email, role } = this.registerForm.value;
+        const { email, role } = this.registerForm.value;
 
-      try {
-        // Call register API and wait for response
-        const response: any = await this.authService.register(email, role);
+        // Perform registration request API call and subscribe
+        this.authService.register(email, role).subscribe({
+          next: (response: any) => {
+            loading.dismiss();
+            this.showToast('Verification code sent to your email!', 'success');
 
-        await loading.dismiss();
-        await this.showToast('Verification code sent to your email!', 'success');
-        
-        // Navigate to OTP verification page
-        await this.router.navigate(['/verify-otp'], {
-          queryParams: { email },
+            // Navigate to OTP verification page
+            this.router.navigate(['/verify-otp'], {
+              queryParams: { email },
+            });
+            this.isSubmitting = false;
+          },
+          error: (error: any) => {
+            loading.dismiss();
+            this.showToast(error.message || 'Registration failed', 'danger');
+            this.isSubmitting = false;
+          }
         });
-      } catch (error: any) {
-        await loading.dismiss();
-        await this.showToast(error.message || 'Registration failed', 'danger');
-      } finally {
-        this.isSubmitting = false;
-      }
+      });
     }
   }
 }

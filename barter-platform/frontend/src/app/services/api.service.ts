@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { StorageService } from './storage.service';
 
@@ -17,142 +18,145 @@ export class ApiService {
     private router: Router,
   ) {}
 
+  // Generate public request headers
   private getHeaders(): HttpHeaders {
     return new HttpHeaders({
       'Content-Type': 'application/json',
     });
   }
 
-  private async getAuthHeaders(): Promise<HttpHeaders> {
-    const token = await this.storage.getAccessToken();
+  // Generate authentication headers synchronously using sessionStorage token
+  private getAuthHeaders(): HttpHeaders {
+    const token = this.storage.getAccessToken();
     return new HttpHeaders({
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`,
     });
   }
 
-  // Refresh token helper to run when a 401 error occurs
-  private async refreshToken(): Promise<string | null> {
-    const refreshToken = await this.storage.getRefreshToken();
-    if (!refreshToken || refreshToken === 'undefined' || refreshToken === 'null') return null;
-
-    try {
-      const response = await this.post<any>('auth/refresh', { refreshToken });
-      if (response && response.success) {
-        await this.storage.setAccessToken(response.data.accessToken);
-        await this.storage.setRefreshToken(response.data.refreshToken);
-        return response.data.accessToken;
-      }
-      return null;
-    } catch (error) {
-      return null;
+  // Attempt to refresh the access token using the refresh token from storage
+  private refreshToken(): Observable<string | null> {
+    const refreshToken = this.storage.getRefreshToken();
+    if (!refreshToken || refreshToken === 'undefined' || refreshToken === 'null') {
+      return of(null);
     }
+
+    const url = `${this.baseUrl}/auth/refresh`;
+    return this.http.post<any>(url, { refreshToken }, { headers: this.getHeaders(), withCredentials: true }).pipe(
+      map((response) => {
+        if (response && response.success) {
+          this.storage.setAccessToken(response.data.accessToken);
+          this.storage.setRefreshToken(response.data.refreshToken);
+          return response.data.accessToken;
+        }
+        return null;
+      }),
+      catchError(() => of(null))
+    );
   }
 
-  // Logout helper to run when refresh token fails
-  private async logout(): Promise<void> {
-    await this.storage.clear();
-    await this.router.navigate(['/login']);
+  // Log out the user synchronously by clearing credentials and routing to login
+  private logout(): void {
+    this.storage.clear();
+    this.router.navigate(['/login']);
   }
 
-  // Helper to execute authenticated HTTP request & handle token refreshing on 401 response
-  private async requestWithAuth<T>(
+  // Handle authorized requests and automatically attempt token refresh on 401 Unauthorized status
+  private requestWithAuth<T>(
     method: 'GET' | 'POST' | 'PUT' | 'DELETE',
     endpoint: string,
     body?: any,
     isFormData: boolean = false
-  ): Promise<T> {
-    let headers = await this.getAuthHeaders();
-    if (isFormData) {
-      // Don't set Content-Type header when uploading files: let browser set it automatically
-      const token = await this.storage.getAccessToken();
-      headers = new HttpHeaders({
-        'Authorization': `Bearer ${token}`,
-      });
-    }
+  ): Observable<T> {
+    const token = this.storage.getAccessToken();
+    const headers = isFormData
+      ? new HttpHeaders({ 'Authorization': `Bearer ${token}` })
+      : this.getAuthHeaders();
 
     const url = `${this.baseUrl}/${endpoint}`;
 
-    try {
-      let observable;
-      if (method === 'GET') {
-        observable = this.http.get<T>(url, { headers, withCredentials: true });
-      } else if (method === 'POST') {
-        observable = this.http.post<T>(url, body, { headers, withCredentials: true });
-      } else if (method === 'PUT') {
-        observable = this.http.put<T>(url, body, { headers, withCredentials: true });
-      } else {
-        observable = this.http.delete<T>(url, { headers, withCredentials: true });
-      }
+    let observable: Observable<T>;
+    if (method === 'GET') {
+      observable = this.http.get<T>(url, { headers, withCredentials: true });
+    } else if (method === 'POST') {
+      observable = this.http.post<T>(url, body, { headers, withCredentials: true });
+    } else if (method === 'PUT') {
+      observable = this.http.put<T>(url, body, { headers, withCredentials: true });
+    } else {
+      observable = this.http.delete<T>(url, { headers, withCredentials: true });
+    }
 
-      return await firstValueFrom(observable);
-    } catch (error: any) {
-      // If unauthorized (401 status), attempt to refresh token once and retry
-      if (error.status === 401 && !endpoint.includes('auth/refresh')) {
-        const newToken = await this.refreshToken();
-        if (newToken) {
-          const retryHeaders = new HttpHeaders({
-            'Content-Type': isFormData ? undefined : 'application/json',
-            'Authorization': `Bearer ${newToken}`,
-          } as any);
+    return observable.pipe(
+      catchError((error: any) => {
+        // If request is unauthorized (401), perform a token refresh check and retry once
+        if (error.status === 401 && !endpoint.includes('auth/refresh')) {
+          return this.refreshToken().pipe(
+            switchMap((newToken) => {
+              if (newToken) {
+                const retryHeaders = new HttpHeaders({
+                  'Content-Type': isFormData ? undefined : 'application/json',
+                  'Authorization': `Bearer ${newToken}`,
+                } as any);
 
-          let retryObservable;
-          if (method === 'GET') {
-            retryObservable = this.http.get<T>(url, { headers: retryHeaders, withCredentials: true });
-          } else if (method === 'POST') {
-            retryObservable = this.http.post<T>(url, body, { headers: retryHeaders, withCredentials: true });
-          } else if (method === 'PUT') {
-            retryObservable = this.http.put<T>(url, body, { headers: retryHeaders, withCredentials: true });
-          } else {
-            retryObservable = this.http.delete<T>(url, { headers: retryHeaders, withCredentials: true });
-          }
-
-          return await firstValueFrom(retryObservable);
-        } else {
-          // Token refresh failed, perform logout
-          await this.logout();
-          throw new Error('Session expired. Please log in again.');
+                if (method === 'GET') {
+                  return this.http.get<T>(url, { headers: retryHeaders, withCredentials: true });
+                } else if (method === 'POST') {
+                  return this.http.post<T>(url, body, { headers: retryHeaders, withCredentials: true });
+                } else if (method === 'PUT') {
+                  return this.http.put<T>(url, body, { headers: retryHeaders, withCredentials: true });
+                } else {
+                  return this.http.delete<T>(url, { headers: retryHeaders, withCredentials: true });
+                }
+              } else {
+                // If refresh token validation fails, log out the user and return session expired error
+                this.logout();
+                return throwError(() => new Error('Session expired. Please log in again.'));
+              }
+            })
+          );
         }
-      }
-      throw new Error(error.error?.error?.message || error.message || 'Request failed');
-    }
+        return throwError(() => new Error(error.error?.error?.message || error.message || 'Request failed'));
+      })
+    );
   }
 
-  // Public POST request (no auth required)
-  public async post<T>(endpoint: string, data: any): Promise<T> {
+  // Public HTTP POST request wrapper returning Observable
+  public post<T>(endpoint: string, data: any): Observable<T> {
     const url = `${this.baseUrl}/${endpoint}`;
-    const observable = this.http.post<T>(url, data, { headers: this.getHeaders(), withCredentials: true });
-    try {
-      return await firstValueFrom(observable);
-    } catch (error: any) {
-      throw new Error(error.error?.error?.message || error.message || 'Request failed');
-    }
+    return this.http.post<T>(url, data, { headers: this.getHeaders(), withCredentials: true }).pipe(
+      catchError((error: any) => {
+        return throwError(() => new Error(error.error?.error?.message || error.message || 'Request failed'));
+      })
+    );
   }
 
-  // Authenticated requests
-  async authPost<T>(endpoint: string, data: any): Promise<T> {
+  // Authenticated HTTP POST request wrapper returning Observable
+  authPost<T>(endpoint: string, data: any): Observable<T> {
     return this.requestWithAuth<T>('POST', endpoint, data);
   }
 
-  async authGet<T>(endpoint: string): Promise<T> {
+  // Authenticated HTTP GET request wrapper returning Observable
+  authGet<T>(endpoint: string): Observable<T> {
     return this.requestWithAuth<T>('GET', endpoint);
   }
 
-  async authPut<T>(endpoint: string, data: any): Promise<T> {
+  // Authenticated HTTP PUT request wrapper returning Observable
+  authPut<T>(endpoint: string, data: any): Observable<T> {
     return this.requestWithAuth<T>('PUT', endpoint, data);
   }
 
-  async authDelete<T>(endpoint: string): Promise<T> {
+  // Authenticated HTTP DELETE request wrapper returning Observable
+  authDelete<T>(endpoint: string): Observable<T> {
     return this.requestWithAuth<T>('DELETE', endpoint);
   }
 
-  // For file uploads (multipart/form-data)
-  async authPostFormData<T>(endpoint: string, formData: FormData): Promise<T> {
+  // Authenticated HTTP POST request for file uploads (FormData) returning Observable
+  authPostFormData<T>(endpoint: string, formData: FormData): Observable<T> {
     return this.requestWithAuth<T>('POST', endpoint, formData, true);
   }
 
-  // For PUT requests with form data
-  async authPutFormData<T>(endpoint: string, formData: FormData): Promise<T> {
+  // Authenticated HTTP PUT request for file uploads (FormData) returning Observable
+  authPutFormData<T>(endpoint: string, formData: FormData): Observable<T> {
     return this.requestWithAuth<T>('PUT', endpoint, formData, true);
   }
 }

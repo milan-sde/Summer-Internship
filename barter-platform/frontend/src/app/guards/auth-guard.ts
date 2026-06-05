@@ -12,11 +12,12 @@ export class AuthGuard implements CanActivate {
     private router: Router
   ) {}
 
-  async canActivate(): Promise<boolean> {
-    const isLoggedIn = await this.storage.isLoggedIn();
+  // Synchronously determine if user is authenticated before allowing routing
+  canActivate(): boolean {
+    const isLoggedIn = this.storage.isLoggedIn();
 
     if (!isLoggedIn) {
-      await this.router.navigate(['/login']);
+      this.router.navigate(['/login']);
       return false;
     }
 

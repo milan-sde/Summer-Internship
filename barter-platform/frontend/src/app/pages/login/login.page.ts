@@ -88,50 +88,51 @@ export class LoginPage implements OnInit {
     await toast.present();
   }
 
-  // Submit login credentials
-  async onSubmit() {
+  // Submit login credentials and establish session via subscribe
+  onSubmit() {
     if (this.loginForm.valid && !this.isSubmitting) {
       this.isSubmitting = true;
 
-      // Show loading spinner
-      const loading = await this.loadingController.create({
+      // Create and display the loading indicator
+      this.loadingController.create({
         message: 'Logging in...',
-      });
-      await loading.present();
+      }).then((loading) => {
+        loading.present();
 
-      const { email, password } = this.loginForm.value;
+        const { email, password } = this.loginForm.value;
 
-      try {
-        // Call login API and wait for response
-        const response: any = await this.authService.login(email, password);
+        // Perform login API call and subscribe to response
+        this.authService.login(email, password).subscribe({
+          next: (response: any) => {
+            loading.dismiss();
+            if (response.success) {
+              // Save details synchronously in local storage session
+              this.authService.saveUserSession(
+                response.data.accessToken,
+                response.data.refreshToken,
+                response.data.user,
+              );
 
-        if (response.success) {
-          // Save tokens and session details
-          await this.authService.saveUserSession(
-            response.data.accessToken,
-            response.data.refreshToken,
-            response.data.user,
-          );
+              this.showToast('Login successful!', 'success');
 
-          await loading.dismiss();
-          await this.showToast('Login successful!', 'success');
-
-          // Redirect based on onboarding status
-          if (response.data.user.onboardingCompleted) {
-            await this.router.navigate(['/dashboard']);
-          } else {
-            await this.router.navigate(['/complete-profile']);
+              // Route based on user onboarding status
+              if (response.data.user.onboardingCompleted) {
+                this.router.navigate(['/dashboard']);
+              } else {
+                this.router.navigate(['/complete-profile']);
+              }
+            } else {
+              this.showToast('Login failed', 'danger');
+            }
+            this.isSubmitting = false;
+          },
+          error: (error: any) => {
+            loading.dismiss();
+            this.showToast(error.message || 'Login failed', 'danger');
+            this.isSubmitting = false;
           }
-        } else {
-          await loading.dismiss();
-          await this.showToast('Login failed', 'danger');
-        }
-      } catch (error: any) {
-        await loading.dismiss();
-        await this.showToast(error.message || 'Login failed', 'danger');
-      } finally {
-        this.isSubmitting = false;
-      }
+        });
+      });
     }
   }
 }

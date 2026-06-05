@@ -27,7 +27,7 @@ import {
   IonButtons,
   IonBackButton,
 } from '@ionic/angular/standalone';
-import { ToastController } from '@ionic/angular/standalone';
+import { ToastController, LoadingController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   cameraOutline,
@@ -121,7 +121,7 @@ export class ProfilePage implements OnInit {
   pastWorkLinks: string[] = [''];
 
   // Avatar / Logo simulation
-  avatarPreview: string | null = null;
+  avatarPreview: string | null | undefined = null;
   selectedFile: File | null = null;
 
   constructor(
@@ -130,6 +130,7 @@ export class ProfilePage implements OnInit {
     private storage: StorageService,
     private router: Router,
     private toastController: ToastController,
+    private loadingController: LoadingController,
   ) {
     addIcons({
       cameraOutline,
@@ -151,10 +152,10 @@ export class ProfilePage implements OnInit {
     });
   }
 
-  async ngOnInit() {
-    this.currentUser = await this.storage.getUser();
+  ngOnInit() {
+    this.currentUser = this.storage.getUser();
     this.setupForm();
-    await this.loadProfileData();
+    this.loadProfileData();
   }
 
   setupForm() {
@@ -166,7 +167,7 @@ export class ProfilePage implements OnInit {
           [Validators.required, Validators.pattern(/^[a-zA-Z0-9_.]{1,30}$/)],
         ],
         phoneNumber: ['', [Validators.required, Validators.minLength(5)]],
-        email: [{ value: this.currentUser?.email || '', disabled: true }],
+        email: [{ value: this.currentUser?.email, disabled: true }],
         bio: [
           '',
           [
@@ -191,7 +192,7 @@ export class ProfilePage implements OnInit {
         firstName: ['', [Validators.required]],
         lastName: ['', [Validators.required]],
         phoneNumber: ['', [Validators.required, Validators.minLength(5)]],
-        email: [{ value: this.currentUser?.email || '', disabled: true }],
+        email: [{ value: this.currentUser?.email, disabled: true }],
         bio: [
           '',
           [
@@ -207,60 +208,64 @@ export class ProfilePage implements OnInit {
     }
   }
 
-  async loadProfileData() {
+  // Loading the authenticated user's profile details and patch the form
+  loadProfileData() {
     this.isLoading = true;
-    try {
-      this.profileData = await this.profileService.getMyProfile();
-      if (this.profileData) {
-        this.avatarPreview = this.profileData.avatarUrl || null;
+    this.profileService.getMyProfile().subscribe({
+      next: (profile: any) => {
+        this.profileData = profile;
+        if (this.profileData) {
+          this.avatarPreview = this.profileData.avatarUrl;
 
-        if (this.currentUser?.role === 'INFLUENCER') {
-          this.profileForm.patchValue({
-            fullName: this.profileData.fullName || '',
-            username: this.profileData.username || '',
-            phoneNumber: this.profileData.phoneNumber || '',
-            bio: this.profileData.bio || '',
-            avatarUrl: this.profileData.avatarUrl || '',
-            instagramUsername:
-              this.profileData.platforms?.instagram?.username || '',
-            instagramFollowers:
-              this.profileData.platforms?.instagram?.followers || null,
-            youtubeUsername:
-              this.profileData.platforms?.youtube?.username || '',
-            youtubeFollowers:
-              this.profileData.platforms?.youtube?.followers || null,
-            twitterUsername:
-              this.profileData.platforms?.twitter?.username || '',
-            twitterFollowers:
-              this.profileData.platforms?.twitter?.followers || null,
-          });
+          if (this.currentUser?.role === 'INFLUENCER') {
+            this.profileForm.patchValue({
+              fullName: this.profileData.fullName,
+              username: this.profileData.username,
+              phoneNumber: this.profileData.phoneNumber,
+              bio: this.profileData.bio,
+              avatarUrl: this.profileData.avatarUrl,
+              instagramUsername:
+                this.profileData.platforms?.instagram?.username,
+              instagramFollowers:
+                this.profileData.platforms?.instagram?.followers,
+              youtubeUsername:
+                this.profileData.platforms?.youtube?.username,
+              youtubeFollowers:
+                this.profileData.platforms?.youtube?.followers,
+              twitterUsername:
+                this.profileData.platforms?.twitter?.username,
+              twitterFollowers:
+                this.profileData.platforms?.twitter?.followers,
+            });
 
-          this.selectedCategories = this.profileData.categories || [];
-          this.selectedCountries = this.profileData.countries || [];
-          this.pastWorkLinks =
-            this.profileData.pastWorkLinks &&
-            this.profileData.pastWorkLinks.length > 0
-              ? [...this.profileData.pastWorkLinks]
-              : [''];
-        } else {
-          this.profileForm.patchValue({
-            firstName: this.profileData.firstName || '',
-            lastName: this.profileData.lastName || '',
-            phoneNumber: this.profileData.phoneNumber || '',
-            bio: this.profileData.bio || '',
-            avatarUrl: this.profileData.avatarUrl || '',
-            budgetMin: this.profileData.budgetMin || 0,
-            budgetMax: this.profileData.budgetMax || 0,
-          });
+            this.selectedCategories = this.profileData.categories || [];
+            this.selectedCountries = this.profileData.countries || [];
+            this.pastWorkLinks =
+              this.profileData.pastWorkLinks &&
+              this.profileData.pastWorkLinks.length > 0
+                ? [...this.profileData.pastWorkLinks]
+                : [''];
+          } else {
+            this.profileForm.patchValue({
+              firstName: this.profileData.firstName,
+              lastName: this.profileData.lastName,
+              phoneNumber: this.profileData.phoneNumber,
+              bio: this.profileData.bio,
+              avatarUrl: this.profileData.avatarUrl,
+              budgetMin: this.profileData.budgetMin,
+              budgetMax: this.profileData.budgetMax,
+            });
 
-          this.selectedIndustries = this.profileData.industries || [];
+            this.selectedIndustries = this.profileData.industries || [];
+          }
         }
+        this.isLoading = false;
+      },
+      error: (error: any) => {
+        console.error('Failed to load user profile details:', error);
+        this.isLoading = false;
       }
-    } catch (error) {
-      console.error('Failed to load user profile details:', error);
-    } finally {
-      this.isLoading = false;
-    }
+    });
   }
 
   // Toggles for chips
@@ -339,7 +344,7 @@ export class ProfilePage implements OnInit {
       const raw = this.profileForm.value;
       const profileData: any = {
         bio: raw.bio,
-        avatarUrl: raw.avatarUrl || '',
+        avatarUrl: raw.avatarUrl,
       };
 
       if (this.currentUser?.role === 'INFLUENCER') {
@@ -353,17 +358,17 @@ export class ProfilePage implements OnInit {
         const platforms: any = {};
         if (raw.instagramUsername || raw.instagramFollowers) {
           platforms.instagram = {
-            username: raw.instagramUsername || '',
+            username: raw.instagramUsername,
             followers:
               raw.instagramFollowers !== null && raw.instagramFollowers !== ''
                 ? Number(raw.instagramFollowers)
                 : 0,
           };
-          profileData.instagramHandle = raw.instagramUsername || '';
+          profileData.instagramHandle = raw.instagramUsername;
         }
         if (raw.youtubeUsername || raw.youtubeFollowers) {
           platforms.youtube = {
-            username: raw.youtubeUsername || '',
+            username: raw.youtubeUsername,
             followers:
               raw.youtubeFollowers !== null && raw.youtubeFollowers !== ''
                 ? Number(raw.youtubeFollowers)
@@ -372,7 +377,7 @@ export class ProfilePage implements OnInit {
         }
         if (raw.twitterUsername || raw.twitterFollowers) {
           platforms.twitter = {
-            username: raw.twitterUsername || '',
+            username: raw.twitterUsername,
             followers:
               raw.twitterFollowers !== null && raw.twitterFollowers !== ''
                 ? Number(raw.twitterFollowers)
@@ -475,15 +480,27 @@ export class ProfilePage implements OnInit {
 
       this.isSubmitting = true;
 
-      try {
-        const profile = await this.profileService.updateProfile(profileData);
-        await this.showToast('Profile updated successfully!', 'success');
-        await this.router.navigate(['/dashboard']);
-      } catch (error) {
-        console.error('Profile update failed:', error);
-      } finally {
-        this.isSubmitting = false;
-      }
+      // Show loader during profile update save operation
+      this.loadingController.create({
+        message: 'Updating your profile...'
+      }).then((loading) => {
+        loading.present();
+
+        this.profileService.updateProfile(profileData).subscribe({
+          next: (profile: any) => {
+            loading.dismiss();
+            this.showToast('Profile updated successfully!', 'success');
+            this.router.navigate(['/dashboard']);
+            this.isSubmitting = false;
+          },
+          error: (error: any) => {
+            loading.dismiss();
+            console.error('Profile update failed:', error);
+            this.showToast(error.message || 'Profile update failed', 'danger');
+            this.isSubmitting = false;
+          }
+        });
+      });
     } else {
       this.profileForm.markAllAsTouched();
     }

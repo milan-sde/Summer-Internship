@@ -21,6 +21,8 @@ import {
   IonInput,
   IonButtons,
   IonBackButton,
+  LoadingController,
+  ToastController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -78,6 +80,8 @@ export class CreatePasswordPage implements OnInit {
     private authService: AuthService,
     private router: Router,
     private route: ActivatedRoute,
+    private loadingController: LoadingController,
+    private toastController: ToastController,
   ) {
     addIcons({
       lockClosedOutline,
@@ -184,25 +188,45 @@ export class CreatePasswordPage implements OnInit {
     return 'success';
   }
 
-  async onSubmit() {
+  // Submit and create new password using subscribe pattern
+  onSubmit() {
     if (this.createPasswordForm.valid && !this.isSubmitting) {
       this.isSubmitting = true;
       const { password, confirmPassword } = this.createPasswordForm.value;
 
-      try {
-        await this.authService.createPassword(
-          this.email,
-          password,
-          confirmPassword,
-        );
-        // Navigate to login page
-        await this.router.navigate(['/login']);
-      } catch (error) {
-        console.error('Password creation failed:', error);
-      } finally {
-        this.isSubmitting = false;
-      }
+      this.loadingController.create({
+        message: 'Setting up your account...',
+      }).then((loading) => {
+        loading.present();
+
+        this.authService.createPassword(this.email, password, confirmPassword).subscribe({
+          next: (response: any) => {
+            loading.dismiss();
+            this.showToast('Password created! Please login.', 'success');
+            this.router.navigate(['/login']);
+            this.isSubmitting = false;
+          },
+          error: (error: any) => {
+            loading.dismiss();
+            console.error('Password creation failed:', error);
+            this.showToast(error.message || 'Password creation failed', 'danger');
+            this.isSubmitting = false;
+          }
+        });
+      });
     }
+  }
+
+  // Display toast feedback messages
+  async showToast(message: string, color: string = 'primary') {
+    const toast = await this.toastController.create({
+      message: message,
+      duration: 3000,
+      position: 'top',
+      color: color,
+      buttons: ['OK'],
+    });
+    await toast.present();
   }
 
   togglePassword() {

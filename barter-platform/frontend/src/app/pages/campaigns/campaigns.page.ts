@@ -127,44 +127,67 @@ export class CampaignsPage implements OnInit {
     });
   }
 
-  async ngOnInit() {
-    this.currentUser = await this.storage.getUser();
-    await this.loadCampaigns();
+  ngOnInit() {
+    this.currentUser = this.storage.getUser();
+    this.loadCampaigns();
   }
 
-  async ionViewWillEnter() {
-    await this.loadCampaigns();
+  ionViewWillEnter() {
+    this.loadCampaigns();
   }
 
-  async loadCampaigns() {
+  // Load campaigns list depending on user role and active discover/applied segment via subscribe
+  loadCampaigns(callback?: () => void) {
     this.isLoading = true;
-    try {
-      if (this.currentUser?.role === 'BRAND') {
-        // Brands manage their created campaigns
-        this.campaigns = await this.campaignService.getMyCampaigns();
-      } else {
-        // Fetch applied campaigns to keep count updated
-        const appliedCampaigns = await this.campaignService.getAppliedCampaigns();
-        this.appliedCount = appliedCampaigns.length;
-
-        // Influencers discover or view applied campaigns
-        if (this.activeSegment === 'discover') {
-          const rawCampaigns = await this.campaignService.getCampaigns({
-            category: this.selectedCategory !== 'All' ? this.selectedCategory : undefined,
-            platform: this.selectedPlatform ? this.selectedPlatform : undefined
-          });
-
-          // Client-side sorting & filters
-          this.campaigns = this.applyClientSideFilters(rawCampaigns);
-        } else {
-          // Applied
-          this.campaigns = this.applyClientSideFilters(appliedCampaigns);
+    if (this.currentUser?.role === 'BRAND') {
+      this.campaignService.getMyCampaigns().subscribe({
+        next: (response: any) => {
+          this.campaigns = response.success ? response.data.campaigns : [];
+          this.isLoading = false;
+          if (callback) callback();
+        },
+        error: (error: any) => {
+          console.error('Failed to load campaigns:', error);
+          this.isLoading = false;
+          if (callback) callback();
         }
-      }
-    } catch (error) {
-      console.error('Failed to load campaigns:', error);
-    } finally {
-      this.isLoading = false;
+      });
+    } else {
+      // Influencers flow: fetch applied count first, then discover or show applied campaigns
+      this.campaignService.getAppliedCampaigns().subscribe({
+        next: (appliedRes: any) => {
+          const appliedCampaigns = appliedRes.success ? appliedRes.data.campaigns : [];
+          this.appliedCount = appliedCampaigns.length;
+
+          if (this.activeSegment === 'discover') {
+            this.campaignService.getCampaigns({
+              category: this.selectedCategory !== 'All' ? this.selectedCategory : undefined,
+              platform: this.selectedPlatform ? this.selectedPlatform : undefined
+            }).subscribe({
+              next: (discoverRes: any) => {
+                const rawCampaigns = discoverRes.success ? discoverRes.data.campaigns : [];
+                this.campaigns = this.applyClientSideFilters(rawCampaigns);
+                this.isLoading = false;
+                if (callback) callback();
+              },
+              error: (error: any) => {
+                console.error('Failed to load discover campaigns:', error);
+                this.isLoading = false;
+                if (callback) callback();
+              }
+            });
+          } else {
+            this.campaigns = this.applyClientSideFilters(appliedCampaigns);
+            this.isLoading = false;
+            if (callback) callback();
+          }
+        },
+        error: (error: any) => {
+          console.error('Failed to load applied campaigns count:', error);
+          this.isLoading = false;
+          if (callback) callback();
+        }
+      });
     }
   }
 
@@ -188,41 +211,46 @@ export class CampaignsPage implements OnInit {
     return result;
   }
 
-  async segmentChanged(event: any) {
+  segmentChanged(event: any) {
     this.activeSegment = event.detail.value;
-    await this.loadCampaigns();
+    this.loadCampaigns();
   }
 
-  async selectCategory(category: string) {
+  selectCategory(category: string) {
     this.selectedCategory = category;
-    await this.loadCampaigns();
+    this.loadCampaigns();
   }
 
-  async onFilterChanged() {
-    await this.loadCampaigns();
+  onFilterChanged() {
+    this.loadCampaigns();
   }
 
-  async applyToCampaign(campaign: ICampaign, event: Event) {
+  // Submit request to apply for campaign via subscribe
+  applyToCampaign(campaign: ICampaign, event: Event) {
     if (event) {
       event.stopPropagation();
     }
 
-    try {
-      const updated = await this.campaignService.applyToCampaign(campaign.id);
-      // update item in local list
-      const idx = this.campaigns.findIndex(c => c.id === campaign.id);
-      if (idx > -1) {
-        this.campaigns[idx] = updated;
+    this.campaignService.applyToCampaign(campaign.id).subscribe({
+      next: (response: any) => {
+        const updated = response.success ? response.data.campaign : null;
+        if (updated) {
+          const idx = this.campaigns.findIndex(c => c.id === campaign.id);
+          if (idx > -1) {
+            this.campaigns[idx] = updated;
+          }
+        }
+        this.loadCampaigns();
+      },
+      error: (error: any) => {
+        console.error('Failed to apply:', error);
       }
-      await this.loadCampaigns();
-    } catch (error) {
-      console.error('Failed to apply:', error);
-    }
+    });
   }
 
   hasApplied(campaign: ICampaign): boolean {
     if (!this.currentUser || !campaign.applicants) return false;
-    const userId = this.currentUser.id || this.currentUser._id;
+    const userId = this.currentUser.id;
     return campaign.applicants.some(
       (app: any) => (app && app.influencerId === userId) || (app === userId)
     );
@@ -230,7 +258,7 @@ export class CampaignsPage implements OnInit {
 
   getApplicationStatus(campaign: ICampaign): string {
     if (!this.currentUser || !campaign.applicants) return '';
-    const userId = this.currentUser.id || this.currentUser._id;
+    const userId = this.currentUser.id;
     const app = campaign.applicants.find(
       (a: any) => (a && a.influencerId === userId) || (a === userId)
     );
@@ -244,16 +272,22 @@ export class CampaignsPage implements OnInit {
     this.showApplicants[campaignId] = !this.showApplicants[campaignId];
   }
 
-  async updateStatus(campaignId: string, influencerId: string, status: 'APPROVED' | 'REJECTED') {
-    try {
-      const updated = await this.campaignService.updateApplicantStatus(campaignId, influencerId, status);
-      const idx = this.campaigns.findIndex(c => c.id === campaignId);
-      if (idx > -1) {
-        this.campaigns[idx] = updated;
+  // Update applicant status (APPROVED/REJECTED) via subscribe
+  updateStatus(campaignId: string, influencerId: string, status: 'APPROVED' | 'REJECTED') {
+    this.campaignService.updateApplicantStatus(campaignId, influencerId, status).subscribe({
+      next: (response: any) => {
+        const updated = response.success ? response.data.campaign : null;
+        if (updated) {
+          const idx = this.campaigns.findIndex(c => c.id === campaignId);
+          if (idx > -1) {
+            this.campaigns[idx] = updated;
+          }
+        }
+      },
+      error: (error: any) => {
+        console.error('Failed to update status:', error);
       }
-    } catch (error) {
-      console.error('Failed to update status:', error);
-    }
+    });
   }
 
   getInitials(name: string): string {
@@ -307,9 +341,10 @@ export class CampaignsPage implements OnInit {
     this.router.navigate(['/create-campaign']);
   }
 
-  async doRefresh(event: any) {
-    await this.loadCampaigns();
-    event.target.complete();
+  doRefresh(event: any) {
+    this.loadCampaigns(() => {
+      event.target.complete();
+    });
   }
 
   viewProfile() {

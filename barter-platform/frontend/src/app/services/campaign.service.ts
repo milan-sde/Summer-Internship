@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 import { ApiService } from './api.service';
-import { LoadingController, ToastController } from '@ionic/angular/standalone';
 
 export enum SocialPlatform {
   Instagram = 'Instagram',
@@ -24,7 +24,7 @@ export interface ICampaign {
   totalSlots: number;
   filledSlots: number;
   followersRequired: string;
-  applicants: any[];
+  applicants?: any[];
   status: 'ACTIVE' | 'PAST';
   createdAt: string;
   updatedAt: string;
@@ -35,15 +35,11 @@ export interface ICampaign {
 })
 export class CampaignService {
   constructor(
-    private apiService: ApiService,
-    private loadingController: LoadingController,
-    private toastController: ToastController
+    private apiService: ApiService
   ) {}
 
-  /**
-   * Create a new campaign (Brands only)
-   */
-  async createCampaign(campaignData: {
+  // Create a new campaign (Brands only) via API
+  createCampaign(campaignData: {
     title: string;
     description: string;
     platform: string;
@@ -53,166 +49,58 @@ export class CampaignService {
     followersRequired: string;
     startDate?: string;
     endDate?: string;
-  }): Promise<ICampaign> {
-    const loading = await this.loadingController.create({
-      message: 'Creating campaign...'
-    });
-    await loading.present();
-
-    try {
-      const response: any = await this.apiService.authPost('campaigns', campaignData);
-
-      if (response.success) {
-        await this.showToast('Campaign created successfully!', 'success');
-        return response.data.campaign;
-      }
-      throw new Error('Failed to create campaign');
-    } catch (error: any) {
-      await this.showToast(error.message || 'Failed to create campaign', 'danger');
-      throw error;
-    } finally {
-      await loading.dismiss();
-    }
+  }): Observable<any> {
+    return this.apiService.authPost('campaigns', campaignData);
   }
 
-  /**
-   * Get all active campaigns with optional filters (Discovery)
-   */
-  async getCampaigns(filters?: {
+  // Get active campaigns list with optional category/platform query filters via API
+  getCampaigns(filters?: {
     category?: string;
     platform?: string;
     search?: string;
     minBudget?: number;
     maxBudget?: number;
-  }): Promise<ICampaign[]> {
-    try {
-      let queryParams: string[] = [];
-      if (filters) {
-        if (filters.category && filters.category !== 'All') {
-          queryParams.push(`category=${encodeURIComponent(filters.category)}`);
-        }
-        if (filters.platform) {
-          queryParams.push(`platform=${encodeURIComponent(filters.platform)}`);
-        }
-        if (filters.search) {
-          queryParams.push(`search=${encodeURIComponent(filters.search)}`);
-        }
-        if (filters.minBudget !== undefined) {
-          queryParams.push(`minBudget=${filters.minBudget}`);
-        }
-        if (filters.maxBudget !== undefined) {
-          queryParams.push(`maxBudget=${filters.maxBudget}`);
-        }
+  }): Observable<any> {
+    let queryParams: string[] = [];
+    if (filters) {
+      if (filters.category && filters.category !== 'All') {
+        queryParams.push(`category=${encodeURIComponent(filters.category)}`);
       }
-
-      const queryString = queryParams.length > 0 ? `?${queryParams.join('&')}` : '';
-      const response: any = await this.apiService.authGet(`campaigns${queryString}`);
-
-      if (response.success) {
-        return response.data.campaigns;
+      if (filters.platform) {
+        queryParams.push(`platform=${encodeURIComponent(filters.platform)}`);
       }
-      throw new Error('Failed to fetch campaigns');
-    } catch (error: any) {
-      console.error('Fetch campaigns error:', error);
-      throw error;
+      if (filters.search) {
+        queryParams.push(`search=${encodeURIComponent(filters.search)}`);
+      }
+      if (filters.minBudget !== undefined) {
+        queryParams.push(`minBudget=${filters.minBudget}`);
+      }
+      if (filters.maxBudget !== undefined) {
+        queryParams.push(`maxBudget=${filters.maxBudget}`);
+      }
     }
+
+    const queryString = queryParams.length > 0 ? `?${queryParams.join('&')}` : '';
+    return this.apiService.authGet(`campaigns${queryString}`);
   }
 
-  /**
-   * Apply to a campaign (Influencers only)
-   */
-  async applyToCampaign(campaignId: string): Promise<ICampaign> {
-    const loading = await this.loadingController.create({
-      message: 'Applying for campaign...'
-    });
-    await loading.present();
-
-    try {
-      const response: any = await this.apiService.authPost(`campaigns/${campaignId}/apply`, {});
-
-      if (response.success) {
-        await this.showToast('Applied successfully! Application is pending brand review.', 'success');
-        return response.data.campaign;
-      }
-      throw new Error('Application failed');
-    } catch (error: any) {
-      await this.showToast(error.message || 'Failed to apply to campaign', 'danger');
-      throw error;
-    } finally {
-      await loading.dismiss();
-    }
+  // Submit request to apply for a campaign (Influencers only) via API
+  applyToCampaign(campaignId: string): Observable<any> {
+    return this.apiService.authPost(`campaigns/${campaignId}/apply`, {});
   }
 
-  /**
-   * Get brand campaigns (Brands only)
-   */
-  async getMyCampaigns(): Promise<ICampaign[]> {
-    try {
-      const response: any = await this.apiService.authGet('campaigns/my-campaigns');
-
-      if (response.success) {
-        return response.data.campaigns;
-      }
-      throw new Error('Failed to fetch my campaigns');
-    } catch (error: any) {
-      console.error('Get my campaigns error:', error);
-      throw error;
-    }
+  // Fetch campaigns created by the currently authenticated brand user via API
+  getMyCampaigns(): Observable<any> {
+    return this.apiService.authGet('campaigns/my-campaigns');
   }
 
-  /**
-   * Get influencer applied campaigns (Influencers only)
-   */
-  async getAppliedCampaigns(): Promise<ICampaign[]> {
-    try {
-      const response: any = await this.apiService.authGet('campaigns/applied');
-
-      if (response.success) {
-        return response.data.campaigns;
-      }
-      throw new Error('Failed to fetch applied campaigns');
-    } catch (error: any) {
-      console.error('Get applied campaigns error:', error);
-      throw error;
-    }
+  // Fetch campaigns applied to by the currently authenticated influencer user via API
+  getAppliedCampaigns(): Observable<any> {
+    return this.apiService.authGet('campaigns/applied');
   }
 
-  /**
-   * Update the status of an applicant (Brands only)
-   */
-  async updateApplicantStatus(campaignId: string, influencerId: string, status: 'APPROVED' | 'REJECTED'): Promise<ICampaign> {
-    const loading = await this.loadingController.create({
-      message: 'Updating application...'
-    });
-    await loading.present();
-
-    try {
-      const response: any = await this.apiService.authPost(`campaigns/${campaignId}/applicants/${influencerId}/status`, { status });
-
-      if (response.success) {
-        await this.showToast(`Application successfully ${status.toLowerCase()}!`, 'success');
-        return response.data.campaign;
-      }
-      throw new Error('Failed to update status');
-    } catch (error: any) {
-      await this.showToast(error.message || 'Failed to update application', 'danger');
-      throw error;
-    } finally {
-      await loading.dismiss();
-    }
-  }
-
-  /**
-   * Show dynamic toast messages
-   */
-  private async showToast(message: string, color: string = 'primary') {
-    const toast = await this.toastController.create({
-      message: message,
-      duration: 3500,
-      position: 'bottom',
-      color: color,
-      buttons: ['OK']
-    });
-    await toast.present();
+  // Update status of a campaign applicant (Brands only) via API
+  updateApplicantStatus(campaignId: string, influencerId: string, status: 'APPROVED' | 'REJECTED'): Observable<any> {
+    return this.apiService.authPost(`campaigns/${campaignId}/applicants/${influencerId}/status`, { status });
   }
 }

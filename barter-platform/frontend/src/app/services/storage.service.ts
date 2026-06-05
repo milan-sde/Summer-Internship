@@ -1,5 +1,5 @@
-// src/app/services/storage.service.ts
 import { Injectable } from '@angular/core';
+import { User } from './auth.service';
 
 @Injectable({
   providedIn: 'root',
@@ -7,27 +7,33 @@ import { Injectable } from '@angular/core';
 export class StorageService {
   constructor() {}
 
-  async setAccessToken(token: string): Promise<void> {
+  // Save access token synchronously in sessionStorage
+  setAccessToken(token: string): void {
     sessionStorage.setItem('access_token', token);
   }
-  async getAccessToken(): Promise<string | null> {
+
+  // Get access token synchronously from sessionStorage
+  getAccessToken(): string | null {
     return sessionStorage.getItem('access_token') || null;
   }
 
-  async setRefreshToken(token: string): Promise<void> {
+  // Save refresh token synchronously in sessionStorage
+  setRefreshToken(token: string): void {
     sessionStorage.setItem('refresh_token', token);
   }
 
-  async getRefreshToken(): Promise<string | null> {
+  // Get refresh token synchronously from sessionStorage
+  getRefreshToken(): string | null {
     return sessionStorage.getItem('refresh_token') || null;
   }
 
-  async setUser(user: any): Promise<void> {
+  // Save user details synchronously in sessionStorage
+  setUser(user: User): void {
     sessionStorage.setItem('user', JSON.stringify(user));
   }
 
-
-  async getUser(): Promise<any> {
+  // Get user details synchronously from sessionStorage
+  getUser(): User | null {
     const userString = sessionStorage.getItem('user');
     if (!userString) {
       return null;
@@ -40,12 +46,14 @@ export class StorageService {
     }
   }
 
-  async isLoggedIn(): Promise<boolean> {
-    const token = await this.getAccessToken();
+  // Check login status synchronously based on access token availability
+  isLoggedIn(): boolean {
+    const token = this.getAccessToken();
     return token !== null;
   }
 
-  async clear(): Promise<void> {
+  // Clear all items synchronously from sessionStorage
+  clear(): void {
     sessionStorage.clear();
   }
 }

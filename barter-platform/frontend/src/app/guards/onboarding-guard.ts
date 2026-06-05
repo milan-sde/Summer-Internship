@@ -12,11 +12,12 @@ export class OnboardingGuard implements CanActivate {
     private router: Router
   ) {}
 
-  async canActivate(): Promise<boolean> {
-    const user = await this.storage.getUser();
+  // Synchronously determine if user profile onboarding is completed before allowing access
+  canActivate(): boolean {
+    const user = this.storage.getUser();
 
     if (!user || !user.onboardingCompleted) {
-      await this.router.navigate(['/complete-profile']);
+      this.router.navigate(['/complete-profile']);
       return false;
     }
 

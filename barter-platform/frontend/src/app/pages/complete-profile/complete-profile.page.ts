@@ -25,7 +25,7 @@ import {
   IonRow,
   IonCol,
 } from '@ionic/angular/standalone';
-import { ToastController } from '@ionic/angular/standalone';
+import { ToastController, LoadingController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   cameraOutline,
@@ -114,7 +114,7 @@ export class CompleteProfilePage implements OnInit {
   pastWorkLinks: string[] = [''];
 
   // Avatar / Logo simulation
-  avatarPreview: string | null = null;
+  avatarPreview: string | null | undefined = null;
   selectedFile: File | null = null;
 
   constructor(
@@ -123,6 +123,7 @@ export class CompleteProfilePage implements OnInit {
     private storage: StorageService,
     private router: Router,
     private toastController: ToastController,
+    private loadingController: LoadingController,
   ) {
     addIcons({
       cameraOutline,
@@ -143,8 +144,8 @@ export class CompleteProfilePage implements OnInit {
     });
   }
 
-  async ngOnInit() {
-    this.currentUser = await this.storage.getUser();
+  ngOnInit() {
+    this.currentUser = this.storage.getUser();
     this.setupForm();
   }
 
@@ -157,7 +158,7 @@ export class CompleteProfilePage implements OnInit {
           [Validators.required, Validators.pattern(/^[a-zA-Z0-9_.]{1,30}$/)],
         ],
         phoneNumber: ['', [Validators.required, Validators.minLength(5)]],
-        email: [{ value: this.currentUser?.email || '', disabled: true }],
+        email: [{ value: this.currentUser?.email, disabled: true }],
         bio: [
           '',
           [
@@ -182,7 +183,7 @@ export class CompleteProfilePage implements OnInit {
         firstName: ['', [Validators.required]],
         lastName: ['', [Validators.required]],
         phoneNumber: ['', [Validators.required, Validators.minLength(5)]],
-        email: [{ value: this.currentUser?.email || '', disabled: true }],
+        email: [{ value: this.currentUser?.email, disabled: true }],
         bio: [
           '',
           [
@@ -285,7 +286,7 @@ export class CompleteProfilePage implements OnInit {
       const raw = this.profileForm.value;
       const profileData: any = {
         bio: raw.bio,
-        avatarUrl: raw.avatarUrl || '',
+        avatarUrl: raw.avatarUrl,
       };
 
       if (this.currentUser?.role === 'INFLUENCER') {
@@ -299,17 +300,17 @@ export class CompleteProfilePage implements OnInit {
         const platforms: any = {};
         if (raw.instagramUsername || raw.instagramFollowers) {
           platforms.instagram = {
-            username: raw.instagramUsername || '',
+            username: raw.instagramUsername,
             followers:
               raw.instagramFollowers !== null && raw.instagramFollowers !== ''
                 ? Number(raw.instagramFollowers)
                 : 0,
           };
-          profileData.instagramHandle = raw.instagramUsername || '';
+          profileData.instagramHandle = raw.instagramUsername;
         }
         if (raw.youtubeUsername || raw.youtubeFollowers) {
           platforms.youtube = {
-            username: raw.youtubeUsername || '',
+            username: raw.youtubeUsername,
             followers:
               raw.youtubeFollowers !== null && raw.youtubeFollowers !== ''
                 ? Number(raw.youtubeFollowers)
@@ -318,7 +319,7 @@ export class CompleteProfilePage implements OnInit {
         }
         if (raw.twitterUsername || raw.twitterFollowers) {
           platforms.twitter = {
-            username: raw.twitterUsername || '',
+            username: raw.twitterUsername,
             followers:
               raw.twitterFollowers !== null && raw.twitterFollowers !== ''
                 ? Number(raw.twitterFollowers)
@@ -421,21 +422,34 @@ export class CompleteProfilePage implements OnInit {
 
       this.isSubmitting = true;
 
-      try {
-        const profile = await this.profileService.createProfile(profileData);
+      // Create and display loading screen during profile creation
+      this.loadingController.create({
+        message: 'Creating your profile...'
+      }).then((loading) => {
+        loading.present();
 
-        // Update user in storage
-        if (this.currentUser) {
-          this.currentUser.onboardingCompleted = true;
-          await this.storage.setUser(this.currentUser);
-        }
+        this.profileService.createProfile(profileData).subscribe({
+          next: (response: any) => {
+            loading.dismiss();
 
-        await this.router.navigate(['/dashboard']);
-      } catch (error) {
-        console.error('Profile creation failed:', error);
-      } finally {
-        this.isSubmitting = false;
-      }
+            // Update user onboarding state synchronously in session storage
+            if (this.currentUser) {
+              this.currentUser.onboardingCompleted = true;
+              this.storage.setUser(this.currentUser);
+            }
+
+            this.showToast('Profile created successfully! Welcome aboard!', 'success');
+            this.router.navigate(['/dashboard']);
+            this.isSubmitting = false;
+          },
+          error: (error: any) => {
+            loading.dismiss();
+            console.error('Profile creation failed:', error);
+            this.showToast(error.message || 'Failed to create profile', 'danger');
+            this.isSubmitting = false;
+          }
+        });
+      });
     } else {
       this.profileForm.markAllAsTouched();
     }
@@ -447,6 +461,18 @@ export class CompleteProfilePage implements OnInit {
       color: 'danger',
       duration: 3500,
       position: 'bottom',
+      buttons: ['OK'],
+    });
+    await toast.present();
+  }
+
+  // Display toast feedback messages
+  async showToast(message: string, color: string = 'primary') {
+    const toast = await this.toastController.create({
+      message: message,
+      duration: 3000,
+      position: 'bottom',
+      color: color,
       buttons: ['OK'],
     });
     await toast.present();

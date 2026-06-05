@@ -14,15 +14,16 @@ export class GuestGuard implements CanActivate {
     private router: Router
   ) {}
 
-  async canActivate(): Promise<boolean> {
-    const isLoggedIn = await this.storage.isLoggedIn();
+  // Synchronously determine if the guest route is accessible (user is not logged in)
+  canActivate(): boolean {
+    const isLoggedIn = this.storage.isLoggedIn();
 
     if (isLoggedIn) {
-      const user = await this.storage.getUser();
+      const user = this.storage.getUser();
       if (user?.onboardingCompleted) {
-        await this.router.navigate(['/dashboard']);
+        this.router.navigate(['/dashboard']);
       } else {
-        await this.router.navigate(['/complete-profile']);
+        this.router.navigate(['/complete-profile']);
       }
       return false;
     }
