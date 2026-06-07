@@ -4,6 +4,7 @@ import { Router, RouterLink } from '@angular/router';
 import { CampaignService, ICampaign } from '../../services/campaign.service';
 import { StorageService } from '../../services/storage.service';
 import { ProfileService } from '../../services/profile.service';
+import { environment } from 'src/environments/environment';
 import {
   IonHeader,
   IonToolbar,
@@ -288,6 +289,15 @@ export class CampaignsPage implements OnInit {
         console.error('Failed to update status:', error);
       }
     });
+  }
+
+  getAvatarUrl(url: string | null | undefined): string {
+    if (!url) return '';
+    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
+      return url;
+    }
+    const backendBase = environment.apiUrl.replace('/api', '');
+    return `${backendBase}${url}`;
   }
 
   getInitials(name: string): string {

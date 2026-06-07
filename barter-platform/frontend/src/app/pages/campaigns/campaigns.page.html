@@ -138,7 +138,7 @@
           <!-- Avatar and brand title -->
           <div class="brand-info-box">
             <div class="brand-avatar-box">
-              <img *ngIf="campaign.brandLogo" [src]="campaign.brandLogo" class="brand-avatar-img">
+              <img *ngIf="campaign.brandLogo" [src]="getAvatarUrl(campaign.brandLogo)" class="brand-avatar-img">
               <span *ngIf="!campaign.brandLogo" class="brand-avatar-initial">{{ getInitials(campaign.brandName) }}</span>
             </div>
             <div class="brand-names-box">
@@ -267,7 +267,7 @@
             <div *ngFor="let applicant of campaign.applicants" class="applicant-item-row">
               <div class="applicant-profile-info">
                 <div class="applicant-avatar-circle">
-                  <img *ngIf="applicant.avatarUrl" [src]="applicant.avatarUrl" class="applicant-avatar-img">
+                  <img *ngIf="applicant.avatarUrl" [src]="getAvatarUrl(applicant.avatarUrl)" class="applicant-avatar-img">
                   <span *ngIf="!applicant.avatarUrl" class="applicant-avatar-initial">{{ getInitials(applicant.fullName) }}</span>
                 </div>
                 <div class="applicant-text-info">
