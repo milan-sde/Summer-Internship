@@ -10,6 +10,7 @@ import {
 import { StorageService } from '../../services/storage.service';
 import { Router } from '@angular/router';
 import { ProfileService } from 'src/app/services/profile.service';
+import { environment } from 'src/environments/environment';
 import {
   IonHeader,
   IonToolbar,
@@ -254,17 +255,47 @@ export class CompleteProfilePage implements OnInit {
     }
   }
 
-  // Image loading preview
+  // Helper to construct full avatar URL for static files
+  getAvatarUrl(url: string | null | undefined): string {
+    if (!url) return '';
+    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
+      return url;
+    }
+    const backendBase = environment.apiUrl.replace('/api', '');
+    return `${backendBase}${url}`;
+  }
+
+  // Image upload and preview handling
   onFileSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
       this.selectedFile = file;
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.avatarPreview = reader.result as string;
-        this.profileForm.patchValue({ avatarUrl: this.avatarPreview });
-      };
-      reader.readAsDataURL(file);
+
+      // Show loader during immediate image upload
+      this.loadingController.create({
+        message: 'Uploading image...'
+      }).then((loading) => {
+        loading.present();
+
+        this.profileService.uploadAvatar(file).subscribe({
+          next: (response: any) => {
+            loading.dismiss();
+            if (response && response.success && response.data) {
+              const uploadedPath = response.data.avatar;
+              // Update visual preview immediately
+              this.avatarPreview = uploadedPath;
+              // Patch form control to store relative URL path
+              this.profileForm.patchValue({ avatarUrl: uploadedPath });
+              this.showToast('Image uploaded successfully!', 'success');
+            }
+          },
+          error: (error: any) => {
+            loading.dismiss();
+            console.error('Failed to upload avatar:', error);
+            this.showToast('Failed to upload image. Please try again.', 'danger');
+          }
+        });
+      });
     }
   }
 

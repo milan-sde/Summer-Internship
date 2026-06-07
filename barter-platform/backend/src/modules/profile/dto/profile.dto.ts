@@ -23,7 +23,10 @@ export const CreateProfileDtoSchema = z.object({
   
   avatarUrl: z
     .string()
-    .url('Please provide a valid URL')
+    .refine(
+      (val) => !val || val.startsWith('/') || val.startsWith('http://') || val.startsWith('https://') || val.startsWith('data:'),
+      { message: 'Please provide a valid URL or local path' }
+    )
     .optional()
     .or(z.literal('')),
   

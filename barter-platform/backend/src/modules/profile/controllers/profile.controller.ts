@@ -67,6 +67,7 @@ export const getPublicProfile = asyncHandler(
 export const updateProfile = asyncHandler(
   async (req: Request, res: Response) => {
     const userId = req.user!.userId;
+    console.log("PUT /api/profile request body:", req.body);
     const profile = await profileService.updateProfile(userId, req.body);
 
     res.status(200).json({
@@ -111,3 +112,36 @@ export const getOnboardingStatus = asyncHandler(
     });
   },
 );
+
+// Handle user avatar upload
+export const uploadAvatar = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.user!.userId;
+
+    if (!req.file) {
+      res.status(400).json({
+        success: false,
+        error: {
+          code: "VALIDATION_ERROR",
+          message: "No avatar file provided",
+        },
+      });
+      return;
+    }
+
+    // Relative path to store in Mongoose / access via URL
+    const avatarUrlPath = `/static/avatars/${req.file.filename}`;
+
+    // Update avatar URL in the database
+    await profileService.updateAvatar(userId, avatarUrlPath);
+
+    res.status(200).json({
+      success: true,
+      message: "Avatar uploaded successfully",
+      data: {
+        avatar: avatarUrlPath,
+      },
+    });
+  },
+);
+

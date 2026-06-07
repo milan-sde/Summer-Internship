@@ -4,6 +4,7 @@ import cors from "cors";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
+import path from "path";
 import { requestLogger } from "@shared/middlewares/request-logger";
 import { errorHandler } from "@shared/middlewares/error-handler";
 import { connectDatabase } from "@shared/database/connection";
@@ -33,6 +34,9 @@ app.use(
 // body parser:
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+
+// serve static files from the static uploads directory
+app.use("/static", express.static(path.join(__dirname, "static")));
 
 //cookie parser:
 app.use(cookieParser());

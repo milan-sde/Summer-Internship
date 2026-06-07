@@ -82,11 +82,11 @@ const profileSchema = new Schema<IProfile>(
     },
     avatarUrl: {
       type: String,
-      match: [/^https?:\/\/.+/, 'Invalid URL format']
+      match: [/^((https?:\/\/|data:|\/static\/).+)?$/, 'Invalid URL format']
     },
     website: {
       type: String,
-      match: [/^https?:\/\/.+/, 'Invalid URL format']
+      match: [/^(https?:\/\/.+)?$/, 'Invalid URL format']
     },
     location: {
       type: String,

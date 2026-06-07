@@ -57,7 +57,7 @@
           />
           <div class="avatar-picker-wrapper">
             <div class="avatar-picker" (click)="fileInput.click()">
-              <img *ngIf="avatarPreview" [src]="avatarPreview" />
+              <img *ngIf="avatarPreview" [src]="getAvatarUrl(avatarPreview)" />
               <span *ngIf="!avatarPreview">{{ getInitials() }}</span>
             </div>
             <div class="camera-badge" (click)="fileInput.click()">

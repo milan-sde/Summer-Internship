@@ -15,6 +15,7 @@ export interface IUser extends Document {
   onBoardingCompleted: boolean;
   lastLoginAt: Date;
   refreshTokenVersion: number;
+  avatar?: string | null;
   createdAt: Date;
   updatedAt: Date;
 
@@ -67,6 +68,10 @@ const userSchema = new Schema<IUser>(
     refreshTokenVersion: {
       type: Number,
       default: 0,
+    },
+    avatar: {
+      type: String,
+      default: null,
     },
   },
   {

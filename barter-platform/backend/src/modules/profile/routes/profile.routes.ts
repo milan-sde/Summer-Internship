@@ -14,15 +14,23 @@ import {
   getPublicProfile,
   updateProfile,
   searchProfiles,
-  getOnboardingStatus
+  getOnboardingStatus,
+  uploadAvatar
 } from '../controllers/profile.controller';
 import { authenticate } from '@shared/middlewares/auth.middleware';
 import { validate, validateQuery } from '@modules/auth/validators/auth.validator';
+import { createUploader } from '@shared/middlewares/multer';
 
 const router = Router();
 
 // All routes in this file require user login
 router.use(authenticate);
+
+// Initialize Multer uploader for avatar uploads
+const avatarUploader = createUploader('avatars', 'avatar');
+
+// Avatar upload endpoint
+router.put('/avatar', avatarUploader.single('avatar'), uploadAvatar);
 
 // Discovery and search endpoints
 router.get('/search', validateQuery(SearchProfilesQuerySchema), searchProfiles);

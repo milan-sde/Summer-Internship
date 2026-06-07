@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { ApiService } from './api.service';
 import { StorageService } from './storage.service';
 
@@ -139,7 +140,9 @@ export class ProfileService {
 
   // Get current user's profile details via API
   getMyProfile(): Observable<any> {
-    return this.apiService.authGet('profile/me');
+    return this.apiService.authGet<any>('profile/me').pipe(
+      map(res => res?.data?.profile)
+    );
   }
 
   // Update current user's profile details via API
@@ -175,6 +178,6 @@ export class ProfileService {
   uploadAvatar(file: File): Observable<any> {
     const formData = new FormData();
     formData.append('avatar', file);
-    return this.apiService.authPostFormData('profile/upload-avatar', formData);
+    return this.apiService.authPutFormData('profile/avatar', formData);
   }
 }

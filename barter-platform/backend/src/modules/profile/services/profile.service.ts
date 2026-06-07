@@ -301,6 +301,25 @@ export class ProfileService {
     await this.profileRepository.deleteByUserId(userId);
   }
 
+  // Update user avatar in User schema and optionally Profile schema
+  async updateAvatar(userId: string, avatarPath: string): Promise<string> {
+    const user = await this.userRepository.findById(userId);
+    if (!user) {
+      throw new NotFoundError('User');
+    }
+
+    // Update avatar on User model
+    await this.userRepository.update(userId, { avatar: avatarPath });
+
+    // Check if the Profile exists, and sync avatarUrl if it does
+    const profile = await this.profileRepository.findByUserId(userId);
+    if (profile) {
+      await this.profileRepository.updateByUserId(userId, { avatarUrl: avatarPath });
+    }
+
+    return avatarPath;
+  }
+
   // Map Mongoose model fields to response DTO format
   private toResponseDto(profile: any): ProfileResponseDto {
     return {
