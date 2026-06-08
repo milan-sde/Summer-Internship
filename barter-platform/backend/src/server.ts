@@ -23,7 +23,11 @@ const PORT = process.env.PORT || 3000;
 
 // Register middleware in order: security, parsers, logs, routes, then error handling
 
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+  }),
+);
 app.use(
   cors({
     origin: process.env.FRONTEND_URL || "http://localhost:8100",

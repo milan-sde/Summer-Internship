@@ -36,6 +36,15 @@ export interface IProfile extends Document {
     youtube?: { username?: string; followers?: number };
     twitter?: { username?: string; followers?: number };
   };
+  instagram?: {
+    instagramId: string;
+    username: string;
+    accessToken: string;
+    tokenExpiresAt?: Date;
+    followersCount: number;
+    profilePicture?: string;
+    connectedAt: Date;
+  };
   pastWorkLinks?: string[];
   isVerified?: boolean;
 
@@ -146,6 +155,15 @@ const profileSchema = new Schema<IProfile>(
         username: String,
         followers: Number
       }
+    },
+    instagram: {
+      instagramId: { type: String, required: false },
+      username: { type: String, required: false },
+      accessToken: { type: String, required: false },
+      tokenExpiresAt: { type: Date, required: false },
+      followersCount: { type: Number, default: 0 },
+      profilePicture: { type: String, required: false },
+      connectedAt: { type: Date, default: Date.now }
     },
     pastWorkLinks: {
       type: [String],
