@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ApiService } from './api.service';
+import { environment } from 'src/environments/environment';
 
 export enum SocialPlatform {
   Instagram = 'Instagram',
   YouTube = 'YouTube',
-  Twitter = 'Twitter'
+  Twitter = 'Twitter',
 }
 
 export interface ICampaign {
@@ -31,12 +32,12 @@ export interface ICampaign {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CampaignService {
-  constructor(
-    private apiService: ApiService
-  ) {}
+  private readonly apiUrl = environment.apiUrl.replace(/\/+$/, '');
+
+  constructor(private http: HttpClient) {}
 
   // Create a new campaign (Brands only) via API
   createCampaign(campaignData: {
@@ -50,7 +51,9 @@ export class CampaignService {
     startDate?: string;
     endDate?: string;
   }): Observable<any> {
-    return this.apiService.authPost('campaigns', campaignData);
+    return this.http.post(`${this.apiUrl}/campaigns`, campaignData, {
+      withCredentials: true,
+    });
   }
 
   // Get active campaigns list with optional category/platform query filters via API
@@ -80,27 +83,46 @@ export class CampaignService {
       }
     }
 
-    const queryString = queryParams.length > 0 ? `?${queryParams.join('&')}` : '';
-    return this.apiService.authGet(`campaigns${queryString}`);
+    const queryString =
+      queryParams.length > 0 ? `?${queryParams.join('&')}` : '';
+    return this.http.get(`${this.apiUrl}/campaigns${queryString}`, {
+      withCredentials: true,
+    });
   }
 
   // Submit request to apply for a campaign (Influencers only) via API
   applyToCampaign(campaignId: string): Observable<any> {
-    return this.apiService.authPost(`campaigns/${campaignId}/apply`, {});
+    return this.http.post(
+      `${this.apiUrl}/campaigns/${campaignId}/apply`,
+      {},
+      { withCredentials: true },
+    );
   }
 
   // Fetch campaigns created by the currently authenticated brand user via API
   getMyCampaigns(): Observable<any> {
-    return this.apiService.authGet('campaigns/my-campaigns');
+    return this.http.get(`${this.apiUrl}/campaigns/my-campaigns`, {
+      withCredentials: true,
+    });
   }
 
   // Fetch campaigns applied to by the currently authenticated influencer user via API
   getAppliedCampaigns(): Observable<any> {
-    return this.apiService.authGet('campaigns/applied');
+    return this.http.get(`${this.apiUrl}/campaigns/applied`, {
+      withCredentials: true,
+    });
   }
 
   // Update status of a campaign applicant (Brands only) via API
-  updateApplicantStatus(campaignId: string, influencerId: string, status: 'APPROVED' | 'REJECTED'): Observable<any> {
-    return this.apiService.authPost(`campaigns/${campaignId}/applicants/${influencerId}/status`, { status });
+  updateApplicantStatus(
+    campaignId: string,
+    influencerId: string,
+    status: 'APPROVED' | 'REJECTED',
+  ): Observable<any> {
+    return this.http.post(
+      `${this.apiUrl}/campaigns/${campaignId}/applicants/${influencerId}/status`,
+      { status },
+      { withCredentials: true },
+    );
   }
 }

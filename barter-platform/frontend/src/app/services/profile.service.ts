@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ApiService } from './api.service';
-import { StorageService } from './storage.service';
+import { environment } from 'src/environments/environment';
 
 export interface CreateProfileDto {
   fullName?: string;
@@ -122,62 +122,103 @@ export interface ProfileResponse {
   industries?: string[];
   budgetMin?: number;
   budgetMax?: number;
+  instagram?: {
+    instagramId: string;
+    username: string;
+    followersCount: number;
+    profilePicture?: string;
+    connectedAt?: Date;
+  };
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ProfileService {
-  constructor(
-    private apiService: ApiService,
-    private storage: StorageService
-  ) {}
+  private readonly apiUrl = environment.apiUrl.replace(/\/+$/, '');
+
+  constructor(private http: HttpClient) {}
 
   // Create a new user profile on onboarding completion via API
   createProfile(profileData: CreateProfileDto): Observable<any> {
-    return this.apiService.authPost('profile', profileData);
+    return this.http.post(`${this.apiUrl}/profile`, profileData, {
+      withCredentials: true,
+    });
   }
 
   // Get current user's profile details via API
   getMyProfile(): Observable<any> {
-    return this.apiService.authGet<any>('profile/me').pipe(
-      map(res => res?.data?.profile)
-    );
+    return this.http
+      .get<any>(`${this.apiUrl}/profile/me`, { withCredentials: true })
+      .pipe(map((res) => res?.data?.profile));
   }
 
   // Update current user's profile details via API
   updateProfile(profileData: UpdateProfileDto): Observable<any> {
-    return this.apiService.authPut('profile', profileData);
+    return this.http.put(`${this.apiUrl}/profile`, profileData, {
+      withCredentials: true,
+    });
   }
 
   // Get profile details by user ID via API
   getProfileById(userId: string): Observable<any> {
-    return this.apiService.authGet(`profile/${userId}`);
+    return this.http.get(`${this.apiUrl}/profile/${userId}`, {
+      withCredentials: true,
+    });
+  }
+
+  // Get unified influencer profile details (profile, instagram media, and portfolio) via API
+  getInfluencerProfile(influencerId: string): Observable<any> {
+    return this.http
+      .get<any>(`${this.apiUrl}/influencers/${influencerId}`, {
+        withCredentials: true,
+      })
+      .pipe(map((res) => res?.data));
+  }
+
+  // Trigger manual synchronization of connected Instagram metrics & media caching via API
+  syncInstagram(): Observable<any> {
+    return this.http.post(
+      `${this.apiUrl}/instagram/sync`,
+      {},
+      { withCredentials: true },
+    );
   }
 
   // Get public profile details by Instagram handle via API
   getPublicProfile(instagramHandle: string): Observable<any> {
-    return this.apiService.authGet(`profile/public/${instagramHandle}`);
+    return this.http.get(`${this.apiUrl}/profile/public/${instagramHandle}`, {
+      withCredentials: true,
+    });
   }
 
   // Search profiles with optional filters and pagination via API
-  searchProfiles(query: string, role?: string, page: number = 1, limit: number = 20): Observable<any> {
+  searchProfiles(
+    query: string,
+    role?: string,
+    page: number = 1,
+    limit: number = 20,
+  ): Observable<any> {
     let url = `profile/search?q=${encodeURIComponent(query)}&page=${page}&limit=${limit}`;
     if (role) {
       url += `&role=${role}`;
     }
-    return this.apiService.authGet(url);
+    return this.http.get(`${this.apiUrl}/${url}`, { withCredentials: true });
   }
 
   // Check if onboarding is completed by requesting onboarding status via API
   getOnboardingStatus(): Observable<any> {
-    return this.apiService.authGet('profile/onboarding-status');
+    return this.http.get(`${this.apiUrl}/profile/onboarding-status`, {
+      withCredentials: true,
+    });
   }
 
   // Upload user avatar image using multipart/form-data via API
   uploadAvatar(file: File): Observable<any> {
     const formData = new FormData();
     formData.append('avatar', file);
-    return this.apiService.authPutFormData('profile/avatar', formData);
+    return this.http.put(`${this.apiUrl}/profile/avatar`, formData, {
+      withCredentials: true,
+    });
   }
 }
