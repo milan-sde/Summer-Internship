@@ -1,0 +1,296 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/dashboard" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title class="headings">My Portfolio</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding" [fullscreen]="true">
+  <div style="max-width: 800px; margin: 0 auto">
+    <!-- Upload Section -->
+    <div class="glassmorphism-card ion-padding" style="margin-bottom: 25px">
+      <h3
+        class="headings"
+        style="
+          font-weight: 700;
+          color: var(--ion-color-step-800);
+          margin: 0 0 15px 0;
+          display: flex;
+          align-items: center;
+        "
+      >
+        <ion-icon
+          name="cloud-upload-outline"
+          style="margin-right: 8px; color: var(--ion-color-primary)"
+        ></ion-icon>
+        Upload Portfolio Item
+      </h3>
+
+      <form [formGroup]="uploadForm" (ngSubmit)="onSubmit()">
+        <!-- Interactive File Picker Container -->
+        <input
+          type="file"
+          #fileInput
+          (change)="onFileSelected($event)"
+          accept="image/*,video/*"
+          style="display: none"
+        />
+
+        <div
+          class="file-picker-container"
+          (click)="!filePreview && fileInput.click()"
+          [class.has-preview]="filePreview"
+        >
+          <!-- Default Selector Display -->
+          @if (!filePreview) {
+          <div class="file-picker-placeholder">
+            <ion-icon
+              name="cloud-upload-outline"
+              class="upload-icon"
+            ></ion-icon>
+            <p class="upload-text-main">Tap to select Image or Video</p>
+            <p class="upload-text-sub">Supports JPG, PNG, MP4 up to 50MB</p>
+          </div>
+          }
+
+          <!-- Preview Content Display -->
+          @if (filePreview) {
+          <div class="preview-wrapper">
+            <!-- Close Button to Reset Selected File -->
+            <button
+              type="button"
+              class="preview-close-btn"
+              (click)="clearSelectedFile(); $event.stopPropagation();"
+            >
+              &times;
+            </button>
+
+            <!-- Image Preview -->
+            @if (fileType === 'image') {
+            <img [src]="filePreview" class="preview-media" />
+            }
+
+            <!-- Video Preview -->
+            @if (fileType === 'video') {
+            <video
+              [src]="filePreview"
+              class="preview-media"
+              controls
+              muted
+            ></video>
+            }
+          </div>
+          }
+        </div>
+
+        <!-- Caption Field -->
+        <div class="custom-input-group" style="margin-top: 15px">
+          <label class="custom-input-label">Caption *</label>
+          <ion-item lines="none" class="custom-input-item">
+            <ion-textarea
+              formControlName="caption"
+              rows="3"
+              placeholder="Enter a caption describing this work item..."
+            ></ion-textarea>
+          </ion-item>
+          @if (uploadForm.get('caption')?.touched &&
+          uploadForm.get('caption')?.invalid) {
+          <div class="input-error-msg">
+            Caption is required (max 500 characters).
+          </div>
+          }
+        </div>
+
+        <!-- Category Field -->
+        <div class="custom-input-group">
+          <label class="custom-input-label">Category / Platform *</label>
+          <ion-item lines="none" class="custom-input-item">
+            <ion-input
+              type="text"
+              formControlName="category"
+              placeholder="e.g. Fashion Shoot, Unboxing Video, Travel Reel"
+            ></ion-input>
+          </ion-item>
+          @if (uploadForm.get('category')?.touched &&
+          uploadForm.get('category')?.invalid) {
+          <div class="input-error-msg">
+            Category is required (max 100 characters).
+          </div>
+          }
+        </div>
+
+        <!-- Submit Button -->
+        <ion-button
+          expand="block"
+          type="submit"
+          [disabled]="isUploading"
+          class="submit-btn"
+          style="margin-top: 20px"
+        >
+          <ion-icon
+            name="cloud-upload-outline"
+            slot="start"
+            style="font-size: 1.2rem"
+          ></ion-icon>
+          {{ isUploading ? 'Uploading Item...' : 'Upload to Portfolio' }}
+        </ion-button>
+      </form>
+    </div>
+
+    <!-- Portfolio Display Section -->
+    <h3
+      class="headings"
+      style="
+        font-weight: 700;
+        color: var(--ion-color-step-800);
+        margin: 0 0 15px 5px;
+        display: flex;
+        align-items: center;
+      "
+    >
+      <ion-icon
+        name="folder-open-outline"
+        style="margin-right: 8px; color: var(--ion-color-primary)"
+      ></ion-icon>
+      My Catalog
+    </h3>
+
+    <!-- Loading State -->
+    @if (isLoading) {
+    <div style="text-align: center; padding: 40px 0">
+      <div class="loading-spinner" style="margin: 0 auto 10px auto"></div>
+      <span style="color: var(--ion-color-step-600); font-weight: 600"
+        >Loading portfolio...</span
+      >
+    </div>
+    }
+
+    <!-- Empty State -->
+    @if (!isLoading && portfolioItems.length === 0) {
+    <div
+      class="glassmorphism-card ion-padding text-center"
+      style="padding: 40px 20px"
+    >
+      <ion-icon
+        name="folder-open-outline"
+        style="
+          font-size: 3.5rem;
+          color: var(--ion-color-step-300);
+          margin-bottom: 10px;
+        "
+      ></ion-icon>
+      <h4
+        style="
+          font-weight: 700;
+          color: var(--ion-color-step-700);
+          margin: 0 0 5px 0;
+        "
+      >
+        No portfolio items yet
+      </h4>
+      <p style="color: var(--ion-color-step-500); margin: 0; font-size: 0.9rem">
+        Upload images or videos above to showcase your work to brands!
+      </p>
+    </div>
+    }
+
+    <!-- Items Grid -->
+    @if (!isLoading && portfolioItems.length > 0) {
+    <ion-grid class="ion-no-padding">
+      <ion-row>
+        @for (item of portfolioItems; track item.id) {
+        <ion-col size="12" size-sm="6" style="padding: 8px">
+          <ion-card
+            class="portfolio-item-card"
+            style="
+              margin: 0;
+              height: 100%;
+              display: flex;
+              flex-direction: column;
+              border-radius: 12px;
+              overflow: hidden;
+              box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+              border: 1px solid var(--ion-color-step-150);
+            "
+          >
+            <!-- Media Container -->
+            <div class="card-media-container">
+              <!-- Image Preview -->
+              @if (item.mediaType === 'image') {
+              <img
+                [src]="getMediaUrl(item.mediaUrl)"
+                class="card-media"
+                alt="Portfolio Image"
+              />
+              }
+
+              <!-- Video Player -->
+              @if (item.mediaType === 'video') {
+              <video
+                [src]="getMediaUrl(item.mediaUrl)"
+                class="card-media"
+                controls
+                playsinline
+              ></video>
+              }
+
+              <!-- Category Badge -->
+              <span class="card-category-badge">{{ item.title }}</span>
+            </div>
+
+            <!-- Content Area -->
+            <ion-card-content
+              style="
+                flex-grow: 1;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                padding: 15px;
+              "
+            >
+              <div>
+                <p
+                  style="
+                    color: var(--ion-color-step-800);
+                    font-size: 0.95rem;
+                    line-height: 1.4;
+                    margin: 0 0 15px 0;
+                    font-weight: 500;
+                  "
+                >
+                  {{ item.description }}
+                </p>
+              </div>
+
+              <!-- Card Footer Action -->
+              <div
+                style="
+                  display: flex;
+                  justify-content: flex-end;
+                  align-items: center;
+                  border-top: 1px solid var(--ion-color-step-100);
+                  padding-top: 10px;
+                "
+              >
+                <ion-button
+                  fill="clear"
+                  color="danger"
+                  size="small"
+                  (click)="confirmDelete(item)"
+                  style="font-weight: 600; margin: 0"
+                >
+                  <ion-icon name="trash-outline" slot="start"></ion-icon>
+                  Delete
+                </ion-button>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+        }
+      </ion-row>
+    </ion-grid>
+    }
+  </div>
+</ion-content>

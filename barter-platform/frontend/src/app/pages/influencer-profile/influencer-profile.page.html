@@ -1,0 +1,296 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/campaigns" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title class="headings">Influencer Profile</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding" [fullscreen]="true">
+  <!-- Loading State -->
+  @if (isLoading) {
+  <div style="text-align: center; padding: 60px 0">
+    <div class="loading-spinner" style="margin: 0 auto 10px auto"></div>
+    <span style="color: var(--ion-color-step-600); font-weight: 600"
+      >Loading influencer profile...</span
+    >
+  </div>
+  }
+
+  <!-- Error State -->
+  @if (!isLoading && errorMsg) {
+  <div
+    class="glassmorphism-card ion-padding text-center"
+    style="max-width: 500px; margin: 40px auto"
+  >
+    <ion-icon
+      name="alert-circle-outline"
+      style="
+        font-size: 3rem;
+        color: var(--ion-color-danger);
+        margin-bottom: 10px;
+      "
+    ></ion-icon>
+    <h4
+      style="
+        font-weight: 700;
+        color: var(--ion-color-step-700);
+        margin: 0 0 5px 0;
+      "
+    >
+      Failed to load profile
+    </h4>
+    <p
+      style="
+        color: var(--ion-color-step-500);
+        margin: 0 0 15px 0;
+        font-size: 0.9rem;
+      "
+    >
+      {{ errorMsg }}
+    </p>
+    <ion-button size="small" (click)="loadFullProfile()">Retry</ion-button>
+  </div>
+  }
+
+  <!-- Profile Content -->
+  @if (!isLoading && !errorMsg && profile) {
+  <div style="max-width: 900px; margin: 0 auto">
+    <!-- ================= PROFILE SECTION ================= -->
+    <div
+      class="glassmorphism-card ion-padding profile-header-section"
+      style="margin-bottom: 25px"
+    >
+      <div class="profile-header-top">
+        <!-- Circular Avatar -->
+        <div class="profile-avatar-wrapper">
+          @if (profile.avatarUrl) {
+          <img
+            [src]="getMediaUrl(profile.avatarUrl)"
+            class="profile-avatar-img"
+            alt="Avatar"
+          />
+          } @else {
+          <span class="profile-avatar-initial"
+            >{{ getInitials(profile.fullName) }}</span
+          >
+          }
+        </div>
+
+        <!-- Details -->
+        <div class="profile-details-info">
+          <h2 class="headings profile-name">{{ profile.fullName }}</h2>
+          <p class="profile-username">
+            @{{ profile.username || 'influencer' }}
+          </p>
+
+          <!-- Followers Count Badge -->
+          <div class="followers-badge-row">
+            <span class="followers-count-badge">
+              <ion-icon
+                name="people-outline"
+                style="margin-right: 4px"
+              ></ion-icon>
+              {{ (profile.instagram?.followersCount || profile.stats?.followers
+              || 0) | number }} Followers
+            </span>
+            @if (profile.instagram?.username) {
+            <span class="instagram-verified-tag">
+              <ion-icon
+                name="logo-instagram"
+                style="margin-right: 4px"
+              ></ion-icon>
+              Verified Partner
+            </span>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Bio -->
+      <div
+        class="profile-bio-container"
+        style="
+          margin-top: 15px;
+          border-top: 1px solid var(--ion-color-step-100);
+          padding-top: 15px;
+        "
+      >
+        <h4
+          style="
+            margin: 0 0 8px 0;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--ion-color-step-800);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          "
+        >
+          Bio
+        </h4>
+        <p
+          style="
+            margin: 0;
+            font-size: 0.95rem;
+            color: var(--ion-color-step-700);
+            line-height: 1.5;
+          "
+        >
+          {{ profile.bio }}
+        </p>
+      </div>
+
+      <!-- Categories & Countries Chips -->
+      <div class="chips-container-row" style="margin-top: 15px">
+        @for (cat of profile.categories; track cat) {
+        <span class="info-chip category">{{ cat }}</span>
+        } @for (country of profile.countries; track country) {
+        <span class="info-chip country">{{ country }}</span>
+        }
+      </div>
+    </div>
+
+    <!-- ================= INSTAGRAM CONTENT SECTION ================= -->
+    <div style="margin-top: 30px">
+      <h3 class="headings section-header-title">
+        <ion-icon
+          name="logo-instagram"
+          class="section-title-icon instagram"
+        ></ion-icon>
+        Instagram Content
+      </h3>
+
+      <!-- Horizontal Scroll Wrapper -->
+      <div class="instagram-scroll-container">
+        @if (instagramMedia.length === 0) {
+        <div class="no-media-placeholder">
+          <p>Instagram account not connected or no media synced recently.</p>
+        </div>
+        } @for (media of instagramMedia; track $index) {
+        <div class="instagram-media-card">
+          <!-- Thumbnail Container -->
+          <div class="insta-thumbnail-box">
+            <!-- Thumbnail Image -->
+            <img
+              [src]="media.mediaType === 'VIDEO' ? (media.thumbnailUrl || media.mediaUrl) : media.mediaUrl"
+              class="insta-thumbnail-img"
+              alt="Instagram Post"
+            />
+
+            <!-- Type Icon Overlay -->
+            <div class="insta-type-overlay">
+              <ion-icon
+                [name]="media.mediaType === 'VIDEO' ? 'play-circle-outline' : 'image-outline'"
+                class="insta-overlay-icon"
+              ></ion-icon>
+            </div>
+          </div>
+
+          <!-- Caption -->
+          <div class="insta-card-caption-box">
+            <p class="insta-caption-text">
+              {{ media.caption || 'No caption' }}
+            </p>
+            <span class="insta-date-tag"
+              >{{ media.timestamp | date:'mediumDate' }}</span
+            >
+          </div>
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- ================= PORTFOLIO SECTION ================= -->
+    <div style="margin-top: 30px; margin-bottom: 40px">
+      <h3 class="headings section-header-title">
+        <ion-icon
+          name="folder-open-outline"
+          class="section-title-icon portfolio"
+        ></ion-icon>
+        Portfolio Catalog
+      </h3>
+
+      @if (portfolioMedia.length === 0) {
+      <div
+        class="glassmorphism-card ion-padding text-center"
+        style="padding: 30px 15px"
+      >
+        <p
+          style="margin: 0; color: var(--ion-color-step-600); font-weight: 500"
+        >
+          No portfolio work uploaded by this influencer yet.
+        </p>
+      </div>
+      }
+
+      <!-- Grid Layout -->
+      @if (portfolioMedia.length > 0) {
+      <ion-grid class="ion-no-padding">
+        <ion-row>
+          @for (item of portfolioMedia; track item.id) {
+          <ion-col size="12" size-sm="6" size-md="4" style="padding: 8px">
+            <ion-card
+              class="portfolio-showcase-card"
+              style="
+                margin: 0;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                border-radius: 12px;
+                overflow: hidden;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+                border: 1px solid var(--ion-color-step-150);
+              "
+            >
+              <!-- Media Box -->
+              <div class="portfolio-showcase-media-box">
+                <!-- Image -->
+                @if (item.mediaType === 'image') {
+                <img
+                  [src]="getMediaUrl(item.mediaUrl)"
+                  class="portfolio-showcase-media"
+                  alt="Portfolio Showcase Image"
+                />
+                }
+
+                <!-- Video Player -->
+                @if (item.mediaType === 'video') {
+                <video
+                  [src]="getMediaUrl(item.mediaUrl)"
+                  class="portfolio-showcase-media"
+                  controls
+                  playsinline
+                ></video>
+                }
+
+                <!-- Category Badge -->
+                <span class="portfolio-showcase-category-badge"
+                  >{{ item.title }}</span
+                >
+              </div>
+
+              <!-- Content -->
+              <ion-card-content style="padding: 15px; flex-grow: 1">
+                <p
+                  style="
+                    color: var(--ion-color-step-800);
+                    font-size: 0.9rem;
+                    line-height: 1.4;
+                    margin: 0;
+                    font-weight: 500;
+                  "
+                >
+                  {{ item.description }}
+                </p>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+          }
+        </ion-row>
+      </ion-grid>
+      }
+    </div>
+  </div>
+  }
+</ion-content>

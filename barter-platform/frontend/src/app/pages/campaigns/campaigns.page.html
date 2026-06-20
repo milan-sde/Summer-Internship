@@ -1,8 +1,16 @@
 <ion-header class="ion-no-border">
   <ion-toolbar class="header-toolbar">
     <ion-buttons slot="start">
-      <ion-button routerLink="/dashboard" fill="clear" style="--color: var(--ion-color-dark); margin: 0; --padding-start: 8px;">
-        <ion-icon name="arrow-back-outline" slot="icon-only" style="font-size: 1.4rem;"></ion-icon>
+      <ion-button
+        routerLink="/dashboard"
+        fill="clear"
+        style="--color: var(--ion-color-dark); margin: 0; --padding-start: 8px"
+      >
+        <ion-icon
+          name="arrow-back-outline"
+          slot="icon-only"
+          style="font-size: 1.4rem"
+        ></ion-icon>
       </ion-button>
     </ion-buttons>
     <div class="logo-container" slot="start">
@@ -13,7 +21,11 @@
     <ion-title class="headings header-title">Campaigns</ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="viewProfile()" class="profile-header-btn">
-        <ion-icon name="person-outline" slot="icon-only" class="header-profile-icon"></ion-icon>
+        <ion-icon
+          name="person-outline"
+          slot="icon-only"
+          class="header-profile-icon"
+        ></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -25,121 +37,160 @@
   </ion-refresher>
 
   <div class="campaigns-container">
-
     <!-- Subtitle Description -->
-    <div class="page-subtitle-box" *ngIf="currentUser?.role === 'INFLUENCER'">
+    @if (currentUser?.role === 'INFLUENCER') {
+    <div class="page-subtitle-box">
       <p class="subtitle-text">Discover and apply to brand campaigns</p>
     </div>
-
-    <div class="page-subtitle-box" *ngIf="currentUser?.role === 'BRAND'">
-      <p class="subtitle-text">Create and manage your campaign offers for influencers</p>
+    } @if (currentUser?.role === 'BRAND') {
+    <div class="page-subtitle-box">
+      <p class="subtitle-text">
+        Create and manage your campaign offers for influencers
+      </p>
     </div>
+    }
 
     <!-- ================= INFLUENCER DASHBOARD ================= -->
-    <ng-container *ngIf="currentUser?.role === 'INFLUENCER'">
+    @if (currentUser?.role === 'INFLUENCER') {
 
-      <!-- Toggle Segment Tabs -->
-      <div class="segment-tabs-container">
-        <ion-segment [value]="activeSegment" (ionChange)="segmentChanged($event)" class="custom-segment">
-          <ion-segment-button value="discover" class="custom-segment-button">
-            <ion-label>Discover</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="applied" class="custom-segment-button">
-            <ion-label>Applied ({{ appliedCount }})</ion-label>
-          </ion-segment-button>
-        </ion-segment>
+    <!-- Toggle Segment Tabs -->
+    <div class="segment-tabs-container">
+      <ion-segment
+        [value]="activeSegment"
+        (ionChange)="segmentChanged($event)"
+        class="custom-segment"
+      >
+        <ion-segment-button value="discover" class="custom-segment-button">
+          <ion-label>Discover</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="applied" class="custom-segment-button">
+          <ion-label>Applied ({{ appliedCount }})</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+    </div>
+
+    <!-- Categories Tags Carousel (Only on Discover Segment) -->
+    @if (activeSegment === 'discover') {
+    <div class="categories-scroll-wrapper">
+      <div class="categories-scroll-container">
+        @for (cat of categoriesList; track cat) {
+        <span
+          [class.active]="selectedCategory === cat"
+          (click)="selectCategory(cat)"
+          class="category-tag"
+        >
+          {{ cat }}
+        </span>
+        }
+      </div>
+    </div>
+    }
+
+    <!-- Dropdown Filtering Buttons -->
+    @if (activeSegment === 'discover') {
+    <div class="filters-dropdown-row">
+      <!-- Platform Select Button -->
+      <div class="filter-dropdown-btn">
+        <ion-icon name="play-circle-outline" class="dropdown-icon"></ion-icon>
+        <ion-select
+          [value]="selectedPlatform"
+          (ionChange)="selectedPlatform = $event.detail.value; onFilterChanged()"
+          placeholder="Platform"
+          interface="popover"
+          class="custom-select"
+        >
+          <ion-select-option value="">Platform</ion-select-option>
+          <ion-select-option value="Instagram">Instagram</ion-select-option>
+          <ion-select-option value="YouTube">YouTube</ion-select-option>
+          <ion-select-option value="Twitter">X (Twitter)</ion-select-option>
+        </ion-select>
+        <ion-icon name="chevron-down-outline" class="chevron-icon"></ion-icon>
       </div>
 
-      <!-- Categories Tags Carousel (Only on Discover Segment) -->
-      <div class="categories-scroll-wrapper" *ngIf="activeSegment === 'discover'">
-        <div class="categories-scroll-container">
-          <span *ngFor="let cat of categoriesList"
-                [class.active]="selectedCategory === cat"
-                (click)="selectCategory(cat)"
-                class="category-tag">
-            {{ cat }}
-          </span>
-        </div>
+      <!-- Budget Select Button -->
+      <div class="filter-dropdown-btn">
+        <span class="dropdown-rupee-icon">₹</span>
+        <ion-select
+          [value]="selectedBudgetSort"
+          (ionChange)="selectedBudgetSort = $event.detail.value; onFilterChanged()"
+          placeholder="Budget"
+          interface="popover"
+          class="custom-select"
+        >
+          <ion-select-option value="">Budget</ion-select-option>
+          <ion-select-option value="desc">High to Low</ion-select-option>
+          <ion-select-option value="asc">Low to High</ion-select-option>
+        </ion-select>
+        <ion-icon name="chevron-down-outline" class="chevron-icon"></ion-icon>
       </div>
 
-      <!-- Dropdown Filtering Buttons -->
-      <div class="filters-dropdown-row" *ngIf="activeSegment === 'discover'">
-
-        <!-- Platform Select Button -->
-        <div class="filter-dropdown-btn">
-          <ion-icon name="play-circle-outline" class="dropdown-icon"></ion-icon>
-          <ion-select [value]="selectedPlatform" (ionChange)="selectedPlatform = $event.detail.value; onFilterChanged()" placeholder="Platform" interface="popover" class="custom-select">
-            <ion-select-option value="">Platform</ion-select-option>
-            <ion-select-option value="Instagram">Instagram</ion-select-option>
-            <ion-select-option value="YouTube">YouTube</ion-select-option>
-            <ion-select-option value="Twitter">X (Twitter)</ion-select-option>
-          </ion-select>
-          <ion-icon name="chevron-down-outline" class="chevron-icon"></ion-icon>
-        </div>
-
-        <!-- Budget Select Button -->
-        <div class="filter-dropdown-btn">
-          <span class="dropdown-rupee-icon">₹</span>
-          <ion-select [value]="selectedBudgetSort" (ionChange)="selectedBudgetSort = $event.detail.value; onFilterChanged()" placeholder="Budget" interface="popover" class="custom-select">
-            <ion-select-option value="">Budget</ion-select-option>
-            <ion-select-option value="desc">High to Low</ion-select-option>
-            <ion-select-option value="asc">Low to High</ion-select-option>
-          </ion-select>
-          <ion-icon name="chevron-down-outline" class="chevron-icon"></ion-icon>
-        </div>
-
-        <!-- Sort Select Button -->
-        <div class="filter-dropdown-btn">
-          <ion-icon name="swap-vertical-outline" class="dropdown-icon"></ion-icon>
-          <ion-select [value]="selectedSort" (ionChange)="selectedSort = $event.detail.value; onFilterChanged()" placeholder="Sort" interface="popover" class="custom-select">
-            <ion-select-option value="newest">Sort</ion-select-option>
-            <ion-select-option value="slots">Open Slots</ion-select-option>
-          </ion-select>
-          <ion-icon name="chevron-down-outline" class="chevron-icon"></ion-icon>
-        </div>
-
+      <!-- Sort Select Button -->
+      <div class="filter-dropdown-btn">
+        <ion-icon name="swap-vertical-outline" class="dropdown-icon"></ion-icon>
+        <ion-select
+          [value]="selectedSort"
+          (ionChange)="selectedSort = $event.detail.value; onFilterChanged()"
+          placeholder="Sort"
+          interface="popover"
+          class="custom-select"
+        >
+          <ion-select-option value="newest">Sort</ion-select-option>
+          <ion-select-option value="slots">Open Slots</ion-select-option>
+        </ion-select>
+        <ion-icon name="chevron-down-outline" class="chevron-icon"></ion-icon>
       </div>
-
-    </ng-container>
+    </div>
+    } }
 
     <!-- ================= BRAND DASHBOARD HEADER ================= -->
-    <ng-container *ngIf="currentUser?.role === 'BRAND'">
-      <div class="brand-dashboard-header">
-        <h3 class="brand-section-title headings">My Campaigns</h3>
-        <ion-button (click)="onCreateCampaign()" class="create-campaign-btn">
-          <ion-icon name="add-outline" slot="start"></ion-icon>
-          Create Campaign
-        </ion-button>
-      </div>
-    </ng-container>
+    @if (currentUser?.role === 'BRAND') {
+    <div class="brand-dashboard-header">
+      <h3 class="brand-section-title headings">My Campaigns</h3>
+      <ion-button (click)="onCreateCampaign()" class="create-campaign-btn">
+        <ion-icon name="add-outline" slot="start"></ion-icon>
+        Create Campaign
+      </ion-button>
+    </div>
+    }
 
     <!-- Loading State -->
-    <div *ngIf="isLoading" class="loading-state">
+    @if (isLoading) {
+    <div class="loading-state">
       <div class="loading-spinner"></div>
       <span class="loading-text">Loading campaigns...</span>
     </div>
+    }
 
     <!-- Empty State -->
-    <div *ngIf="!isLoading && campaigns.length === 0" class="empty-state">
+    @if (!isLoading && campaigns.length === 0) {
+    <div class="empty-state">
       <ion-icon name="funnel-outline" class="empty-icon"></ion-icon>
       <h3>No campaigns found</h3>
       <p>There are no campaign offers matching these filters currently.</p>
     </div>
+    }
 
     <!-- Campaigns List -->
-    <div class="campaigns-grid-list" *ngIf="!isLoading && campaigns.length > 0">
-
+    @if (!isLoading && campaigns.length > 0) {
+    <div class="campaigns-grid-list">
       <!-- Campaign Card Item -->
-      <div *ngFor="let campaign of campaigns" class="premium-campaign-card">
-
+      @for (campaign of campaigns; track campaign.id) {
+      <div class="premium-campaign-card">
         <!-- Card Header Info -->
         <div class="card-header-row">
-
           <!-- Avatar and brand title -->
           <div class="brand-info-box">
             <div class="brand-avatar-box">
-              <img *ngIf="campaign.brandLogo" [src]="getAvatarUrl(campaign.brandLogo)" class="brand-avatar-img">
-              <span *ngIf="!campaign.brandLogo" class="brand-avatar-initial">{{ getInitials(campaign.brandName) }}</span>
+              @if (campaign.brandLogo) {
+              <img
+                [src]="getAvatarUrl(campaign.brandLogo)"
+                class="brand-avatar-img"
+              />
+              } @else {
+              <span class="brand-avatar-initial"
+                >{{ getInitials(campaign.brandName) }}</span
+              >
+              }
             </div>
             <div class="brand-names-box">
               <h4 class="brand-title headings">{{ campaign.brandName }}</h4>
@@ -149,10 +200,12 @@
 
           <!-- Category Badge on Right -->
           <div class="category-badge-box">
-            <ion-icon [name]="getCategoryIcon(campaign.category)" class="badge-icon"></ion-icon>
+            <ion-icon
+              [name]="getCategoryIcon(campaign.category)"
+              class="badge-icon"
+            ></ion-icon>
             <span class="badge-text">{{ campaign.category }}</span>
           </div>
-
         </div>
 
         <!-- Title & Description -->
@@ -163,153 +216,222 @@
 
         <!-- Details Row (Budget, Days, Slots) -->
         <div class="card-details-metrics-row">
-
           <!-- Budget -->
           <div class="metric-item budget">
             <ion-icon name="cash-outline" class="metric-icon"></ion-icon>
-            <span class="metric-label">₹ {{ campaign.budget | number }} per person</span>
+            <span class="metric-label"
+              >₹ {{ campaign.budget | number }} per person</span
+            >
           </div>
 
           <!-- Followers reach requirement if any -->
-          <div class="metric-item reach" *ngIf="campaign.followersRequired">
+          @if (campaign.followersRequired) {
+          <div class="metric-item reach">
             <ion-icon name="people-outline" class="metric-icon"></ion-icon>
             <span class="metric-text">{{ campaign.followersRequired }}</span>
           </div>
+          }
 
           <!-- Days Left -->
           <div class="metric-item time">
             <ion-icon name="time-outline" class="metric-icon"></ion-icon>
-            <span class="metric-text">{{ getCampaignTimeLabel(campaign) }}</span>
+            <span class="metric-text"
+              >{{ getCampaignTimeLabel(campaign) }}</span
+            >
           </div>
 
           <!-- Slots count -->
           <div class="metric-item slots">
             <ion-icon name="people-outline" class="metric-icon"></ion-icon>
-            <span class="metric-text">{{ campaign.filledSlots }}/{{ campaign.totalSlots }}</span>
+            <span class="metric-text"
+              >{{ campaign.filledSlots }}/{{ campaign.totalSlots }}</span
+            >
           </div>
-
         </div>
 
         <!-- Filled Slots Progress Bar -->
         <div class="progress-bar-container">
-          <div class="progress-bar" [style.width.%]="getProgress(campaign) * 100"></div>
+          <div
+            class="progress-bar"
+            [style.width.%]="getProgress(campaign) * 100"
+          ></div>
         </div>
 
         <!-- Card Footer Actions (Conditional based on role & application state) -->
         <div class="card-footer-action-row">
-
           <!-- BRAND View Actions -->
-          <div class="brand-actions-box" *ngIf="currentUser?.role === 'BRAND'">
+          @if (currentUser?.role === 'BRAND') {
+          <div class="brand-actions-box">
             <div class="brand-applicants-header">
               <span class="applicants-status-pill">
                 {{ campaign.filledSlots }}/{{ campaign.totalSlots }} Enrolled
               </span>
 
               <!-- Toggle View Applicants Button -->
-              <ion-button fill="clear" size="small" (click)="toggleApplicants(campaign.id)" class="view-applicants-toggle-btn">
-                {{ showApplicants[campaign.id] ? 'Hide' : 'View' }} Applicants ({{ campaign.applicants?.length || 0 }})
-                <ion-icon [name]="showApplicants[campaign.id] ? 'chevron-up-outline' : 'chevron-down-outline'" slot="end"></ion-icon>
+              <ion-button
+                fill="clear"
+                size="small"
+                (click)="toggleApplicants(campaign.id)"
+                class="view-applicants-toggle-btn"
+              >
+                {{ showApplicants[campaign.id] ? 'Hide' : 'View' }} Applicants
+                ({{ campaign.applicants?.length || 0 }})
+                <ion-icon
+                  [name]="showApplicants[campaign.id] ? 'chevron-up-outline' : 'chevron-down-outline'"
+                  slot="end"
+                ></ion-icon>
               </ion-button>
             </div>
           </div>
+          }
 
           <!-- INFLUENCER View Actions -->
-          <div class="influencer-actions-box" *ngIf="currentUser?.role === 'INFLUENCER'">
-
+          @if (currentUser?.role === 'INFLUENCER') {
+          <div class="influencer-actions-box">
             <!-- Application Stages Badges -->
-            <ng-container *ngIf="hasApplied(campaign)">
-              <!-- Pending -->
-              <span *ngIf="getApplicationStatus(campaign) === 'PENDING'" class="app-status-badge pending">
-                <ion-icon name="hourglass-outline" class="status-icon"></ion-icon>
-                Pending
-              </span>
+            @if (hasApplied(campaign)) {
+            <!-- Pending -->
+            @if (getApplicationStatus(campaign) === 'PENDING') {
+            <span class="app-status-badge pending">
+              <ion-icon name="hourglass-outline" class="status-icon"></ion-icon>
+              Pending
+            </span>
+            }
 
-              <!-- Approved -->
-              <span *ngIf="getApplicationStatus(campaign) === 'APPROVED'" class="app-status-badge approved">
-                <ion-icon name="checkmark-circle-outline" class="status-icon"></ion-icon>
-                Approved
-              </span>
+            <!-- Approved -->
+            @if (getApplicationStatus(campaign) === 'APPROVED') {
+            <span class="app-status-badge approved">
+              <ion-icon
+                name="checkmark-circle-outline"
+                class="status-icon"
+              ></ion-icon>
+              Approved
+            </span>
+            }
 
-              <!-- Rejected -->
-              <span *ngIf="getApplicationStatus(campaign) === 'REJECTED'" class="app-status-badge rejected">
-                <ion-icon name="close-circle-outline" class="status-icon"></ion-icon>
-                Rejected
-              </span>
-            </ng-container>
+            <!-- Rejected -->
+            @if (getApplicationStatus(campaign) === 'REJECTED') {
+            <span class="app-status-badge rejected">
+              <ion-icon
+                name="close-circle-outline"
+                class="status-icon"
+              ></ion-icon>
+              Rejected
+            </span>
+            } }
 
             <!-- Apply Button (Only if not applied and slots open) -->
-            <ion-button *ngIf="!hasApplied(campaign) && campaign.filledSlots < campaign.totalSlots"
-                        (click)="applyToCampaign(campaign, $event)"
-                        class="apply-now-btn">
+            @if (!hasApplied(campaign) && campaign.filledSlots <
+            campaign.totalSlots) {
+            <ion-button
+              (click)="applyToCampaign(campaign, $event)"
+              class="apply-now-btn"
+            >
               Apply Now
             </ion-button>
+            }
 
             <!-- Fully slots filled indicator -->
-            <span *ngIf="!hasApplied(campaign) && campaign.filledSlots >= campaign.totalSlots" class="fully-filled-badge">
-              Filled
-            </span>
-
+            @if (!hasApplied(campaign) && campaign.filledSlots >=
+            campaign.totalSlots) {
+            <span class="fully-filled-badge"> Filled </span>
+            }
           </div>
-
+          }
         </div>
 
         <!-- BRAND Collapsible Applicants Panel -->
-        <div class="brand-applicants-panel" *ngIf="currentUser?.role === 'BRAND' && showApplicants[campaign.id]">
+        @if (currentUser?.role === 'BRAND' && showApplicants[campaign.id]) {
+        <div class="brand-applicants-panel">
           <div class="panel-header">
             <h4>Applications Received</h4>
           </div>
 
           <div class="applicants-list">
-            <div *ngIf="!campaign.applicants || campaign.applicants.length === 0" class="no-applicants-placeholder">
+            @if (!campaign.applicants || campaign.applicants.length === 0) {
+            <div class="no-applicants-placeholder">
               No applications received for this campaign yet.
             </div>
-
-            <div *ngFor="let applicant of campaign.applicants" class="applicant-item-row">
-              <div class="applicant-profile-info">
+            } @for (applicant of campaign.applicants; track
+            applicant.influencerId) {
+            <div class="applicant-item-row">
+              <div
+                class="applicant-profile-info"
+                (click)="goToInfluencerProfile(applicant.influencerId)"
+                style="cursor: pointer"
+              >
                 <div class="applicant-avatar-circle">
-                  <img *ngIf="applicant.avatarUrl" [src]="getAvatarUrl(applicant.avatarUrl)" class="applicant-avatar-img">
-                  <span *ngIf="!applicant.avatarUrl" class="applicant-avatar-initial">{{ getInitials(applicant.fullName) }}</span>
+                  @if (applicant.avatarUrl) {
+                  <img
+                    [src]="getAvatarUrl(applicant.avatarUrl)"
+                    class="applicant-avatar-img"
+                    alt="Applicant Avatar"
+                  />
+                  } @else {
+                  <span class="applicant-avatar-initial"
+                    >{{ getInitials(applicant.fullName) }}</span
+                  >
+                  }
                 </div>
                 <div class="applicant-text-info">
                   <h5 class="applicant-full-name">{{ applicant.fullName }}</h5>
                   <p class="applicant-username-stats">
-                    <span class="handle">@{{ applicant.username || 'influencer' }}</span>
+                    <span class="handle"
+                      >@{{ applicant.username || 'influencer' }}</span
+                    >
                     <span class="separator">•</span>
-                    <span class="followers-count">{{ applicant.followers | number }} followers</span>
+                    <span class="followers-count"
+                      >{{ applicant.followers | number }} followers</span
+                    >
                   </p>
                 </div>
               </div>
 
               <div class="applicant-status-actions">
                 <!-- Status PENDING: Show Approve/Reject Buttons -->
-                <ng-container *ngIf="applicant.status === 'PENDING'">
-                  <ion-button color="success" size="small" (click)="updateStatus(campaign.id, applicant.influencerId, 'APPROVED')" class="action-btn approve">
-                    Approve
-                  </ion-button>
-                  <ion-button color="danger" size="small" (click)="updateStatus(campaign.id, applicant.influencerId, 'REJECTED')" class="action-btn reject">
-                    Reject
-                  </ion-button>
-                </ng-container>
+                @if (applicant.status === 'PENDING') {
+                <ion-button
+                  color="success"
+                  size="small"
+                  (click)="updateStatus(campaign.id, applicant.influencerId, 'APPROVED')"
+                  class="action-btn approve"
+                >
+                  Approve
+                </ion-button>
+                <ion-button
+                  color="danger"
+                  size="small"
+                  (click)="updateStatus(campaign.id, applicant.influencerId, 'REJECTED')"
+                  class="action-btn reject"
+                >
+                  Reject
+                </ion-button>
+                }
 
                 <!-- Status APPROVED -->
-                <span *ngIf="applicant.status === 'APPROVED'" class="status-indicator approved">
+                @if (applicant.status === 'APPROVED') {
+                <span class="status-indicator approved">
                   <ion-icon name="checkmark-circle-outline"></ion-icon>
                   Approved
                 </span>
+                }
 
                 <!-- Status REJECTED -->
-                <span *ngIf="applicant.status === 'REJECTED'" class="status-indicator rejected">
+                @if (applicant.status === 'REJECTED') {
+                <span class="status-indicator rejected">
                   <ion-icon name="close-circle-outline"></ion-icon>
                   Rejected
                 </span>
+                }
               </div>
             </div>
+            }
           </div>
         </div>
-
+        }
       </div>
-
+      }
     </div>
-
+    }
   </div>
 </ion-content>

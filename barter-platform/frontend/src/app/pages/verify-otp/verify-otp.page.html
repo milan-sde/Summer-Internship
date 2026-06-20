@@ -36,18 +36,20 @@
           </ion-input-otp>
         </div>
 
-        <div *ngIf="verifyOtpForm.get('otp')?.invalid && verifyOtpForm.get('otp')?.touched" class="otp-error-container">
+        @if (verifyOtpForm.get('otp')?.invalid && verifyOtpForm.get('otp')?.touched) {
+        <div class="otp-error-container">
           <ion-text color="danger">
             <small>Please enter a valid 6-digit code</small>
           </ion-text>
         </div>
+        }
 
         <!-- Timer resend info -->
-        <div class="timer-container" *ngIf="!canResend">
-          <ion-text color="medium">
-            Resend code in <span>{{ timer }}s</span>
-          </ion-text>
+        @if (!canResend) {
+        <div class="timer-container">
+          <ion-text color="medium">Resend code in <span>{{ timer }}s</span></ion-text>
         </div>
+        }
 
         <ion-button
           expand="block"

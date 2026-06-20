@@ -6,7 +6,6 @@
 
 <ion-content class="ion-padding" [fullscreen]="true">
   <div class="form-container">
-    
     <!-- Title Area -->
     <div class="form-header">
       <h2>Barter Platform</h2>
@@ -15,9 +14,7 @@
 
     <!-- Glassmorphic Card Container -->
     <div class="glassmorphism-card">
-      
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-        
         <!-- Icon Banner -->
         <div class="login-icon-container">
           <ion-icon name="log-in-outline"></ion-icon>
@@ -27,33 +24,54 @@
         <div class="custom-input-group">
           <label class="custom-input-label">Email</label>
           <ion-item lines="none" class="custom-input-item">
-            <ion-icon name="mail-outline" slot="start" class="input-icon"></ion-icon>
+            <ion-icon
+              name="mail-outline"
+              slot="start"
+              class="input-icon"
+            ></ion-icon>
             <ion-input
               type="email"
               formControlName="email"
               placeholder="you@example.com"
-              [class.invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+              [class.invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+            >
             </ion-input>
           </ion-item>
         </div>
-        <div *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" class="error-container">
+        @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched)
+        {
+        <div class="error-container">
           <ion-text color="danger">
             <small>A valid email is required</small>
           </ion-text>
         </div>
+        }
 
         <!-- Password Input -->
         <div class="custom-input-group">
           <label class="custom-input-label">Password</label>
           <ion-item lines="none" class="custom-input-item">
-            <ion-icon name="lock-closed-outline" slot="start" class="input-icon"></ion-icon>
+            <ion-icon
+              name="lock-closed-outline"
+              slot="start"
+              class="input-icon"
+            ></ion-icon>
             <ion-input
               [type]="showPassword ? 'text' : 'password'"
               formControlName="password"
-              placeholder="Enter your password">
+              placeholder="Enter your password"
+            >
             </ion-input>
-            <ion-button slot="end" fill="clear" (click)="togglePassword()" class="password-toggle-btn">
-              <ion-icon [name]="showPassword ? 'eye-off' : 'eye'" slot="icon-only"></ion-icon>
+            <ion-button
+              slot="end"
+              fill="clear"
+              (click)="togglePassword()"
+              class="password-toggle-btn"
+            >
+              <ion-icon
+                [name]="showPassword ? 'eye-off' : 'eye'"
+                slot="icon-only"
+              ></ion-icon>
             </ion-button>
           </ion-item>
         </div>
@@ -62,20 +80,23 @@
           expand="block"
           type="submit"
           [disabled]="loginForm.invalid || isSubmitting"
-          class="submit-btn">
-          <ion-icon name="log-in-outline" slot="start" style="font-size: 1.2rem;"></ion-icon>
+          class="submit-btn"
+        >
+          <ion-icon
+            name="log-in-outline"
+            slot="start"
+            style="font-size: 1.2rem"
+          ></ion-icon>
           {{ isSubmitting ? 'Logging in...' : 'Login' }}
         </ion-button>
 
         <div class="footer-container">
           <ion-text color="medium" class="footer-text">
-            Don't have an account? 
+            Don't have an account?
             <a routerLink="/register" class="link">Register here</a>
           </ion-text>
         </div>
-
       </form>
-
     </div>
   </div>
 </ion-content>
