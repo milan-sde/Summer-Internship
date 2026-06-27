@@ -8,14 +8,19 @@ const jwtService = new JwtService();
 // Verify JWT token from Authorization header
 export const authenticate = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    // Get token from Authorization header
+    // Get token from Authorization header or query parameter fallback (for redirects)
+    let token: string | undefined;
     const authHeader = req.headers.authorization;
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      throw new UnauthorizedError("No token provided. Please login.");
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      token = authHeader.substring(7); // Remove 'Bearer ' prefix
+    } else if (req.query && typeof req.query.token === "string") {
+      token = req.query.token;
     }
 
-    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+    if (!token) {
+      throw new UnauthorizedError("No token provided. Please login.");
+    }
 
     // Verify token
     const payload = jwtService.verifyAccessToken(token);

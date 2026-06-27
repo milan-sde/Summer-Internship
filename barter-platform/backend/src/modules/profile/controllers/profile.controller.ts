@@ -145,3 +145,25 @@ export const uploadAvatar = asyncHandler(
   },
 );
 
+/**
+ * Retrieves the unified influencer profile (Profile, Instagram Media feed, and local Portfolio catalog).
+ */
+export const getInfluencerProfile = asyncHandler(
+  async (req: Request, res: Response) => {
+    const influencerId = Array.isArray(req.params.id)
+      ? req.params.id[0]
+      : req.params.id;
+
+    // Check if the current requesting user is the influencer themselves
+    const isOwner = req.user?.userId === influencerId;
+    const showAll = req.query.showAll === "true" || isOwner;
+
+    const data = await profileService.getInfluencerFullProfile(influencerId, showAll);
+
+    res.status(200).json({
+      success: true,
+      data,
+    });
+  }
+);
+

@@ -21,7 +21,8 @@ import fs from "fs";
 export const createUploader = (
   folderName: "avatars" | "portfolio" | "campaigns",
   filePrefix: string,
-  maxFileSize: number = 5 * 1024 * 1024 // 5MB in bytes
+  maxFileSize: number = 5 * 1024 * 1024, // 5MB in bytes
+  allowedTypes: ("image" | "video")[] = ["image"]
 ) => {
   // 1. DETERMINE UPLOAD PATH
   // __dirname is the absolute path to this middleware folder.
@@ -57,13 +58,16 @@ export const createUploader = (
   // 4. FILE TYPE FILTER
   // This filter function decides whether to accept or reject an incoming file.
   const fileFilter = (req: any, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
-    // file.mimetype holds the media format type (e.g., 'image/jpeg', 'image/png').
-    // We check if it starts with "image/" to reject non-image files (like PDFs, TXT files, etc.).
-    if (file.mimetype.startsWith("image/")) {
+    // Check if the file matches any of the allowed MIME types
+    const isImageAllowed = allowedTypes.includes("image") && file.mimetype.startsWith("image/");
+    const isVideoAllowed = allowedTypes.includes("video") && file.mimetype.startsWith("video/");
+
+    if (isImageAllowed || isVideoAllowed) {
       cb(null, true); // true means accept the file
     } else {
       // false means reject the file. We pass an error message to let the client know why.
-      cb(new Error("Only image files are allowed!") as any, false);
+      const allowedString = allowedTypes.join(" or ");
+      cb(new Error(`Only ${allowedString} files are allowed!`) as any, false);
     }
   };
 
