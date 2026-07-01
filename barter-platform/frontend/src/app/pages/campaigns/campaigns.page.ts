@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { CampaignService, ICampaign } from '../../services/campaign.service';
@@ -109,7 +109,8 @@ export class CampaignsPage implements OnInit {
     private campaignService: CampaignService,
     private storage: StorageService,
     private profileService: ProfileService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {
     addIcons({
       logoInstagram,
@@ -151,16 +152,19 @@ export class CampaignsPage implements OnInit {
   // Load campaigns list depending on user role and active discover/applied segment via subscribe
   loadCampaigns(callback?: () => void) {
     this.isLoading = true;
+    this.cdr.markForCheck();
     if (this.currentUser?.role === 'BRAND') {
       this.campaignService.getMyCampaigns().subscribe({
         next: (response: any) => {
           this.campaigns = response.success ? response.data.campaigns : [];
           this.isLoading = false;
+          this.cdr.markForCheck();
           if (callback) callback();
         },
         error: (error: any) => {
           console.error('Failed to load campaigns:', error);
           this.isLoading = false;
+          this.cdr.markForCheck();
           if (callback) callback();
         }
       });
@@ -180,23 +184,27 @@ export class CampaignsPage implements OnInit {
                 const rawCampaigns = discoverRes.success ? discoverRes.data.campaigns : [];
                 this.campaigns = this.applyClientSideFilters(rawCampaigns);
                 this.isLoading = false;
+                this.cdr.markForCheck();
                 if (callback) callback();
               },
               error: (error: any) => {
                 console.error('Failed to load discover campaigns:', error);
                 this.isLoading = false;
+                this.cdr.markForCheck();
                 if (callback) callback();
               }
             });
           } else {
             this.campaigns = this.applyClientSideFilters(appliedCampaigns);
             this.isLoading = false;
+            this.cdr.markForCheck();
             if (callback) callback();
           }
         },
         error: (error: any) => {
           console.error('Failed to load applied campaigns count:', error);
           this.isLoading = false;
+          this.cdr.markForCheck();
           if (callback) callback();
         }
       });
@@ -253,6 +261,7 @@ export class CampaignsPage implements OnInit {
           }
         }
         this.loadCampaigns();
+        this.cdr.markForCheck();
       },
       error: (error: any) => {
         console.error('Failed to apply:', error);
@@ -282,6 +291,7 @@ export class CampaignsPage implements OnInit {
 
   toggleApplicants(campaignId: string) {
     this.showApplicants[campaignId] = !this.showApplicants[campaignId];
+    this.cdr.markForCheck();
   }
 
   // Update applicant status (APPROVED/REJECTED) via subscribe
@@ -293,6 +303,7 @@ export class CampaignsPage implements OnInit {
           const idx = this.campaigns.findIndex(c => c.id === campaignId);
           if (idx > -1) {
             this.campaigns[idx] = updated;
+            this.cdr.markForCheck();
           }
         }
       },

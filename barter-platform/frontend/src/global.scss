@@ -33,8 +33,8 @@
  */
 
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
-/* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import '@ionic/angular/css/palettes/dark.system.css';
+@import "@ionic/angular/css/palettes/dark.class.css";
+/* @import '@ionic/angular/css/palettes/dark.system.css'; */
 
 
 
@@ -50,6 +50,26 @@ h1, h2, h3, h4, h5, h6, ion-title, .headings {
 body {
   font-family: var(--font-family-body);
   background-color: var(--ion-color-light);
+}
+
+ion-content {
+  --background: var(--app-bg-body) !important;
+  --scrollbar-width: 0px;
+  --scrollbar-style: none;
+
+  &::part(scroll) {
+    &::-webkit-scrollbar {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+    }
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+.stats-item {
+  --color: var(--ion-color-dark) !important;
 }
 
 .invalid {
@@ -111,8 +131,8 @@ ion-button {
 /* Reusable Premium Card class */
 .premium-card, ion-card {
   --border-radius: 16px !important;
-  --background: #ffffff !important;
-  border: 1px solid var(--ion-color-light-shade) !important;
+  --background: var(--app-bg-card) !important;
+  border: 1px solid var(--app-border-color) !important;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02), 0 1px 2px -1px rgba(0, 0, 0, 0.02) !important;
   margin: 16px 0;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
@@ -125,8 +145,8 @@ ion-button {
 
 /* Premium UI CSS Utilities */
 .glassmorphism-card {
-  background: #ffffff;
-  border: 1px solid var(--ion-color-light-shade);
+  background: var(--app-bg-card);
+  border: 1px solid var(--app-border-color);
   border-radius: 16px;
   box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.02);
   padding: 32px 24px;
@@ -306,9 +326,9 @@ ion-button {
 }
 
 .custom-input-item {
-  --background: var(--ion-color-light);
+  --background: var(--app-bg-input);
   border-radius: 12px;
-  border: 1px solid var(--ion-color-light-shade);
+  border: 1px solid var(--app-border-color);
   margin-bottom: 0;
   --padding-start: 14px;
   --inner-padding-end: 14px;
@@ -318,7 +338,7 @@ ion-button {
   &:focus-within {
     border-color: var(--ion-color-primary);
     box-shadow: 0 0 0 3px rgba(var(--ion-color-primary-rgb), 0.1);
-    --background: white;
+    --background: var(--app-bg-input);
   }
 
   ion-input, ion-textarea {

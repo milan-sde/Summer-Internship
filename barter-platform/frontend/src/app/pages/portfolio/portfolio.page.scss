@@ -45,8 +45,8 @@ ion-content {
 }
 
 .glassmorphism-card {
-  background-color: #ffffff;
-  border: 1px solid var(--ion-color-light-shade);
+  background-color: var(--app-bg-card);
+  border: 1px solid var(--app-border-color);
   border-radius: 16px;
   padding: 24px;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02), 0 1px 2px -1px rgba(0, 0, 0, 0.02);
@@ -184,9 +184,9 @@ ion-content {
 }
 
 .custom-input-item {
-  --background: #ffffff;
+  --background: var(--app-bg-input);
   border-radius: 12px;
-  border: 1px solid var(--ion-color-light-shade);
+  border: 1px solid var(--app-border-color);
   margin-bottom: 0;
   --padding-start: 14px;
   --inner-padding-end: 14px;
@@ -236,8 +236,8 @@ ion-content {
 }
 
 .premium-portfolio-card {
-  background-color: #ffffff;
-  border: 1px solid var(--ion-color-light-shade);
+  background-color: var(--app-bg-card);
+  border: 1px solid var(--app-border-color);
   border-radius: 12px;
   overflow: hidden;
   height: 100%;
@@ -310,7 +310,7 @@ ion-content {
 .card-action-row {
   display: flex;
   justify-content: flex-end;
-  border-top: 1px solid var(--ion-color-light-shade);
+  border-top: 1px solid var(--app-border-color);
   padding-top: 10px;
   margin-top: auto;
 }
@@ -323,8 +323,8 @@ ion-content {
 
 .empty-media-placeholder {
   text-align: center;
-  background-color: var(--ion-color-light-tint);
-  border: 1px dashed var(--ion-color-light-shade);
+  background-color: var(--app-bg-tint);
+  border: 1px dashed var(--app-border-color);
   border-radius: 12px;
   padding: 32px 16px;
   color: var(--ion-color-medium);

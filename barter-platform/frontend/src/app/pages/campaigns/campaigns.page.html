@@ -167,14 +167,13 @@
                 </div>
                 <div class="brand-names-box">
                   <h4 class="brand-title">{{ campaign.brandName }}</h4>
-                  <span class="platform-chip" [class]="campaign.platform | lowercase">
-                    {{ campaign.platform }}
-                  </span>
+                  <span class="brand-platform-text">{{ campaign.platform }}</span>
                 </div>
               </div>
 
               <!-- Category Badge on Right -->
-              <span class="category-badge">
+              <span class="category-badge" [class]="campaign.category | lowercase">
+                <ion-icon [name]="getCategoryIcon(campaign.category)" class="badge-icon"></ion-icon>
                 {{ campaign.category }}
               </span>
             </div>
@@ -189,26 +188,27 @@
             <div class="card-details-metrics-row">
               <!-- Budget -->
               <div class="metric-item">
-                <span class="metric-val">₹{{ campaign.budget | number }}</span>
-                <span class="metric-lbl">Budget</span>
+                <span class="metric-val">₹{{ campaign.budget | number }} per person</span>
               </div>
 
               <!-- Followers reach requirement if any -->
+              @if (campaign.followersRequired) {
               <div class="metric-item">
-                <span class="metric-val">{{ campaign.followersRequired || 'None' }}</span>
-                <span class="metric-lbl">Min Reach</span>
+                <ion-icon name="people-outline" class="metric-icon"></ion-icon>
+                <span class="metric-val">{{ campaign.followersRequired }}</span>
               </div>
+              }
 
               <!-- Days Left -->
               <div class="metric-item">
+                <ion-icon name="time-outline" class="metric-icon"></ion-icon>
                 <span class="metric-val">{{ getCampaignTimeLabel(campaign) }}</span>
-                <span class="metric-lbl">Duration</span>
               </div>
 
               <!-- Slots count -->
               <div class="metric-item">
+                <ion-icon name="people-outline" class="metric-icon"></ion-icon>
                 <span class="metric-val">{{ campaign.filledSlots }}/{{ campaign.totalSlots }}</span>
-                <span class="metric-lbl">Slots Enrolled</span>
               </div>
             </div>
 
@@ -247,17 +247,26 @@
                 @if (hasApplied(campaign)) {
                   <!-- Pending -->
                   @if (getApplicationStatus(campaign) === 'PENDING') {
-                  <span class="status-badge pending">Pending Approval</span>
+                  <span class="status-badge pending">
+                    <ion-icon name="hourglass-outline" class="status-icon"></ion-icon>
+                    Pending
+                  </span>
                   }
 
                   <!-- Approved -->
                   @if (getApplicationStatus(campaign) === 'APPROVED') {
-                  <span class="status-badge approved">Approved</span>
+                  <span class="status-badge approved">
+                    <ion-icon name="checkmark-circle-outline" class="status-icon"></ion-icon>
+                    Approved
+                  </span>
                   }
 
                   <!-- Rejected -->
                   @if (getApplicationStatus(campaign) === 'REJECTED') {
-                  <span class="status-badge rejected">Rejected</span>
+                  <span class="status-badge rejected">
+                    <ion-icon name="close-circle-outline" class="status-icon"></ion-icon>
+                    Rejected
+                  </span>
                   }
                 }
 
@@ -266,6 +275,7 @@
                 <ion-button
                   (click)="applyToCampaign(campaign, $event)"
                   class="apply-now-btn"
+                  size="small"
                 >
                   Apply Now
                 </ion-button>

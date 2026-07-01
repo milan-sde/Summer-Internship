@@ -4,7 +4,8 @@ import { Router, RouterLink } from '@angular/router';
 import { StorageService } from '../../../services/storage.service';
 import { IonIcon, IonButton } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { menuOutline, notificationsOutline, arrowBackOutline } from 'ionicons/icons';
+import { menuOutline, notificationsOutline, arrowBackOutline, sunnyOutline, moonOutline, desktopOutline } from 'ionicons/icons';
+import { ThemeService } from '../../../services/theme.service';
 
 @Component({
   selector: 'app-header',
@@ -24,17 +25,28 @@ export class HeaderComponent implements OnInit {
 
   constructor(
     private storage: StorageService,
-    private router: Router
+    private router: Router,
+    public themeService: ThemeService
   ) {
     addIcons({
       menuOutline,
       notificationsOutline,
-      arrowBackOutline
+      arrowBackOutline,
+      sunnyOutline,
+      moonOutline,
+      desktopOutline
     });
   }
 
   ngOnInit() {
     this.user = this.storage.getUser();
+  }
+
+  getCurrentThemeIcon(): string {
+    const theme = this.themeService.getTheme();
+    if (theme === 'light') return 'sunny-outline';
+    if (theme === 'dark') return 'moon-outline';
+    return 'desktop-outline';
   }
 
   onMenuClick() {

@@ -6,10 +6,12 @@
 }
 
 .app-header-container {
+  position: relative;
+  z-index: 900;
   height: 70px;
   min-height: 70px;
-  background-color: #ffffff;
-  border-bottom: 1px solid var(--ion-color-light-shade);
+  background-color: var(--app-bg-header);
+  border-bottom: 1px solid var(--app-border-color);
   padding: 0 16px;
   display: flex;
   align-items: center;

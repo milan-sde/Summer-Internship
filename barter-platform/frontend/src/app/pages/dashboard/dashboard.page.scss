@@ -87,8 +87,8 @@ ion-content {
 }
 
 .dashboard-action-card {
-  background-color: #ffffff;
-  border: 1px solid var(--ion-color-light-shade);
+  background-color: var(--app-bg-card);
+  border: 1px solid var(--app-border-color);
   border-radius: 16px;
   padding: 24px;
   cursor: pointer;
@@ -120,7 +120,7 @@ ion-content {
       width: 42px;
       height: 42px;
       border-radius: 10px;
-      background-color: var(--ion-color-light-tint);
+      background-color: var(--app-bg-tint);
       color: var(--ion-color-medium);
       display: flex;
       align-items: center;
@@ -136,22 +136,22 @@ ion-content {
       font-family: var(--font-family-headings);
       font-size: 1.1rem;
       font-weight: 700;
-      color: var(--ion-color-dark);
+      color: var(--ion-color-dark) !important;
       margin: 0;
     }
   }
 
   p {
     font-size: 0.9rem;
-    color: var(--ion-color-medium);
+    color: var(--ion-color-medium) !important;
     margin: 0;
     line-height: 1.5;
   }
 }
 
 .stats-card {
-  background-color: #ffffff;
-  border: 1px solid var(--ion-color-light-shade);
+  background-color: var(--app-bg-card);
+  border: 1px solid var(--app-border-color);
   border-radius: 16px;
   padding: 24px;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02), 0 1px 2px -1px rgba(0, 0, 0, 0.02);
@@ -166,7 +166,7 @@ ion-content {
     align-items: center;
     gap: 8px;
     margin-bottom: 20px;
-    border-bottom: 1px solid var(--ion-color-light-shade);
+    border-bottom: 1px solid var(--app-border-color);
     padding-bottom: 12px;
 
     ion-icon {
@@ -178,7 +178,7 @@ ion-content {
       font-family: var(--font-family-headings);
       font-size: 1.15rem;
       font-weight: 700;
-      color: var(--ion-color-dark);
+      color: var(--ion-color-dark) !important;
       margin: 0;
     }
   }
@@ -196,7 +196,7 @@ ion-content {
   --background: transparent;
   --padding-start: 0;
   --inner-padding-end: 0;
-  border-bottom: 1px solid var(--ion-color-light-shade);
+  border-bottom: 1px solid var(--app-border-color);
   padding-bottom: 8px;
 
   &:last-child {

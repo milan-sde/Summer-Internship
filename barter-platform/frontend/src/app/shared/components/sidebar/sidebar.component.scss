@@ -2,6 +2,10 @@
 
 :host {
   display: block;
+
+  @media (max-width: 991.98px) {
+    display: contents;
+  }
 }
 
 .sidebar-wrapper {
@@ -10,11 +14,11 @@
   left: 0;
   bottom: 0;
   width: 260px;
-  background-color: #ffffff;
-  border-right: 1px solid var(--ion-color-light-shade);
+  background-color: var(--app-bg-sidebar);
+  border-right: 1px solid var(--app-border-color);
   display: flex;
   flex-direction: column;
-  z-index: 999;
+  z-index: 99999;
   transform: translateX(-100%);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
@@ -36,7 +40,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid var(--ion-color-light-shade);
+  border-bottom: 1px solid var(--app-border-color);
 }
 
 .logo-container {
@@ -137,8 +141,8 @@
 
 .sidebar-footer {
   padding: 20px 16px;
-  border-top: 1px solid var(--ion-color-light-shade);
-  background-color: var(--ion-color-light-tint);
+  border-top: 1px solid var(--app-border-color);
+  background-color: var(--app-bg-tint);
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -195,7 +199,7 @@
   width: 100%;
   padding: 10px;
   background: none;
-  border: 1px solid var(--ion-color-light-shade);
+  border: 1px solid var(--app-border-color);
   color: var(--ion-color-dark);
   font-family: var(--font-family-body);
   font-size: 0.875rem;
@@ -224,7 +228,7 @@
   background-color: rgba(15, 23, 42, 0.4);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
-  z-index: 998;
+  z-index: 99998;
   animation: fadeIn 0.25s ease-out;
 
   @media (min-width: 992px) {
