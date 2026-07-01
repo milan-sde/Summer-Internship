@@ -1,0 +1,51 @@
+<aside class="sidebar-wrapper" [class.is-open]="isOpen">
+  <!-- Sidebar Header / Logo -->
+  <div class="sidebar-header">
+    <div class="logo-container">
+      <div class="logo-dot"></div>
+      <span class="logo-text">Barter</span>
+    </div>
+    <!-- Close button for mobile drawer -->
+    <button class="mobile-close-btn" (click)="onLinkClick()">
+      <ion-icon name="close-outline"></ion-icon>
+    </button>
+  </div>
+
+  <!-- Menu Items Navigation -->
+  <nav class="sidebar-nav">
+    <ul class="nav-list">
+      <li *ngFor="let item of menuItems">
+        <a 
+          *ngIf="shouldShowItem(item)"
+          [routerLink]="item.route"
+          class="nav-link"
+          [class.active]="isActive(item.route)"
+          (click)="onLinkClick()"
+        >
+          <ion-icon [name]="item.icon" class="nav-icon"></ion-icon>
+          <span class="nav-label">{{ item.label }}</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Sidebar Footer / Profile -->
+  <div class="sidebar-footer">
+    <div class="user-profile-summary">
+      <div class="user-avatar-placeholder">
+        {{ user?.fullName ? user.fullName.charAt(0).toUpperCase() : (user?.email ? user.email.charAt(0).toUpperCase() : 'U') }}
+      </div>
+      <div class="user-details">
+        <div class="user-name">{{ user?.fullName || 'User Account' }}</div>
+        <div class="user-role">{{ user?.role || 'Guest' }}</div>
+      </div>
+    </div>
+    <button class="logout-btn" (click)="logout()">
+      <ion-icon name="log-out-outline" class="logout-icon"></ion-icon>
+      <span class="logout-label">Sign out</span>
+    </button>
+  </div>
+</aside>
+
+<!-- Backdrop overlay for mobile layout -->
+<div class="sidebar-backdrop" *ngIf="isOpen" (click)="onLinkClick()"></div>

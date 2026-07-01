@@ -39,6 +39,9 @@ import {
   folderOpenOutline,
 } from 'ionicons/icons';
 
+import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
+import { HeaderComponent } from '../../shared/components/header/header.component';
+
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.page.html',
@@ -68,10 +71,17 @@ import {
     IonItem,
     IonLabel,
     IonBadge,
+    SidebarComponent,
+    HeaderComponent
   ],
 })
 export class DashboardPage implements OnInit {
   user: any;
+  isSidebarOpen = false;
+
+  toggleSidebar() {
+    this.isSidebarOpen = !this.isSidebarOpen;
+  }
 
   constructor(
     private authService: AuthService,

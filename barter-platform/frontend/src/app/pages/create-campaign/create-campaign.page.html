@@ -1,314 +1,275 @@
-<ion-header class="ion-no-border">
-  <ion-toolbar color="primary">
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/campaigns" text=""></ion-back-button>
-    </ion-buttons>
-    <ion-title class="headings">Create Campaign</ion-title>
-  </ion-toolbar>
-</ion-header>
+<div class="app-layout">
+  <!-- Reusable Sidebar -->
+  <app-sidebar [isOpen]="isSidebarOpen" (closeSidebar)="isSidebarOpen = false"></app-sidebar>
 
-<ion-content class="ion-padding" [fullscreen]="true">
-  <div class="form-container">
-    <!-- Title Area -->
-    <div class="form-header">
-      <h2>Launch a New Campaign</h2>
-      <p>Enter details to recruit top influencers for your brand campaign</p>
-    </div>
+  <div class="main-viewport">
+    <!-- Reusable Header with back button -->
+    <app-header [title]="'Create Campaign'" [showBackButton]="true" [backRoute]="'/campaigns'" (toggleSidebar)="toggleSidebar()"></app-header>
 
-    <!-- Glassmorphic Card Container -->
-    <div class="glassmorphism-card">
-      @if (campaignForm) {
-      <form [formGroup]="campaignForm" (ngSubmit)="onSubmit()">
-        <!-- Campaign Title Input -->
-        <div class="custom-input-group">
-          <label class="custom-input-label">Campaign Title *</label>
-          <ion-item lines="none" class="custom-input-item">
-            <ion-icon
-              name="document-text-outline"
-              slot="start"
-              class="input-icon"
-            ></ion-icon>
-            <ion-input
-              type="text"
-              formControlName="title"
-              placeholder="e.g. Spendwise Brand Campaign"
-            ></ion-input>
-          </ion-item>
-          @if (campaignForm.get('title')?.touched &&
-          campaignForm.get('title')?.invalid) {
-          <div class="validation-error">
-            <ion-text color="danger"
-              ><small
-                >Title must be between 2 and 100 characters.</small
-              ></ion-text
-            >
+    <ion-content class="ion-padding" [fullscreen]="true">
+      <div class="onboarding-wrapper">
+        <div class="form-container">
+          <!-- Title Area -->
+          <div class="form-header">
+            <h2>Launch a Campaign</h2>
+            <p>Recruit top creators to collaborate with your brand</p>
           </div>
-          }
-        </div>
 
-        <!-- Description Input -->
-        <div class="custom-input-group">
-          <label class="custom-input-label">Campaign Description *</label>
-          <ion-item lines="none" class="custom-input-item">
-            <ion-icon
-              name="document-text-outline"
-              slot="start"
-              class="input-icon"
-              style="align-self: flex-start; margin-top: 12px"
-            ></ion-icon>
-            <ion-textarea
-              formControlName="description"
-              rows="4"
-              placeholder="Describe your product, campaign goals, and what influencers will do..."
-            ></ion-textarea>
-          </ion-item>
-          @if (campaignForm.get('description')?.touched &&
-          campaignForm.get('description')?.invalid) {
-          <div class="validation-error">
-            <ion-text color="danger"
-              ><small
-                >Description must be between 10 and 1000 characters.</small
-              ></ion-text
-            >
-          </div>
-          }
-        </div>
-
-        <!-- Platform & Category Row -->
-        <ion-grid class="ion-no-padding">
-          <ion-row>
-            <!-- Platform Select -->
-            <ion-col size="6" class="ion-no-padding padding-right-sm">
+          <!-- Glassmorphic Card Container -->
+          <div class="glassmorphism-card">
+            @if (campaignForm) {
+            <form [formGroup]="campaignForm" (ngSubmit)="onSubmit()">
+              <!-- Campaign Title Input -->
               <div class="custom-input-group">
-                <label class="custom-input-label">Platform *</label>
+                <label class="custom-input-label">Campaign Title *</label>
                 <ion-item lines="none" class="custom-input-item">
                   <ion-icon
-                    [name]="getPlatformIcon(campaignForm.get('platform')?.value)"
-                    slot="start"
-                    class="input-icon"
-                  ></ion-icon>
-                  <ion-select
-                    formControlName="platform"
-                    interface="popover"
-                    class="form-select"
-                  >
-                    @for (plat of platformsList; track plat) {
-                    <ion-select-option [value]="plat"
-                      >{{ plat }}</ion-select-option
-                    >
-                    }
-                  </ion-select>
-                </ion-item>
-              </div>
-            </ion-col>
-
-            <!-- Category Select -->
-            <ion-col size="6" class="ion-no-padding padding-left-sm">
-              <div class="custom-input-group">
-                <label class="custom-input-label">Category *</label>
-                <ion-item lines="none" class="custom-input-item">
-                  <ion-icon
-                    name="options-outline"
-                    slot="start"
-                    class="input-icon"
-                  ></ion-icon>
-                  <ion-select
-                    formControlName="category"
-                    interface="popover"
-                    class="form-select"
-                  >
-                    @for (cat of categoriesList; track cat) {
-                    <ion-select-option [value]="cat"
-                      >{{ cat }}</ion-select-option
-                    >
-                    }
-                  </ion-select>
-                </ion-item>
-              </div>
-            </ion-col>
-          </ion-row>
-        </ion-grid>
-
-        <!-- Start & End Date Row -->
-        <ion-grid class="ion-no-padding">
-          <ion-row>
-            <!-- Start Date -->
-            <ion-col size="6" class="ion-no-padding padding-right-sm">
-              <div class="custom-input-group">
-                <label class="custom-input-label">Start Date *</label>
-                <ion-item lines="none" class="custom-input-item">
-                  <ion-icon
-                    name="calendar-outline"
+                    name="document-text-outline"
                     slot="start"
                     class="input-icon"
                   ></ion-icon>
                   <ion-input
-                    type="date"
-                    formControlName="startDate"
+                    type="text"
+                    formControlName="title"
+                    placeholder="e.g. Summer Brand Ambassador Campaign"
                   ></ion-input>
                 </ion-item>
-                @if (campaignForm.get('startDate')?.touched &&
-                campaignForm.get('startDate')?.invalid) {
+                @if (campaignForm.get('title')?.touched && campaignForm.get('title')?.invalid) {
                 <div class="validation-error">
-                  <ion-text color="danger"
-                    ><small>Start date is required.</small></ion-text
-                  >
+                  <ion-text color="danger">
+                    <small>Title must be between 2 and 100 characters.</small>
+                  </ion-text>
                 </div>
                 }
               </div>
-            </ion-col>
 
-            <!-- End Date -->
-            <ion-col size="6" class="ion-no-padding padding-left-sm">
+              <!-- Description Input -->
               <div class="custom-input-group">
-                <label class="custom-input-label">End Date *</label>
-                <ion-item lines="none" class="custom-input-item">
-                  <ion-icon
-                    name="calendar-outline"
-                    slot="start"
-                    class="input-icon"
-                  ></ion-icon>
-                  <ion-input type="date" formControlName="endDate"></ion-input>
+                <label class="custom-input-label">Campaign Description *</label>
+                <ion-item lines="none" class="custom-input-item text-area-item">
+                  <ion-textarea
+                    formControlName="description"
+                    rows="4"
+                    placeholder="Describe your product, campaign goals, and what you expect from influencers..."
+                  ></ion-textarea>
                 </ion-item>
-                @if (campaignForm.get('endDate')?.touched &&
-                campaignForm.get('endDate')?.invalid) {
+                @if (campaignForm.get('description')?.touched && campaignForm.get('description')?.invalid) {
                 <div class="validation-error">
-                  <ion-text color="danger"
-                    ><small>End date is required.</small></ion-text
-                  >
+                  <ion-text color="danger">
+                    <small>Description must be between 10 and 1000 characters.</small>
+                  </ion-text>
                 </div>
                 }
               </div>
-            </ion-col>
-          </ion-row>
-        </ion-grid>
 
-        <!-- Date Validation Error -->
-        @if (campaignForm.errors?.['dateInvalid'] &&
-        (campaignForm.get('startDate')?.touched ||
-        campaignForm.get('endDate')?.touched)) {
-        <div
-          class="validation-error"
-          style="margin-top: -10px; margin-bottom: 20px"
-        >
-          <ion-text color="danger">
-            <small style="font-weight: 600"
-              >End date must be strictly after the start date.</small
-            >
-          </ion-text>
-        </div>
-        }
+              <!-- Platform & Category Row -->
+              <ion-grid class="ion-no-padding">
+                <ion-row>
+                  <!-- Platform Select -->
+                  <ion-col size="12" size-md="6" class="ion-no-padding responsive-col-left">
+                    <div class="custom-input-group">
+                      <label class="custom-input-label">Platform *</label>
+                      <ion-item lines="none" class="custom-input-item">
+                        <ion-icon
+                          [name]="getPlatformIcon(campaignForm.get('platform')?.value)"
+                          slot="start"
+                          class="input-icon"
+                        ></ion-icon>
+                        <ion-select
+                          formControlName="platform"
+                          interface="popover"
+                          class="form-select"
+                        >
+                          @for (plat of platformsList; track plat) {
+                          <ion-select-option [value]="plat">{{ plat }}</ion-select-option>
+                          }
+                        </ion-select>
+                      </ion-item>
+                    </div>
+                  </ion-col>
 
-        <!-- Budget Input -->
-        <div class="custom-input-group">
-          <label class="custom-input-label">Budget Per Person (₹) *</label>
-          <ion-item lines="none" class="custom-input-item">
-            <ion-icon
-              name="cash-outline"
-              slot="start"
-              class="input-icon"
-            ></ion-icon>
-            <ion-input
-              type="number"
-              formControlName="budget"
-              placeholder="e.g. 1000"
-            ></ion-input>
-          </ion-item>
-          @if (campaignForm.get('budget')?.touched &&
-          campaignForm.get('budget')?.invalid) {
-          <div class="validation-error">
-            <ion-text color="danger"
-              ><small>Budget must be a valid positive number.</small></ion-text
-            >
-          </div>
-          }
-        </div>
+                  <!-- Category Select -->
+                  <ion-col size="12" size-md="6" class="ion-no-padding responsive-col-right">
+                    <div class="custom-input-group">
+                      <label class="custom-input-label">Category *</label>
+                      <ion-item lines="none" class="custom-input-item">
+                        <ion-icon
+                          name="options-outline"
+                          slot="start"
+                          class="input-icon"
+                        ></ion-icon>
+                        <ion-select
+                          formControlName="category"
+                          interface="popover"
+                          class="form-select"
+                        >
+                          @for (cat of categoriesList; track cat) {
+                          <ion-select-option [value]="cat">{{ cat }}</ion-select-option>
+                          }
+                        </ion-select>
+                      </ion-item>
+                    </div>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
 
-        <ion-grid class="ion-no-padding">
-          <ion-row>
-            <!-- Total Slots -->
-            <ion-col size="6" class="ion-no-padding padding-right-sm">
+              <!-- Start & End Date Row -->
+              <ion-grid class="ion-no-padding">
+                <ion-row>
+                  <!-- Start Date -->
+                  <ion-col size="12" size-md="6" class="ion-no-padding responsive-col-left">
+                    <div class="custom-input-group">
+                      <label class="custom-input-label">Start Date *</label>
+                      <ion-item lines="none" class="custom-input-item">
+                        <ion-icon
+                          name="calendar-outline"
+                          slot="start"
+                          class="input-icon"
+                        ></ion-icon>
+                        <ion-input
+                          type="date"
+                          formControlName="startDate"
+                        ></ion-input>
+                      </ion-item>
+                      @if (campaignForm.get('startDate')?.touched && campaignForm.get('startDate')?.invalid) {
+                      <div class="validation-error">
+                        <ion-text color="danger">
+                          <small>Start date is required.</small>
+                        </ion-text>
+                      </div>
+                      }
+                    </div>
+                  </ion-col>
+
+                  <!-- End Date -->
+                  <ion-col size="12" size-md="6" class="ion-no-padding responsive-col-right">
+                    <div class="custom-input-group">
+                      <label class="custom-input-label">End Date *</label>
+                      <ion-item lines="none" class="custom-input-item">
+                        <ion-icon
+                          name="calendar-outline"
+                          slot="start"
+                          class="input-icon"
+                        ></ion-icon>
+                        <ion-input type="date" formControlName="endDate"></ion-input>
+                      </ion-item>
+                      @if (campaignForm.get('endDate')?.touched && campaignForm.get('endDate')?.invalid) {
+                      <div class="validation-error">
+                        <ion-text color="danger">
+                          <small>End date is required.</small>
+                        </ion-text>
+                      </div>
+                      }
+                    </div>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+
+              <!-- Date Validation Error -->
+              @if (campaignForm.errors?.['dateInvalid'] && (campaignForm.get('startDate')?.touched || campaignForm.get('endDate')?.touched)) {
+              <div class="validation-error" style="margin-top: -12px; margin-bottom: 24px">
+                <ion-text color="danger">
+                  <small style="font-weight: 600">End date must be strictly after the start date.</small>
+                </ion-text>
+              </div>
+              }
+
+              <!-- Budget Input -->
               <div class="custom-input-group">
-                <label class="custom-input-label">Total Slots *</label>
+                <label class="custom-input-label">Budget Per Person (₹) *</label>
                 <ion-item lines="none" class="custom-input-item">
                   <ion-icon
-                    name="people-outline"
+                    name="cash-outline"
                     slot="start"
                     class="input-icon"
                   ></ion-icon>
                   <ion-input
                     type="number"
-                    formControlName="totalSlots"
-                    placeholder="10"
+                    formControlName="budget"
+                    placeholder="e.g. 5000"
                   ></ion-input>
                 </ion-item>
+                @if (campaignForm.get('budget')?.touched && campaignForm.get('budget')?.invalid) {
+                <div class="validation-error">
+                  <ion-text color="danger">
+                    <small>Budget must be a valid positive number.</small>
+                  </ion-text>
+                </div>
+                }
               </div>
-            </ion-col>
 
-            <!-- Reach Requirement -->
-            <ion-col size="6" class="ion-no-padding padding-left-sm">
-              <div class="custom-input-group">
-                <label class="custom-input-label">Reach Requirement *</label>
-                <ion-item lines="none" class="custom-input-item">
-                  <ion-icon
-                    name="help-circle-outline"
-                    slot="start"
-                    class="input-icon"
-                  ></ion-icon>
-                  <ion-select
-                    formControlName="followersRequired"
-                    interface="popover"
-                    class="form-select"
-                  >
-                    <ion-select-option value="None"
-                      >No minimum</ion-select-option
-                    >
-                    <ion-select-option value="1K+"
-                      >1K+ followers</ion-select-option
-                    >
-                    <ion-select-option value="5K+"
-                      >5K+ followers</ion-select-option
-                    >
-                    <ion-select-option value="10K+"
-                      >10K+ followers</ion-select-option
-                    >
-                    <ion-select-option value="50K+"
-                      >50K+ followers</ion-select-option
-                    >
-                  </ion-select>
-                </ion-item>
+              <!-- Slots and Reach Row -->
+              <ion-grid class="ion-no-padding">
+                <ion-row>
+                  <!-- Total Slots -->
+                  <ion-col size="12" size-md="6" class="ion-no-padding responsive-col-left">
+                    <div class="custom-input-group">
+                      <label class="custom-input-label">Total Slots *</label>
+                      <ion-item lines="none" class="custom-input-item">
+                        <ion-icon
+                          name="people-outline"
+                          slot="start"
+                          class="input-icon"
+                        ></ion-icon>
+                        <ion-input
+                          type="number"
+                          formControlName="totalSlots"
+                          placeholder="10"
+                        ></ion-input>
+                      </ion-item>
+                    </div>
+                  </ion-col>
+
+                  <!-- Reach Requirement -->
+                  <ion-col size="12" size-md="6" class="ion-no-padding responsive-col-right">
+                    <div class="custom-input-group">
+                      <label class="custom-input-label">Reach Requirement *</label>
+                      <ion-item lines="none" class="custom-input-item">
+                        <ion-icon
+                          name="help-circle-outline"
+                          slot="start"
+                          class="input-icon"
+                        ></ion-icon>
+                        <ion-select
+                          formControlName="followersRequired"
+                          interface="popover"
+                          class="form-select"
+                        >
+                          <ion-select-option value="None">No minimum</ion-select-option>
+                          <ion-select-option value="1K+">1K+ followers</ion-select-option>
+                          <ion-select-option value="5K+">5K+ followers</ion-select-option>
+                          <ion-select-option value="10K+">10K+ followers</ion-select-option>
+                          <ion-select-option value="50K+">50K+ followers</ion-select-option>
+                        </ion-select>
+                      </ion-item>
+                    </div>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+
+              <!-- Submit Button -->
+              <ion-button
+                expand="block"
+                type="submit"
+                [disabled]="isSubmitting"
+                class="submit-btn"
+              >
+                {{ isSubmitting ? 'Creating Campaign...' : 'Launch Campaign' }}
+              </ion-button>
+
+              <!-- Validation warning banner -->
+              @if (!campaignForm.valid && campaignForm.touched) {
+              <div style="text-align: center; margin-top: 16px">
+                <ion-text color="danger">
+                  <small style="font-weight: 600">Please fill out all required fields correctly.</small>
+                </ion-text>
               </div>
-            </ion-col>
-          </ion-row>
-        </ion-grid>
-
-        <!-- Submit Button -->
-        <ion-button
-          expand="block"
-          type="submit"
-          [disabled]="isSubmitting"
-          class="submit-btn"
-        >
-          <ion-icon
-            name="checkmark-circle-outline"
-            slot="start"
-            style="font-size: 1.2rem"
-          ></ion-icon>
-          {{ isSubmitting ? 'Creating Campaign...' : 'Launch Campaign' }}
-        </ion-button>
-
-        <!-- Validation warning banner -->
-        @if (!campaignForm.valid && campaignForm.touched) {
-        <div style="text-align: center; margin-top: 15px">
-          <ion-text color="danger">
-            <small style="font-weight: 600"
-              >Please fill out all required fields correctly.</small
-            >
-          </ion-text>
+              }
+            </form>
+            }
+          </div>
         </div>
-        }
-      </form>
-      }
-    </div>
+      </div>
+    </ion-content>
   </div>
-</ion-content>
+</div>

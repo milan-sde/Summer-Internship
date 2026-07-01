@@ -50,6 +50,9 @@ import {
   playCircleOutline
 } from 'ionicons/icons';
 
+import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
+import { HeaderComponent } from '../../shared/components/header/header.component';
+
 @Component({
   selector: 'app-campaigns',
   templateUrl: './campaigns.page.html',
@@ -72,12 +75,19 @@ import {
     IonRefresher,
     IonRefresherContent,
     IonSelect,
-    IonSelectOption
+    IonSelectOption,
+    SidebarComponent,
+    HeaderComponent
   ]
 })
 export class CampaignsPage implements OnInit {
   currentUser: any;
   campaigns: ICampaign[] = [];
+  isSidebarOpen = false;
+
+  toggleSidebar() {
+    this.isSidebarOpen = !this.isSidebarOpen;
+  }
   isLoading = true;
   appliedCount = 0;
 

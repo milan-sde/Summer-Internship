@@ -50,6 +50,9 @@ import {
   cashOutline,
 } from 'ionicons/icons';
 
+import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
+import { HeaderComponent } from '../../shared/components/header/header.component';
+
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.page.html',
@@ -75,6 +78,8 @@ import {
     IonButtons,
     IonBackButton,
     TitleCasePipe,
+    SidebarComponent,
+    HeaderComponent
   ],
 })
 export class ProfilePage implements OnInit {
@@ -83,6 +88,11 @@ export class ProfilePage implements OnInit {
   isLoading = true;
   currentUser: any;
   profileData: any;
+  isSidebarOpen = false;
+
+  toggleSidebar() {
+    this.isSidebarOpen = !this.isSidebarOpen;
+  }
 
   // Custom visual chips selections lists
   categoriesList = [

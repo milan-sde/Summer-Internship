@@ -1,813 +1,598 @@
-/* Root container spacing */
-.campaigns-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 10px 0 30px 0;
-  font-family: var(--ion-font-family, 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
-}
+// src/app/pages/campaigns/campaigns.page.scss
 
-/* Header style modifications */
-.header-toolbar {
-  --background: var(--ion-color-white);
-  --color: var(--ion-color-dark);
-  border-bottom: 1px solid var(--ion-color-light-shade);
-}
-
-.logo-container {
+.app-layout {
   display: flex;
-  align-items: center;
-  margin-left: 8px;
+  min-height: 100vh;
+  width: 100vw;
+  background-color: var(--ion-color-light);
 }
 
-.logo-icon-box {
-  width: 36px;
-  height: 36px;
-  background: transparent;
-  border-radius: 10px;
+.main-viewport {
+  flex: 1;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  min-width: 0;
+  height: 100vh;
+  overflow: hidden;
 }
 
-.logo-letter {
-  font-size: 1.8rem;
-  font-weight: 900;
-  font-style: italic;
-  background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-primary-tint));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.header-title {
-  font-weight: 800;
-  font-size: 1.5rem;
-  color: var(--ion-color-dark);
-  margin-left: 10px;
-}
-
-.profile-header-btn {
-  --color: var(--ion-color-dark);
+ion-content {
   --background: var(--ion-color-light);
-  --border-radius: 14px;
-  width: 40px;
-  height: 40px;
-  margin-right: 8px;
 }
 
-.header-profile-icon {
-  font-size: 1.5rem;
+.campaigns-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  @media (min-width: 992px) {
+    padding: 24px 8px;
+  }
 }
 
-/* Subtitle and Description text */
-.page-subtitle-box {
-  margin-bottom: 20px;
-  padding: 0 8px;
-}
-
-.subtitle-text {
-  font-size: 0.95rem;
-  color: var(--ion-color-medium);
-  font-weight: 500;
-  margin: 0;
-}
-
-/* Tab Segment Controller */
+// Segment Tabs
 .segment-tabs-container {
   padding: 0 8px;
-  margin-bottom: 20px;
 }
 
 .custom-segment {
-  --background: var(--ion-color-light);
-  border-radius: 16px;
+  --background: var(--ion-color-light-shade);
+  border-radius: 12px;
   padding: 4px;
-  height: 52px;
+  max-width: 400px;
 }
 
 .custom-segment-button {
+  --background-checked: #ffffff;
+  --color-checked: var(--ion-color-primary);
   --color: var(--ion-color-medium);
-  --color-checked: var(--ion-color-white);
-  --background: transparent;
-  --background-checked: var(--ion-color-primary);
-  --border-radius: 12px;
-  font-weight: 700;
-  font-size: 0.95rem;
-  text-transform: none;
-  --indicator-color: transparent;
-  transition: all 0.3s ease;
+  --border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  min-height: 38px;
+  --indicator-color: transparent !important;
 }
 
-.custom-segment-button::part(indicator) {
-  background: var(--ion-color-primary) !important;
-  border-radius: 12px;
-}
-
-/* Category Tags Scroll Carousel */
+// Category tag scrolling
 .categories-scroll-wrapper {
-  margin-bottom: 20px;
-  width: 100%;
   overflow-x: auto;
-  overflow-y: hidden;
+  padding: 4px 8px;
+  white-space: nowrap;
   -webkit-overflow-scrolling: touch;
-}
-
-.categories-scroll-wrapper::-webkit-scrollbar {
-  display: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .categories-scroll-container {
   display: inline-flex;
-  padding: 4px 8px;
-  gap: 10px;
-  white-space: nowrap;
+  gap: 8px;
 }
 
 .category-tag {
-  display: inline-flex;
-  padding: 8px 22px;
-  background: var(--ion-color-light);
-  color: var(--ion-color-dark);
-  font-weight: 700;
-  font-size: 0.85rem;
-  border-radius: 40px;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  white-space: nowrap;
-
-  &:hover {
-    transform: translateY(-1px);
-  }
-
-  &.active {
-    background: var(--ion-color-primary);
-    color: var(--ion-color-white);
-    box-shadow: 0 4px 12px rgba(var(--ion-color-primary-rgb), 0.25);
-  }
-}
-
-/* Filtering Dropdown Fields Row */
-.filters-dropdown-row {
-  display: flex;
-  padding: 0 8px;
-  gap: 10px;
-  margin-bottom: 25px;
-  flex-wrap: wrap;
-}
-
-.filter-dropdown-btn {
-  flex: 1;
-  min-width: 100px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: var(--ion-color-white);
+  display: inline-block;
+  background-color: #ffffff;
   border: 1px solid var(--ion-color-light-shade);
-  border-radius: 14px;
-  padding: 8px 12px;
-  height: 44px;
-  position: relative;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--ion-color-medium);
   cursor: pointer;
   transition: all 0.2s ease;
 
-  &:active {
-    transform: scale(0.98);
-  }
-
-  .dropdown-icon {
-    font-size: 1.2rem;
-    color: var(--ion-color-primary);
-    margin-right: 4px;
-  }
-
-  .dropdown-rupee-icon {
-    font-size: 1.1rem;
-    font-weight: 800;
-    color: var(--ion-color-primary);
-    margin-right: 6px;
-    display: inline-block;
-  }
-
-  .chevron-icon {
-    font-size: 0.95rem;
-    color: var(--ion-color-medium);
-    pointer-events: none;
-  }
-
-  .custom-select {
-    width: 100%;
-    --padding-start: 4px;
-    --padding-end: 4px;
-    font-size: 0.85rem;
-    font-weight: 600;
+  &:hover {
+    background-color: var(--ion-color-light-tint);
     color: var(--ion-color-dark);
-    --placeholder-color: var(--ion-color-medium);
-    --placeholder-opacity: 1;
-    text-transform: capitalize;
-    --arrow-display: none;
-    max-width: calc(100% - 30px);
+  }
+
+  &.active {
+    background-color: var(--ion-color-primary);
+    border-color: var(--ion-color-primary);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(var(--ion-color-primary-rgb), 0.2);
   }
 }
 
-/* Brand view specific header */
-.brand-dashboard-header {
+// Filters Select Dropdown row
+.filters-dropdown-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0 8px;
+  margin-bottom: 8px;
+}
+
+.filter-dropdown-btn {
+  background-color: #ffffff;
+  border: 1px solid var(--ion-color-light-shade);
+  border-radius: 10px;
+  padding: 0 12px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0 8px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.brand-section-title {
-  font-size: 1.35rem;
-  font-weight: 800;
-  color: var(--ion-color-dark);
-  margin: 0;
-}
-
-.create-campaign-btn {
-  --background: var(--ion-color-primary);
-  --border-radius: 40px;
-  --box-shadow: 0 4px 12px rgba(var(--ion-color-primary-rgb), 0.25);
-  font-weight: 700;
-  font-size: 0.85rem;
-  margin: 0;
   height: 38px;
+
+  ion-select {
+    --padding-start: 0;
+    --padding-end: 0;
+    --padding-top: 0;
+    --padding-bottom: 0;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--ion-color-dark);
+  }
 }
 
-/* Premium Glassmorphic Cards Styling */
+// Brand Header
+.brand-dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 12px;
+  margin-bottom: 8px;
+
+  .brand-header-text {
+    h2 {
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: var(--ion-color-dark);
+      margin: 0;
+    }
+    p {
+      font-size: 0.875rem;
+      color: var(--ion-color-medium);
+      margin: 4px 0 0 0;
+    }
+  }
+
+  .create-campaign-btn {
+    --border-radius: 12px;
+    height: 40px;
+    font-weight: 600;
+  }
+}
+
+// Campaign Card Styling
 .premium-campaign-card {
-  background: var(--ion-color-white);
-  border: none;
-  border-radius: 24px;
-  padding: 20px;
-  margin-bottom: 18px;
-  box-shadow: 0 2px 8px rgba(var(--ion-color-black-rgb), 0.04), 0 4px 16px rgba(var(--ion-color-black-rgb), 0.02);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background-color: #ffffff;
+  border: 1px solid var(--ion-color-light-shade);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02), 0 1px 2px -1px rgba(0, 0, 0, 0.02);
+  margin-bottom: 16px;
   display: flex;
   flex-direction: column;
+  gap: 16px;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
-  &:active {
-    transform: scale(0.99);
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.05), 0 4px 12px -8px rgba(0, 0, 0, 0.05);
   }
 }
 
 .card-header-row {
   display: flex;
-  align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 15px;
-  flex-wrap: wrap;
-  gap: 10px;
+  align-items: flex-start;
+  gap: 12px;
 }
 
 .brand-info-box {
   display: flex;
   align-items: center;
   gap: 12px;
-  flex: 1;
-  min-width: 150px;
 }
 
 .brand-avatar-box {
-  width: 48px;
-  height: 48px;
-  background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-primary-tint));
-  border-radius: 16px;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background-color: var(--ion-color-light-tint);
+  border: 1px solid var(--ion-color-light-shade);
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  box-shadow: 0 4px 10px rgba(var(--ion-color-primary-rgb), 0.15);
-}
 
-.brand-avatar-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
+  .brand-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 
-.brand-avatar-initial {
-  color: var(--ion-color-white);
-  font-size: 1.5rem;
-  font-weight: 800;
+  .brand-avatar-initial {
+    font-family: var(--font-family-headings);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--ion-color-primary);
+  }
 }
 
 .brand-names-box {
   display: flex;
   flex-direction: column;
-  flex: 1;
+  gap: 4px;
+
+  .brand-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--ion-color-dark);
+    margin: 0;
+  }
 }
 
-.brand-title {
-  font-size: 1rem;
-  font-weight: 800;
-  color: var(--ion-color-dark);
-  margin: 0;
+.platform-chip {
+  align-self: flex-start;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 12px;
+  text-transform: uppercase;
+
+  &.instagram {
+    background-color: rgba(225, 48, 108, 0.08);
+    color: #E1306C;
+  }
+  &.youtube {
+    background-color: rgba(255, 0, 0, 0.08);
+    color: #FF0000;
+  }
+  &.twitter {
+    background-color: rgba(29, 161, 242, 0.08);
+    color: #1DA1F2;
+  }
 }
 
-.brand-platform-text {
-  font-size: 0.75rem;
+.category-badge {
+  background-color: var(--ion-color-light-tint);
   color: var(--ion-color-medium);
-  margin: 2px 0 0 0;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.8rem;
   font-weight: 600;
+  border: 1px solid var(--ion-color-light-shade);
 }
 
-/* Category Badge (Top Right) */
-.category-badge-box {
-  display: flex;
-  align-items: center;
-  background: rgba(var(--ion-color-primary-rgb), 0.08);
-  border-radius: 40px;
-  padding: 6px 12px;
-  gap: 6px;
-  flex-shrink: 0;
-
-  .badge-icon {
-    font-size: 0.9rem;
-    color: var(--ion-color-primary);
-  }
-
-  .badge-text {
-    font-size: 0.7rem;
-    font-weight: 800;
-    color: var(--ion-color-primary);
-  }
-}
-
-/* Card main content */
 .card-content-box {
-  margin-bottom: 15px;
+  .campaign-main-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--ion-color-dark);
+    margin: 0 0 6px 0;
+  }
+
+  .campaign-desc-text {
+    font-size: 0.925rem;
+    color: var(--ion-color-medium);
+    margin: 0;
+    line-height: 1.5;
+  }
 }
 
-.campaign-main-title {
-  font-size: 1.15rem;
-  font-weight: 800;
-  color: var(--ion-color-dark);
-  margin: 0 0 6px 0;
-  line-height: 1.35;
-}
-
-.campaign-desc-text {
-  font-size: 0.85rem;
-  color: var(--ion-color-medium);
-  margin: 0;
-  line-height: 1.45;
-}
-
-/* Details and metrics row */
+// Metrics Layout
 .card-details-metrics-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
-  padding: 4px 0;
-  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  background-color: var(--ion-color-light-tint);
+  border: 1px solid var(--ion-color-light-shade);
+  border-radius: 12px;
+  padding: 16px;
+
+  @media (min-width: 576px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 .metric-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--ion-color-medium);
-  padding: 4px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 
-  .metric-icon {
-    font-size: 1rem;
+  .metric-val {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--ion-color-dark);
+  }
+
+  .metric-lbl {
+    font-size: 0.75rem;
     color: var(--ion-color-medium);
-  }
-
-  &.budget {
-    background: rgba(var(--ion-color-primary-rgb), 0.1);
-    padding: 4px 12px;
-    border-radius: 40px;
-    color: var(--ion-color-primary);
-    font-weight: 800;
-
-    .metric-icon {
-      color: var(--ion-color-primary);
-    }
-  }
-
-  .metric-label {
-    font-weight: 800;
+    font-weight: 500;
+    text-transform: uppercase;
   }
 }
 
-/* Orange Visual Progress Bar */
+// Progress Bar
 .progress-bar-container {
   width: 100%;
   height: 6px;
-  background: var(--ion-color-light-shade);
+  background-color: var(--ion-color-light-shade);
   border-radius: 3px;
-  margin-bottom: 16px;
   overflow: hidden;
 }
 
 .progress-bar {
   height: 100%;
-  background: var(--ion-color-primary);
+  background-color: var(--ion-color-primary);
   border-radius: 3px;
-  transition: width 0.4s ease-out;
+  transition: width 0.3s ease;
 }
 
-/* Card footer application status / action button */
+// Action button / pill area
 .card-footer-action-row {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
-  width: 100%;
+  margin-top: 4px;
 }
 
 .brand-actions-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   width: 100%;
 
-  .brand-applicants-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-
-  .applicants-status-pill {
-    background: var(--ion-color-light);
+  .enrolled-status-pill {
+    font-size: 0.85rem;
+    font-weight: 600;
     color: var(--ion-color-medium);
-    font-weight: 700;
-    font-size: 0.8rem;
-    padding: 6px 12px;
-    border-radius: 40px;
   }
 
   .view-applicants-toggle-btn {
-    margin: 0;
-    --color: var(--ion-color-primary);
-    font-weight: 700;
-    font-size: 0.8rem;
+    --border-radius: 8px;
+    font-weight: 600;
   }
 }
 
 .influencer-actions-box {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  width: 100%;
-
   .apply-now-btn {
-    --background: var(--ion-color-primary);
-    --border-radius: 40px;
-    --box-shadow: 0 4px 12px rgba(var(--ion-color-primary-rgb), 0.25);
-    font-weight: 700;
-    font-size: 0.85rem;
-    height: 38px;
-    margin: 0;
-  }
-
-  .app-status-badge {
-    display: inline-flex;
-    align-items: center;
-    font-weight: 700;
-    font-size: 0.8rem;
-    padding: 6px 14px;
-    border-radius: 40px;
-    gap: 6px;
-
-    .status-icon {
-      font-size: 0.95rem;
-    }
-
-    &.pending {
-      background: rgba(var(--ion-color-warning-rgb), 0.15);
-      color: var(--ion-color-warning-shade);
-    }
-
-    &.approved {
-      background: rgba(var(--ion-color-success-rgb), 0.15);
-      color: var(--ion-color-success-shade);
-    }
-
-    &.rejected {
-      background: rgba(var(--ion-color-danger-rgb), 0.15);
-      color: var(--ion-color-danger);
-    }
-  }
-
-  .fully-filled-badge {
-    background: var(--ion-color-light);
-    color: var(--ion-color-medium);
-    font-weight: 700;
-    font-size: 0.8rem;
-    padding: 6px 14px;
-    border-radius: 40px;
+    --border-radius: 8px;
+    height: 36px;
+    font-weight: 600;
   }
 }
 
-/* BRAND Collapsible Applicants Panel */
+// Status Badges
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+
+  &.pending {
+    background-color: rgba(245, 158, 11, 0.08);
+    color: var(--ion-color-warning);
+  }
+  &.approved {
+    background-color: rgba(16, 185, 129, 0.08);
+    color: var(--ion-color-success);
+  }
+  &.rejected {
+    background-color: rgba(239, 68, 68, 0.08);
+    color: var(--ion-color-danger);
+  }
+  &.filled {
+    background-color: var(--ion-color-light-shade);
+    color: var(--ion-color-medium);
+  }
+}
+
+// Collapsible Applicants Drawer
 .brand-applicants-panel {
-  margin-top: 15px;
-  padding-top: 15px;
-  border-top: 1px solid var(--ion-color-light-shade);
-  width: 100%;
+  margin-top: 16px;
+  background-color: var(--ion-color-light-tint);
+  border: 1px solid var(--ion-color-light-shade);
+  border-radius: 12px;
+  padding: 16px;
+  animation: slideDown 0.25s ease-out;
 
   .panel-header {
     margin-bottom: 12px;
+    border-bottom: 1px solid var(--ion-color-light-shade);
+    padding-bottom: 8px;
 
     h4 {
-      margin: 0;
-      font-size: 0.9rem;
-      font-weight: 800;
-      color: var(--ion-color-dark);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-  }
-
-  .no-applicants-placeholder {
-    font-size: 0.85rem;
-    color: var(--ion-color-medium);
-    padding: 15px 0;
-    text-align: center;
-  }
-
-  .applicant-item-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--ion-color-light-shade);
-    flex-wrap: wrap;
-    gap: 12px;
-
-    &:last-child {
-      border-bottom: none;
-    }
-  }
-
-  .applicant-profile-info {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex: 1;
-    min-width: 180px;
-  }
-
-  .applicant-avatar-circle {
-    width: 38px;
-    height: 38px;
-    background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-primary-tint));
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    flex-shrink: 0;
-
-    .applicant-avatar-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .applicant-avatar-initial {
-      color: var(--ion-color-white);
-      font-weight: bold;
-      font-size: 1rem;
-    }
-  }
-
-  .applicant-text-info {
-    flex: 1;
-
-    .applicant-full-name {
-      margin: 0;
-      font-size: 0.85rem;
-      font-weight: 800;
-      color: var(--ion-color-dark);
-    }
-
-    .applicant-username-stats {
-      margin: 2px 0 0 0;
-      font-size: 0.7rem;
-      color: var(--ion-color-medium);
-
-      .handle {
-        font-weight: 600;
-        color: var(--ion-color-medium);
-      }
-
-      .separator {
-        margin: 0 4px;
-      }
-    }
-  }
-
-  .applicant-status-actions {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    flex-wrap: wrap;
-
-    .action-btn {
-      margin: 0;
-      --border-radius: 40px;
+      font-size: 0.95rem;
       font-weight: 700;
-      font-size: 0.7rem;
-      height: 32px;
-
-      &.approve {
-        --background: var(--ion-color-success);
-      }
-
-      &.reject {
-        --background: var(--ion-color-danger);
-      }
-    }
-
-    .status-indicator {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      padding: 4px 10px;
-      border-radius: 40px;
-
-      &.approved {
-        background: rgba(var(--ion-color-success-rgb), 0.15);
-        color: var(--ion-color-success-shade);
-      }
-
-      &.rejected {
-        background: rgba(var(--ion-color-danger-rgb), 0.15);
-        color: var(--ion-color-danger);
-      }
+      color: var(--ion-color-dark);
+      margin: 0;
     }
   }
 }
 
-/* Loading State */
-.loading-state {
+.applicants-list {
   display: flex;
   flex-direction: column;
+  gap: 12px;
+}
+
+.no-applicants-placeholder {
+  font-size: 0.85rem;
+  color: var(--ion-color-medium);
+  text-align: center;
+  padding: 12px 0;
+}
+
+.applicant-item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  background-color: #ffffff;
+  border: 1px solid var(--ion-color-light-shade);
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.applicant-profile-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.applicant-avatar-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background-color: rgba(var(--ion-color-primary-rgb), 0.1);
+  color: var(--ion-color-primary);
+  display: flex;
   align-items: center;
   justify-content: center;
-  padding: 50px 20px;
-  text-align: center;
+  overflow: hidden;
+  border: 1px solid var(--ion-color-light-shade);
+
+  .applicant-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .applicant-avatar-initial {
+    font-family: var(--font-family-headings);
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+}
+
+.applicant-text-info {
+  min-width: 0;
+
+  .applicant-full-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--ion-color-dark);
+    margin: 0 0 2px 0;
+  }
+
+  .applicant-username-stats {
+    font-size: 0.75rem;
+    color: var(--ion-color-medium);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+}
+
+.applicant-status-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  .action-btn {
+    --border-radius: 6px;
+    height: 30px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .status-indicator {
+    font-size: 0.8rem;
+    font-weight: 700;
+
+    &.approved { color: var(--ion-color-success); }
+    &.rejected { color: var(--ion-color-danger); }
+  }
+}
+
+// Loading Skeletons
+.loading-state-container {
+  display: flex;
+  flex-direction: column;
   gap: 16px;
 }
 
-.loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid var(--ion-color-light);
-  border-top-color: var(--ion-color-primary);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.loading-text {
-  font-weight: 600;
-  color: var(--ion-color-medium);
-  font-size: 0.9rem;
-}
-
-/* Empty State */
-.empty-state {
+.skeleton-card {
+  background-color: #ffffff;
+  border: 1px solid var(--ion-color-light-shade);
+  border-radius: 16px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  gap: 16px;
+}
+
+.skeleton-header {
+  display: flex;
+  gap: 12px;
+}
+
+.skeleton-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background-color: var(--ion-color-light-shade);
+}
+
+.skeleton-title-wrapper {
+  display: flex;
+  flex-direction: column;
   justify-content: center;
-  padding: 50px 20px;
+  gap: 6px;
+  flex: 1;
+}
+
+.skeleton-line {
+  height: 12px;
+  background-color: var(--ion-color-light-shade);
+  border-radius: 6px;
+  animation: pulse 1.5s infinite ease-in-out;
+
+  &.short { width: 40%; }
+  &.micro { width: 20%; }
+  &.medium { width: 70%; }
+  &.long { width: 100%; }
+}
+
+// Empty State
+.empty-state-container {
   text-align: center;
-}
+  padding: 40px 16px;
 
-.empty-icon {
-  font-size: 3rem;
-  color: var(--ion-color-light-shade);
-  margin-bottom: 12px;
-}
-
-.empty-state h3 {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--ion-color-dark);
-  margin: 0 0 6px 0;
-}
-
-.empty-state p {
-  font-size: 0.85rem;
-  color: var(--ion-color-medium);
-  margin: 0;
-  max-width: 280px;
-  line-height: 1.4;
-}
-
-/* Responsive Design for Mobile */
-@media (max-width: 480px) {
-  .campaigns-container {
-    padding: 5px 0 20px 0;
+  .empty-icon-wrapper {
+    width: 60px;
+    height: 60px;
+    background-color: var(--ion-color-light-shade);
+    color: var(--ion-color-medium);
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    margin-bottom: 16px;
   }
 
-  .page-subtitle-box {
-    padding: 0 4px;
+  h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--ion-color-dark);
+    margin: 0 0 4px 0;
   }
 
-  .segment-tabs-container {
-    padding: 0 4px;
-  }
-
-  .filters-dropdown-row {
-    padding: 0 4px;
-    gap: 8px;
-  }
-
-  .filter-dropdown-btn {
-    min-width: 80px;
-    padding: 6px 10px;
-    height: 40px;
-
-    .custom-select {
-      font-size: 0.75rem;
-    }
-  }
-
-  .category-tag {
-    padding: 6px 18px;
-    font-size: 0.8rem;
-  }
-
-  .premium-campaign-card {
-    padding: 16px;
-    margin-bottom: 14px;
-    border-radius: 20px;
-  }
-
-  .brand-avatar-box {
-    width: 40px;
-    height: 40px;
-  }
-
-  .brand-avatar-initial {
-    font-size: 1.2rem;
-  }
-
-  .brand-title {
+  p {
     font-size: 0.9rem;
-  }
-
-  .campaign-main-title {
-    font-size: 1rem;
-  }
-
-  .campaign-desc-text {
-    font-size: 0.8rem;
-  }
-
-  .card-details-metrics-row {
-    gap: 8px;
-  }
-
-  .metric-item {
-    font-size: 0.7rem;
-
-    &.budget {
-      padding: 3px 10px;
-    }
-  }
-
-  .apply-now-btn,
-  .app-status-badge,
-  .fully-filled-badge {
-    font-size: 0.75rem;
-    height: 34px;
-  }
-
-  .brand-dashboard-header {
-    padding: 0 4px;
-  }
-
-  .brand-section-title {
-    font-size: 1.2rem;
+    color: var(--ion-color-medium);
+    margin: 0;
   }
 }
 
-/* Tablet and small desktop adjustments */
-@media (min-width: 481px) and (max-width: 768px) {
-  .campaigns-container {
-    padding: 10px 16px 30px 16px;
-  }
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
-  .premium-campaign-card {
-    padding: 18px;
-  }
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
 }

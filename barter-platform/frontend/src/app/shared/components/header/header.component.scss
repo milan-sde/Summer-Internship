@@ -1,0 +1,139 @@
+// src/app/shared/components/header/header.component.scss
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.app-header-container {
+  height: 70px;
+  min-height: 70px;
+  background-color: #ffffff;
+  border-bottom: 1px solid var(--ion-color-light-shade);
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+
+  @media (min-width: 992px) {
+    padding: 0 24px;
+  }
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.page-title {
+  font-family: var(--font-family-headings);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--ion-color-dark);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  @media (min-width: 992px) {
+    font-size: 1.35rem;
+  }
+}
+
+.mobile-toggle-btn, .back-btn {
+  background: none;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  color: var(--ion-color-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: var(--ion-color-light-tint);
+  }
+
+  ion-icon {
+    font-size: 1.5rem;
+  }
+}
+
+.mobile-toggle-btn {
+  @media (min-width: 992px) {
+    display: none;
+  }
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  color: var(--ion-color-medium);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  position: relative;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: var(--ion-color-light-tint);
+    color: var(--ion-color-dark);
+  }
+
+  ion-icon {
+    font-size: 1.35rem;
+  }
+}
+
+.notification-indicator {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 7px;
+  height: 7px;
+  background-color: var(--ion-color-danger);
+  border-radius: 50%;
+  border: 1px solid #ffffff;
+}
+
+.avatar-menu-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+}
+
+.avatar-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background-color: rgba(var(--ion-color-primary-rgb), 0.1);
+  color: var(--ion-color-primary);
+  font-family: var(--font-family-headings);
+  font-weight: 700;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(var(--ion-color-primary-rgb), 0.2);
+}

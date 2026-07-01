@@ -33,6 +33,9 @@ import {
 import { StorageService } from 'src/app/services/storage.service';
 import { environment } from 'src/environments/environment';
 
+import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
+import { HeaderComponent } from '../../shared/components/header/header.component';
+
 @Component({
   selector: 'app-instagram-catalogue',
   templateUrl: './instagram-catalogue.page.html',
@@ -52,6 +55,8 @@ import { environment } from 'src/environments/environment';
     IonCol,
     IonCard,
     IonCardContent,
+    SidebarComponent,
+    HeaderComponent
   ],
 })
 export class InstagramCataloguePage implements OnInit {
@@ -59,6 +64,11 @@ export class InstagramCataloguePage implements OnInit {
   instagramMedia: InstagramMediaItem[] = [];
   profileInstagram: any = null;
   isLoading = true;
+  isSidebarOpen = false;
+
+  toggleSidebar() {
+    this.isSidebarOpen = !this.isSidebarOpen;
+  }
 
   constructor(
     private profileService: ProfileService,

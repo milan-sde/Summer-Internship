@@ -1,708 +1,579 @@
-<ion-header class="ion-no-border">
-  <ion-toolbar color="primary">
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/dashboard" text=""></ion-back-button>
-    </ion-buttons>
-    <ion-title class="headings">Edit Profile</ion-title>
-  </ion-toolbar>
-</ion-header>
+<div class="app-layout">
+  <!-- Reusable Sidebar -->
+  <app-sidebar [isOpen]="isSidebarOpen" (closeSidebar)="isSidebarOpen = false"></app-sidebar>
 
-<ion-content class="ion-padding" [fullscreen]="true">
-  <!-- Loading State -->
-  @if (isLoading) {
-  <div
-    style="
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-    "
-  >
-    <span
-      style="
-        font-weight: 600;
-        color: var(--ion-color-step-600);
-        margin-top: 15px;
-        font-family: var(--font-family-body);
-      "
-    >
-      Loading profile details...
-    </span>
-  </div>
-  }
+  <div class="main-viewport">
+    <!-- Reusable Header -->
+    <app-header [title]="'Edit Profile'" (toggleSidebar)="toggleSidebar()"></app-header>
 
-  <!-- Loaded Form -->
-  @if (!isLoading) {
-  <div class="form-container">
-    <!-- Title Area -->
-    <div class="form-header">
-      <h2>Edit Your Profile</h2>
-      <p>Keep your details updated to attract better collaborations</p>
-    </div>
-
-    <!-- Glassmorphic Card Container -->
-    <div class="glassmorphism-card">
-      @if (profileForm) {
-      <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
-        <!-- Interactive Avatar/Logo Upload -->
-        <div class="avatar-picker-container">
-          <input
-            type="file"
-            #fileInput
-            (change)="onFileSelected($event)"
-            accept="image/*"
-            style="display: none"
-          />
-          <div class="avatar-picker-wrapper">
-            <div class="avatar-picker" (click)="fileInput.click()">
-              @if (avatarPreview) {
-              <img [src]="getAvatarUrl(avatarPreview)" />
-              } @else {
-              <span>
-                @if (currentUser?.role === 'INFLUENCER') { {{
-                ((profileForm.get('fullName')?.value?.[0]) ?? 'I') | titlecase
-                }} } @else { {{ getInitials() }} }
-              </span>
-              }
-            </div>
-            <div class="camera-badge" (click)="fileInput.click()">
-              <ion-icon name="camera-outline"></ion-icon>
-            </div>
-          </div>
-          <span class="avatar-picker-label" (click)="fileInput.click()">
-            {{ currentUser?.role === 'INFLUENCER' ? 'Change Profile Photo' :
-            'Change Company Logo' }}
-          </span>
-        </div>
-
-        <!-- ================= INFLUENCER FORM FIELDS ================= -->
-        @if (currentUser?.role === 'INFLUENCER') {
-        <!-- Full Name Input -->
-        <div class="custom-input-group">
-          <label class="custom-input-label">Full Name *</label>
-          <ion-item lines="none" class="custom-input-item">
-            <ion-icon
-              name="person-outline"
-              slot="start"
-              class="input-icon"
-            ></ion-icon>
-            <ion-input
-              type="text"
-              formControlName="fullName"
-              placeholder="Enter your full name"
-            ></ion-input>
-          </ion-item>
-        </div>
-
-        <!-- Phone Number Input -->
-        <div class="custom-input-group">
-          <label class="custom-input-label">Phone Number *</label>
-          <ion-item lines="none" class="custom-input-item">
-            <ion-icon
-              name="call-outline"
-              slot="start"
-              class="input-icon"
-            ></ion-icon>
-            <ion-input
-              type="tel"
-              formControlName="phoneNumber"
-              placeholder="+1234567890"
-            ></ion-input>
-          </ion-item>
-        </div>
-
-        <!-- Fluencr Username Input -->
-        <div class="custom-input-group">
-          <label class="custom-input-label">Influencer Username *</label>
-          <ion-item lines="none" class="custom-input-item">
-            <ion-icon
-              name="person-outline"
-              slot="start"
-              class="input-icon"
-            ></ion-icon>
-            <span
-              class="username-prefix"
-              style="
-                font-weight: 700;
-                margin-right: 4px;
-                color: var(--ion-color-step-600);
-              "
-              >@</span
-            >
-            <ion-input
-              type="text"
-              formControlName="username"
-              placeholder="username"
-            ></ion-input>
-          </ion-item>
-        </div>
-
-        <!-- Email Input -->
-        <div class="custom-input-group" style="opacity: 0.7">
-          <label class="custom-input-label">Email (Read-only)</label>
-          <ion-item lines="none" class="custom-input-item">
-            <ion-icon
-              name="mail-outline"
-              slot="start"
-              class="input-icon"
-            ></ion-icon>
-            <ion-input type="email" formControlName="email"></ion-input>
-          </ion-item>
-        </div>
-
-        <!-- Bio Input -->
-        <div class="custom-input-group">
-          <label class="custom-input-label">Bio *</label>
-          <ion-item lines="none" class="custom-input-item">
-            <ion-icon
-              name="document-text-outline"
-              slot="start"
-              class="input-icon"
-              style="align-self: flex-start; margin-top: 12px"
-            ></ion-icon>
-            <ion-textarea
-              formControlName="bio"
-              rows="4"
-              placeholder="Tell us about yourself, your niches, and your audience..."
-            ></ion-textarea>
-          </ion-item>
-        </div>
-
-        <!-- Categories/Niches chip grid selection -->
-        <div class="ion-margin-top ion-margin-bottom">
-          <h4 class="section-title">Categories / Niches *</h4>
-          <p class="section-subtitle">Select all that describe your content</p>
-          <div class="chip-grid">
-            @for (cat of categoriesList; track cat) {
-            <span
-              [class.selected]="selectedCategories.includes(cat)"
-              (click)="toggleCategory(cat)"
-              class="choice-chip"
-            >
-              {{ cat }}
-            </span>
-            }
-          </div>
-        </div>
-
-        <!-- Country chip grid selection -->
-        <div class="ion-margin-top ion-margin-bottom">
-          <h4 class="section-title">Country *</h4>
-          <p class="section-subtitle">Select your main locations</p>
-          <div class="chip-grid">
-            @for (country of countriesList; track country) {
-            <span
-              [class.selected]="selectedCountries.includes(country)"
-              (click)="toggleCountry(country)"
-              class="choice-chip"
-            >
-              {{ country }}
-            </span>
-            }
-          </div>
-        </div>
-
-        <!-- Instagram OAuth Connection Status Widget -->
-        <div class="social-links-box" style="margin-bottom: 20px">
-          <h4
-            class="section-title"
-            style="
-              color: var(--ion-color-primary);
-              display: flex;
-              align-items: center;
-            "
-          >
-            <ion-icon
-              name="logo-instagram"
-              style="margin-right: 6px; font-size: 1.3rem"
-            ></ion-icon>
-            Instagram Connection
-          </h4>
-
-          <!-- Connected State -->
-          @if (profileData?.instagram?.username) {
-          <div
-            class="ion-padding"
-            style="
-              background: rgba(var(--ion-color-success-rgb), 0.08);
-              border: 1px solid rgba(var(--ion-color-success-rgb), 0.2);
-              border-radius: 12px;
-              margin-top: 10px;
-            "
-          >
-            <div
-              style="
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-              "
-            >
-              <div>
-                <h5
-                  style="
-                    margin: 0;
-                    font-weight: 700;
-                    color: var(--ion-color-success);
-                    display: flex;
-                    align-items: center;
-                  "
-                >
-                  <ion-icon
-                    name="checkmark-circle-outline"
-                    style="margin-right: 4px; font-size: 1.1rem"
-                  ></ion-icon>
-                  Instagram Connected
-                </h5>
-                <p
-                  style="
-                    margin: 5px 0 0 0;
-                    font-weight: 600;
-                    color: var(--ion-color-step-800);
-                  "
-                >
-                  @{{ profileData.instagram.username }}
-                </p>
-                <p
-                  style="
-                    margin: 2px 0 0 0;
-                    font-size: 0.85rem;
-                    color: var(--ion-color-step-600);
-                  "
-                >
-                  Followers: {{ profileData.instagram.followersCount | number }}
-                </p>
-                <p
-                  style="
-                    margin: 2px 0 0 0;
-                    font-size: 0.85rem;
-                    color: var(--ion-color-step-600);
-                  "
-                >
-                  Media: {{ profileData.instagram.mediaCount || 0 | number }}
-                </p>
-              </div>
-
-              <!-- Sync Button -->
-              <ion-button
-                fill="outline"
-                size="small"
-                color="primary"
-                (click)="syncInstagram()"
-                style="font-weight: 600"
-              >
-                Sync Feed
-              </ion-button>
-            </div>
-          </div>
-          }
-
-          <!-- Disconnected State -->
-          @if (!profileData?.instagram?.username) {
-          <div
-            class="ion-padding"
-            style="
-              background: rgba(var(--ion-color-primary-rgb), 0.05);
-              border: 1px dashed rgba(var(--ion-color-primary-rgb), 0.3);
-              border-radius: 12px;
-              margin-top: 10px;
-              text-align: center;
-            "
-          >
-            <p
-              style="
-                margin: 0 0 12px 0;
-                font-size: 0.9rem;
-                color: var(--ion-color-step-600);
-                line-height: 1.4;
-              "
-            >
-              Link your official Creator/Business Instagram page to
-              automatically import your verified posts, Reels, and follower
-              count.
-            </p>
-            <ion-button
-              type="button"
-              size="small"
-              (click)="connectInstagram()"
-              style="
-                --background: linear-gradient(
-                  45deg,
-                  #f09433 0%,
-                  #e6683c 25%,
-                  #dc2743 50%,
-                  #cc2366 75%,
-                  #bc1888 100%
-                );
-                font-weight: 700;
-              "
-            >
-              <ion-icon name="logo-instagram" slot="start"></ion-icon>
-              Connect Instagram
-            </ion-button>
-            <ion-button
-              type="button"
-              size="small"
-              fill="clear"
-              routerLink="/instagram-catalogue"
-              style="margin-top: 8px"
-            >
-              Open Catalogue
-            </ion-button>
-          </div>
-          }
-        </div>
-
-        <!-- Platforms grid -->
-        <div class="social-links-box">
-          <h4 class="section-title" style="color: var(--ion-color-primary)">
-            Social Links *
-          </h4>
-          <p class="section-subtitle">
-            At least one platform is required. Both username and followers must
-            be filled.
-          </p>
-
-          <!-- Instagram Row -->
-          <div class="platform-row">
-            <div class="platform-title-container">
-              <ion-icon
-                name="logo-instagram"
-                class="social-icon instagram"
-              ></ion-icon>
-              <span class="platform-name">Instagram</span>
-            </div>
-            <ion-grid class="ion-no-padding">
-              <ion-row>
-                <ion-col size="7" class="ion-no-padding">
-                  <ion-item lines="none" class="platform-input-item">
-                    <ion-input
-                      type="text"
-                      formControlName="instagramUsername"
-                      placeholder="yourusername"
-                    ></ion-input>
-                  </ion-item>
-                </ion-col>
-                <ion-col size="5" class="ion-no-padding">
-                  <ion-item lines="none" class="platform-input-item no-margin">
-                    <ion-input
-                      type="number"
-                      formControlName="instagramFollowers"
-                      placeholder="Followers"
-                    ></ion-input>
-                    <ion-icon
-                      name="lock-closed-outline"
-                      slot="end"
-                      class="lock-icon"
-                    ></ion-icon>
-                  </ion-item>
-                </ion-col>
-              </ion-row>
-            </ion-grid>
-          </div>
-
-          <!-- YouTube Row -->
-          <div class="platform-row">
-            <div class="platform-title-container">
-              <ion-icon
-                name="logo-youtube"
-                class="social-icon youtube"
-              ></ion-icon>
-              <span class="platform-name">YouTube</span>
-            </div>
-            <ion-grid class="ion-no-padding">
-              <ion-row>
-                <ion-col size="7" class="ion-no-padding">
-                  <ion-item lines="none" class="platform-input-item">
-                    <ion-input
-                      type="text"
-                      formControlName="youtubeUsername"
-                      placeholder="channelhandle"
-                    ></ion-input>
-                  </ion-item>
-                </ion-col>
-                <ion-col size="5" class="ion-no-padding">
-                  <ion-item lines="none" class="platform-input-item no-margin">
-                    <ion-input
-                      type="number"
-                      formControlName="youtubeFollowers"
-                      placeholder="Subscribers"
-                    ></ion-input>
-                    <ion-icon
-                      name="lock-closed-outline"
-                      slot="end"
-                      class="lock-icon"
-                    ></ion-icon>
-                  </ion-item>
-                </ion-col>
-              </ion-row>
-            </ion-grid>
-          </div>
-
-          <!-- Twitter Row -->
-          <div class="platform-row">
-            <div class="platform-title-container">
-              <ion-icon
-                name="logo-twitter"
-                class="social-icon twitter"
-              ></ion-icon>
-              <span class="platform-name">X (Twitter)</span>
-            </div>
-            <ion-grid class="ion-no-padding">
-              <ion-row>
-                <ion-col size="7" class="ion-no-padding">
-                  <ion-item lines="none" class="platform-input-item">
-                    <ion-input
-                      type="text"
-                      formControlName="twitterUsername"
-                      placeholder="yourhandle"
-                    ></ion-input>
-                  </ion-item>
-                </ion-col>
-                <ion-col size="5" class="ion-no-padding">
-                  <ion-item lines="none" class="platform-input-item no-margin">
-                    <ion-input
-                      type="number"
-                      formControlName="twitterFollowers"
-                      placeholder="Followers"
-                    ></ion-input>
-                    <ion-icon
-                      name="lock-closed-outline"
-                      slot="end"
-                      class="lock-icon"
-                    ></ion-icon>
-                  </ion-item>
-                </ion-col>
-              </ion-row>
-            </ion-grid>
-          </div>
-        </div>
-
-        <!-- Past Work Links Dynamic Form Array -->
-        <div class="ion-margin-top ion-margin-bottom">
-          <div class="past-work-header">
-            <h4 class="section-title" style="margin: 0">Past Work Links</h4>
-            <ion-button
-              fill="clear"
-              size="small"
-              (click)="addLink()"
-              class="add-link-btn"
-            >
-              <ion-icon name="add-outline" slot="start"></ion-icon>
-              Add Link
-            </ion-button>
-          </div>
-          <p class="section-subtitle">
-            Add URLs to show brands your best collaborations
-          </p>
-
-          @for (link of pastWorkLinks; track $index; let i = $index) {
-          <div class="link-row">
-            <ion-item lines="none" class="link-input-item">
-              <ion-input
-                type="url"
-                [(ngModel)]="pastWorkLinks[i]"
-                [ngModelOptions]="{standalone: true}"
-                placeholder="https://example.com/work/123"
-              ></ion-input>
-            </ion-item>
-            <ion-button
-              fill="clear"
-              (click)="removeLink(i)"
-              class="delete-link-btn"
-            >
-              <ion-icon
-                name="trash-outline"
-                slot="icon-only"
-                style="font-size: 1.2rem"
-              ></ion-icon>
-            </ion-button>
-          </div>
-          }
-        </div>
-        }
-
-        <!-- ================= BRAND FORM FIELDS ================= -->
-        @if (currentUser?.role === 'BRAND') {
-        <ion-grid class="ion-no-padding">
-          <ion-row>
-            <ion-col size="6" class="ion-no-padding padding-right-sm">
-              <!-- First Name Input -->
-              <div class="custom-input-group">
-                <label class="custom-input-label">First Name *</label>
-                <ion-item lines="none" class="custom-input-item">
-                  <ion-icon
-                    name="person-outline"
-                    slot="start"
-                    class="input-icon"
-                  ></ion-icon>
-                  <ion-input
-                    type="text"
-                    formControlName="firstName"
-                    placeholder="John"
-                  ></ion-input>
-                </ion-item>
-              </div>
-            </ion-col>
-            <ion-col size="6" class="ion-no-padding padding-left-sm">
-              <!-- Last Name Input -->
-              <div class="custom-input-group">
-                <label class="custom-input-label">Last Name *</label>
-                <ion-item lines="none" class="custom-input-item">
-                  <ion-icon
-                    name="person-outline"
-                    slot="start"
-                    class="input-icon"
-                  ></ion-icon>
-                  <ion-input
-                    type="text"
-                    formControlName="lastName"
-                    placeholder="Doe"
-                  ></ion-input>
-                </ion-item>
-              </div>
-            </ion-col>
-          </ion-row>
-        </ion-grid>
-
-        <!-- Contact No. Input -->
-        <div class="custom-input-group">
-          <label class="custom-input-label">Contact No. *</label>
-          <ion-item lines="none" class="custom-input-item">
-            <ion-icon
-              name="call-outline"
-              slot="start"
-              class="input-icon"
-            ></ion-icon>
-            <ion-input
-              type="tel"
-              formControlName="phoneNumber"
-              placeholder="+1234567890"
-            ></ion-input>
-          </ion-item>
-        </div>
-
-        <!-- Email Input -->
-        <div class="custom-input-group" style="opacity: 0.7">
-          <label class="custom-input-label">Email (Read-only)</label>
-          <ion-item lines="none" class="custom-input-item">
-            <ion-icon
-              name="mail-outline"
-              slot="start"
-              class="input-icon"
-            ></ion-icon>
-            <ion-input type="email" formControlName="email"></ion-input>
-          </ion-item>
-        </div>
-
-        <!-- Brand Description Input -->
-        <div class="custom-input-group">
-          <label class="custom-input-label">Brand Description *</label>
-          <ion-item lines="none" class="custom-input-item">
-            <ion-icon
-              name="document-text-outline"
-              slot="start"
-              class="input-icon"
-              style="align-self: flex-start; margin-top: 12px"
-            ></ion-icon>
-            <ion-textarea
-              formControlName="bio"
-              rows="4"
-              placeholder="Tell influencers about your company, products, and collaboration plans..."
-            ></ion-textarea>
-          </ion-item>
-        </div>
-
-        <!-- Industries selection -->
-        <div class="ion-margin-top ion-margin-bottom">
-          <h4 class="section-title">Industry *</h4>
-          <p class="section-subtitle">Select your business sectors</p>
-          <div class="chip-grid">
-            @for (ind of industriesList; track ind) {
-            <span
-              [class.selected]="selectedIndustries.includes(ind)"
-              (click)="toggleIndustry(ind)"
-              class="choice-chip"
-            >
-              {{ ind }}
-            </span>
-            }
-          </div>
-        </div>
-
-        <!-- Budget range side-by-side -->
-        <div class="ion-margin-top ion-margin-bottom">
-          <h4 class="section-title">Budget Range *</h4>
-          <p class="section-subtitle">
-            Enter your typical campaign budget range (USD)
-          </p>
-          <ion-grid class="ion-no-padding">
-            <ion-row>
-              <ion-col size="6" class="ion-no-padding padding-right-sm">
-                <div class="custom-input-group">
-                  <label class="custom-input-label">Min Budget ($)</label>
-                  <ion-item lines="none" class="custom-input-item">
-                    <ion-icon
-                      name="cash-outline"
-                      slot="start"
-                      class="input-icon"
-                    ></ion-icon>
-                    <ion-input
-                      type="number"
-                      formControlName="budgetMin"
-                    ></ion-input>
-                  </ion-item>
-                </div>
-              </ion-col>
-              <ion-col size="6" class="ion-no-padding padding-left-sm">
-                <div class="custom-input-group">
-                  <label class="custom-input-label">Max Budget ($)</label>
-                  <ion-item lines="none" class="custom-input-item">
-                    <ion-icon
-                      name="cash-outline"
-                      slot="start"
-                      class="input-icon"
-                    ></ion-icon>
-                    <ion-input
-                      type="number"
-                      formControlName="budgetMax"
-                    ></ion-input>
-                  </ion-item>
-                </div>
-              </ion-col>
-            </ion-row>
-          </ion-grid>
-        </div>
-        }
-
-        <!-- Submit Button -->
-        <ion-button
-          expand="block"
-          type="submit"
-          [disabled]="isSubmitting"
-          class="submit-btn"
-        >
-          <ion-icon
-            name="checkmark-circle-outline"
-            slot="start"
-            style="font-size: 1.2rem"
-          ></ion-icon>
-          {{ isSubmitting ? 'Saving Changes...' : 'Save Changes' }}
-        </ion-button>
-
-        <!-- Display validation help if invalid and touched -->
-        @if (!profileForm.valid && profileForm.touched) {
-        <div style="text-align: center; margin-top: 15px">
-          <ion-text color="danger">
-            <small style="font-weight: 600"
-              >Please fill out all required fields properly.</small
-            >
-          </ion-text>
-        </div>
-        }
-      </form>
+    <ion-content class="ion-padding" [fullscreen]="true">
+      <!-- Loading State -->
+      @if (isLoading) {
+      <div class="loading-state-container">
+        <div class="loading-spinner"></div>
+        <span>Loading profile details...</span>
+      </div>
       }
-    </div>
+
+      <!-- Loaded Form -->
+      @if (!isLoading) {
+      <div class="onboarding-wrapper">
+        <div class="form-container">
+          <!-- Title Area -->
+          <div class="form-header">
+            <h2>Edit Your Profile</h2>
+            <p>Keep your details updated to attract better collaborations</p>
+          </div>
+
+          <!-- Glassmorphic Card Container -->
+          <div class="glassmorphism-card">
+            @if (profileForm) {
+            <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+              <!-- Interactive Avatar/Logo Upload -->
+              <div class="avatar-picker-container">
+                <input
+                  type="file"
+                  #fileInput
+                  (change)="onFileSelected($event)"
+                  accept="image/*"
+                  style="display: none"
+                />
+                <div class="avatar-picker-wrapper">
+                  <div class="avatar-picker" (click)="fileInput.click()">
+                    @if (avatarPreview) {
+                    <img [src]="getAvatarUrl(avatarPreview)" alt="Profile Preview" />
+                    } @else {
+                    <span>
+                      @if (currentUser?.role === 'INFLUENCER') { {{
+                      ((profileForm.get('fullName')?.value?.[0]) ?? 'I') | titlecase
+                      }} } @else { {{ getInitials() }} }
+                    </span>
+                    }
+                  </div>
+                  <div class="camera-badge" (click)="fileInput.click()">
+                    <ion-icon name="camera-outline"></ion-icon>
+                  </div>
+                </div>
+                <span class="avatar-picker-label" (click)="fileInput.click()">
+                  {{ currentUser?.role === 'INFLUENCER' ? 'Change Profile Photo' : 'Change Company Logo' }}
+                </span>
+              </div>
+
+              <!-- ================= INFLUENCER FORM FIELDS ================= -->
+              @if (currentUser?.role === 'INFLUENCER') {
+              <!-- Full Name Input -->
+              <div class="custom-input-group">
+                <label class="custom-input-label">Full Name *</label>
+                <ion-item lines="none" class="custom-input-item">
+                  <ion-icon
+                    name="person-outline"
+                    slot="start"
+                    class="input-icon"
+                  ></ion-icon>
+                  <ion-input
+                    type="text"
+                    formControlName="fullName"
+                    placeholder="Enter your full name"
+                  ></ion-input>
+                </ion-item>
+              </div>
+
+              <!-- Phone Number Input -->
+              <div class="custom-input-group">
+                <label class="custom-input-label">Phone Number *</label>
+                <ion-item lines="none" class="custom-input-item">
+                  <ion-icon
+                    name="call-outline"
+                    slot="start"
+                    class="input-icon"
+                  ></ion-icon>
+                  <ion-input
+                    type="tel"
+                    formControlName="phoneNumber"
+                    placeholder="+1234567890"
+                  ></ion-input>
+                </ion-item>
+              </div>
+
+              <!-- Influencer Username Input -->
+              <div class="custom-input-group">
+                <label class="custom-input-label">Influencer Username *</label>
+                <ion-item lines="none" class="custom-input-item">
+                  <ion-icon
+                    name="person-outline"
+                    slot="start"
+                    class="input-icon"
+                  ></ion-icon>
+                  <span class="username-prefix">@</span>
+                  <ion-input
+                    type="text"
+                    formControlName="username"
+                    placeholder="username"
+                  ></ion-input>
+                </ion-item>
+              </div>
+
+              <!-- Email Input -->
+              <div class="custom-input-group readonly-group">
+                <label class="custom-input-label">Email (Read-only)</label>
+                <ion-item lines="none" class="custom-input-item">
+                  <ion-icon
+                    name="mail-outline"
+                    slot="start"
+                    class="input-icon"
+                  ></ion-icon>
+                  <ion-input type="email" formControlName="email"></ion-input>
+                </ion-item>
+              </div>
+
+              <!-- Bio Input -->
+              <div class="custom-input-group">
+                <label class="custom-input-label">Bio *</label>
+                <ion-item lines="none" class="custom-input-item text-area-item">
+                  <ion-textarea
+                    formControlName="bio"
+                    rows="4"
+                    placeholder="Tell us about yourself, your niches, and your audience..."
+                  ></ion-textarea>
+                </ion-item>
+              </div>
+
+              <!-- Categories/Niches chip grid selection -->
+              <div class="ion-margin-top ion-margin-bottom">
+                <h4 class="section-title">Categories / Niches *</h4>
+                <p class="section-subtitle">Select all that describe your content</p>
+                <div class="chip-grid">
+                  @for (cat of categoriesList; track cat) {
+                  <span
+                    [class.selected]="selectedCategories.includes(cat)"
+                    (click)="toggleCategory(cat)"
+                    class="choice-chip"
+                  >
+                    {{ cat }}
+                  </span>
+                  }
+                </div>
+              </div>
+
+              <!-- Country chip grid selection -->
+              <div class="ion-margin-top ion-margin-bottom">
+                <h4 class="section-title">Country *</h4>
+                <p class="section-subtitle">Select your main locations</p>
+                <div class="chip-grid">
+                  @for (country of countriesList; track country) {
+                  <span
+                    [class.selected]="selectedCountries.includes(country)"
+                    (click)="toggleCountry(country)"
+                    class="choice-chip"
+                  >
+                    {{ country }}
+                  </span>
+                  }
+                </div>
+              </div>
+
+              <!-- Instagram OAuth Connection Status Widget -->
+              <div class="social-links-box ion-margin-top ion-margin-bottom">
+                <h4 class="section-title instagram-connect-title">
+                  <ion-icon name="logo-instagram"></ion-icon>
+                  Instagram Connection
+                </h4>
+
+                <!-- Connected State -->
+                @if (profileData?.instagram?.username) {
+                <div class="instagram-connected-card">
+                  <div class="instagram-connected-header">
+                    <div>
+                      <h5>
+                        <ion-icon name="checkmark-circle-outline"></ion-icon>
+                        Connected Page
+                      </h5>
+                      <p class="instagram-handle">@{{ profileData.instagram.username }}</p>
+                      <div class="instagram-metrics">
+                        <span>{{ profileData.instagram.followersCount | number }} followers</span>
+                        <span class="separator">•</span>
+                        <span>{{ profileData.instagram.mediaCount || 0 | number }} posts</span>
+                      </div>
+                    </div>
+
+                    <!-- Sync Button -->
+                    <ion-button
+                      fill="outline"
+                      size="small"
+                      (click)="syncInstagram()"
+                      class="instagram-sync-btn"
+                    >
+                      Sync Feed
+                    </ion-button>
+                  </div>
+                </div>
+                }
+
+                <!-- Disconnected State -->
+                @if (!profileData?.instagram?.username) {
+                <div class="instagram-disconnected-card">
+                  <p>
+                    Link your official Creator/Business Instagram page to automatically import your verified posts, Reels, and follower count.
+                  </p>
+                  <div class="instagram-actions">
+                    <ion-button
+                      type="button"
+                      size="small"
+                      (click)="connectInstagram()"
+                      class="instagram-connect-btn"
+                    >
+                      <ion-icon name="logo-instagram" slot="start"></ion-icon>
+                      Connect Instagram
+                    </ion-button>
+                    <ion-button
+                      type="button"
+                      size="small"
+                      fill="clear"
+                      routerLink="/instagram-catalogue"
+                    >
+                      Open Catalogue
+                    </ion-button>
+                  </div>
+                </div>
+                }
+              </div>
+
+              <!-- Platforms grid -->
+              <div class="social-links-box">
+                <h4 class="section-title">Manual Social Links *</h4>
+                <p class="section-subtitle">
+                  At least one platform is required. Both username and followers must be filled.
+                </p>
+
+                <!-- Instagram Row -->
+                <div class="platform-row">
+                  <div class="platform-title-container">
+                    <ion-icon
+                      name="logo-instagram"
+                      class="social-icon instagram"
+                    ></ion-icon>
+                    <span class="platform-name">Instagram</span>
+                  </div>
+                  <ion-grid class="ion-no-padding">
+                    <ion-row>
+                      <ion-col size="7" class="ion-no-padding">
+                        <ion-item lines="none" class="platform-input-item">
+                          <ion-input
+                            type="text"
+                            formControlName="instagramUsername"
+                            placeholder="username"
+                          ></ion-input>
+                        </ion-item>
+                      </ion-col>
+                      <ion-col size="5" class="ion-no-padding">
+                        <ion-item lines="none" class="platform-input-item no-margin">
+                          <ion-input
+                            type="number"
+                            formControlName="instagramFollowers"
+                            placeholder="Followers"
+                          ></ion-input>
+                          <ion-icon
+                            name="lock-closed-outline"
+                            slot="end"
+                            class="lock-icon"
+                          ></ion-icon>
+                        </ion-item>
+                      </ion-col>
+                    </ion-row>
+                  </ion-grid>
+                </div>
+
+                <!-- YouTube Row -->
+                <div class="platform-row">
+                  <div class="platform-title-container">
+                    <ion-icon
+                      name="logo-youtube"
+                      class="social-icon youtube"
+                    ></ion-icon>
+                    <span class="platform-name">YouTube</span>
+                  </div>
+                  <ion-grid class="ion-no-padding">
+                    <ion-row>
+                      <ion-col size="7" class="ion-no-padding">
+                        <ion-item lines="none" class="platform-input-item">
+                          <ion-input
+                            type="text"
+                            formControlName="youtubeUsername"
+                            placeholder="channelhandle"
+                          ></ion-input>
+                        </ion-item>
+                      </ion-col>
+                      <ion-col size="5" class="ion-no-padding">
+                        <ion-item lines="none" class="platform-input-item no-margin">
+                          <ion-input
+                            type="number"
+                            formControlName="youtubeFollowers"
+                            placeholder="Subscribers"
+                          ></ion-input>
+                          <ion-icon
+                            name="lock-closed-outline"
+                            slot="end"
+                            class="lock-icon"
+                          ></ion-icon>
+                        </ion-item>
+                      </ion-col>
+                    </ion-row>
+                  </ion-grid>
+                </div>
+
+                <!-- Twitter Row -->
+                <div class="platform-row">
+                  <div class="platform-title-container">
+                    <ion-icon
+                      name="logo-twitter"
+                      class="social-icon twitter"
+                    ></ion-icon>
+                    <span class="platform-name">X (Twitter)</span>
+                  </div>
+                  <ion-grid class="ion-no-padding">
+                    <ion-row>
+                      <ion-col size="7" class="ion-no-padding">
+                        <ion-item lines="none" class="platform-input-item">
+                          <ion-input
+                            type="text"
+                            formControlName="twitterUsername"
+                            placeholder="yourhandle"
+                          ></ion-input>
+                        </ion-item>
+                      </ion-col>
+                      <ion-col size="5" class="ion-no-padding">
+                        <ion-item lines="none" class="platform-input-item no-margin">
+                          <ion-input
+                            type="number"
+                            formControlName="twitterFollowers"
+                            placeholder="Followers"
+                          ></ion-input>
+                          <ion-icon
+                            name="lock-closed-outline"
+                            slot="end"
+                            class="lock-icon"
+                          ></ion-icon>
+                        </ion-item>
+                      </ion-col>
+                    </ion-row>
+                  </ion-grid>
+                </div>
+              </div>
+
+              <!-- Past Work Links Dynamic Form Array -->
+              <div class="ion-margin-top ion-margin-bottom">
+                <div class="past-work-header">
+                  <h4 class="section-title">Past Work Links</h4>
+                  <ion-button
+                    fill="clear"
+                    size="small"
+                    (click)="addLink()"
+                    class="add-link-btn"
+                  >
+                    <ion-icon name="add-outline" slot="start"></ion-icon>
+                    Add Link
+                  </ion-button>
+                </div>
+                <p class="section-subtitle">
+                  Add URLs to show brands your best collaborations
+                </p>
+
+                @for (link of pastWorkLinks; track $index; let i = $index) {
+                <div class="link-row">
+                  <ion-item lines="none" class="link-input-item">
+                    <ion-input
+                      type="url"
+                      [(ngModel)]="pastWorkLinks[i]"
+                      [ngModelOptions]="{standalone: true}"
+                      placeholder="https://example.com/work/123"
+                    ></ion-input>
+                  </ion-item>
+                  <ion-button
+                    fill="clear"
+                    (click)="removeLink(i)"
+                    class="delete-link-btn"
+                  >
+                    <ion-icon
+                      name="trash-outline"
+                      slot="icon-only"
+                    ></ion-icon>
+                  </ion-button>
+                </div>
+                }
+              </div>
+              }
+
+              <!-- ================= BRAND FORM FIELDS ================= -->
+              @if (currentUser?.role === 'BRAND') {
+              <ion-grid class="ion-no-padding">
+                <ion-row>
+                  <ion-col size="12" size-md="6" class="ion-no-padding responsive-col-left">
+                    <!-- First Name Input -->
+                    <div class="custom-input-group">
+                      <label class="custom-input-label">First Name *</label>
+                      <ion-item lines="none" class="custom-input-item">
+                        <ion-icon
+                          name="person-outline"
+                          slot="start"
+                          class="input-icon"
+                        ></ion-icon>
+                        <ion-input
+                          type="text"
+                          formControlName="firstName"
+                          placeholder="John"
+                        ></ion-input>
+                      </ion-item>
+                    </div>
+                  </ion-col>
+                  <ion-col size="12" size-md="6" class="ion-no-padding responsive-col-right">
+                    <!-- Last Name Input -->
+                    <div class="custom-input-group">
+                      <label class="custom-input-label">Last Name *</label>
+                      <ion-item lines="none" class="custom-input-item">
+                        <ion-icon
+                          name="person-outline"
+                          slot="start"
+                          class="input-icon"
+                        ></ion-icon>
+                        <ion-input
+                          type="text"
+                          formControlName="lastName"
+                          placeholder="Doe"
+                        ></ion-input>
+                      </ion-item>
+                    </div>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+
+              <!-- Contact No. Input -->
+              <div class="custom-input-group">
+                <label class="custom-input-label">Contact No. *</label>
+                <ion-item lines="none" class="custom-input-item">
+                  <ion-icon
+                    name="call-outline"
+                    slot="start"
+                    class="input-icon"
+                  ></ion-icon>
+                  <ion-input
+                    type="tel"
+                    formControlName="phoneNumber"
+                    placeholder="+1234567890"
+                  ></ion-input>
+                </ion-item>
+              </div>
+
+              <!-- Email Input -->
+              <div class="custom-input-group readonly-group">
+                <label class="custom-input-label">Email (Read-only)</label>
+                <ion-item lines="none" class="custom-input-item">
+                  <ion-icon
+                    name="mail-outline"
+                    slot="start"
+                    class="input-icon"
+                  ></ion-icon>
+                  <ion-input type="email" formControlName="email"></ion-input>
+                </ion-item>
+              </div>
+
+              <!-- Brand Description Input -->
+              <div class="custom-input-group">
+                <label class="custom-input-label">Brand Description *</label>
+                <ion-item lines="none" class="custom-input-item text-area-item">
+                  <ion-textarea
+                    formControlName="bio"
+                    rows="4"
+                    placeholder="Tell influencers about your company, products, and campaign goals..."
+                  ></ion-textarea>
+                </ion-item>
+              </div>
+
+              <!-- Industries selection -->
+              <div class="ion-margin-top ion-margin-bottom">
+                <h4 class="section-title">Industry *</h4>
+                <p class="section-subtitle">Select your business sectors</p>
+                <div class="chip-grid">
+                  @for (ind of industriesList; track ind) {
+                  <span
+                    [class.selected]="selectedIndustries.includes(ind)"
+                    (click)="toggleIndustry(ind)"
+                    class="choice-chip"
+                  >
+                    {{ ind }}
+                  </span>
+                  }
+                </div>
+              </div>
+
+              <!-- Budget range side-by-side -->
+              <div class="ion-margin-top ion-margin-bottom">
+                <h4 class="section-title">Budget Range *</h4>
+                <p class="section-subtitle">
+                  Enter your typical campaign budget range (USD)
+                </p>
+                <ion-grid class="ion-no-padding">
+                  <ion-row>
+                    <ion-col size="12" size-md="6" class="ion-no-padding responsive-col-left">
+                      <div class="custom-input-group">
+                        <label class="custom-input-label">Min Budget ($)</label>
+                        <ion-item lines="none" class="custom-input-item">
+                          <ion-icon
+                            name="cash-outline"
+                            slot="start"
+                            class="input-icon"
+                          ></ion-icon>
+                          <ion-input
+                            type="number"
+                            formControlName="budgetMin"
+                          ></ion-input>
+                        </ion-item>
+                      </div>
+                    </ion-col>
+                    <ion-col size="12" size-md="6" class="ion-no-padding responsive-col-right">
+                      <div class="custom-input-group">
+                        <label class="custom-input-label">Max Budget ($)</label>
+                        <ion-item lines="none" class="custom-input-item">
+                          <ion-icon
+                            name="cash-outline"
+                            slot="start"
+                            class="input-icon"
+                          ></ion-icon>
+                          <ion-input
+                            type="number"
+                            formControlName="budgetMax"
+                          ></ion-input>
+                        </ion-item>
+                      </div>
+                    </ion-col>
+                  </ion-row>
+                </ion-grid>
+              </div>
+              }
+
+              <!-- Submit Button -->
+              <ion-button
+                expand="block"
+                type="submit"
+                [disabled]="isSubmitting"
+                class="submit-btn"
+              >
+                {{ isSubmitting ? 'Saving Changes...' : 'Save Changes' }}
+              </ion-button>
+
+              <!-- Display validation help if invalid and touched -->
+              @if (!profileForm.valid && profileForm.touched) {
+              <div style="text-align: center; margin-top: 16px">
+                <ion-text color="danger">
+                  <small style="font-weight: 600">Please fill out all required fields properly.</small>
+                </ion-text>
+              </div>
+              }
+            </form>
+            }
+          </div>
+        </div>
+      </div>
+      }
+    </ion-content>
   </div>
-  }
-</ion-content>
+</div>

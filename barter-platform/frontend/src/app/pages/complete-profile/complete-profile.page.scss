@@ -1,0 +1,355 @@
+// src/app/pages/complete-profile/complete-profile.page.scss
+
+.onboarding-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 0;
+  min-height: 85vh;
+  width: 100%;
+}
+
+.form-container {
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.form-header {
+  text-align: center;
+  margin-bottom: 32px;
+
+  .logo-container {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+
+    .logo-dot {
+      width: 12px;
+      height: 12px;
+      background-color: var(--ion-color-primary);
+      border-radius: 3px;
+    }
+
+    .logo-text {
+      font-family: var(--font-family-headings);
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--ion-color-dark);
+      letter-spacing: -0.5px;
+    }
+  }
+
+  h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--ion-color-dark);
+    margin: 0 0 8px 0;
+  }
+
+  p {
+    font-size: 0.95rem;
+    color: var(--ion-color-medium);
+    margin: 0;
+  }
+}
+
+.avatar-picker-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.avatar-picker-wrapper {
+  position: relative;
+  width: 100px;
+  height: 100px;
+}
+
+.avatar-picker {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: rgba(var(--ion-color-primary-rgb), 0.1);
+  color: var(--ion-color-primary);
+  border: 2px dashed rgba(var(--ion-color-primary-rgb), 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.2s ease;
+
+  span {
+    font-family: var(--font-family-headings);
+    font-size: 2.25rem;
+    font-weight: 700;
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  &:hover {
+    border-color: var(--ion-color-primary);
+    background-color: rgba(var(--ion-color-primary-rgb), 0.15);
+  }
+}
+
+.camera-badge {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background-color: var(--ion-color-primary);
+  color: #ffffff;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  border: 2px solid #ffffff;
+
+  ion-icon {
+    font-size: 1rem;
+  }
+}
+
+.avatar-picker-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--ion-color-primary);
+  margin-top: 12px;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// Two column desktop padding helpers
+.responsive-col-left {
+  padding-right: 0;
+  @media (min-width: 768px) {
+    padding-right: 12px;
+  }
+}
+
+.responsive-col-right {
+  padding-left: 0;
+  @media (min-width: 768px) {
+    padding-left: 12px;
+  }
+}
+
+.readonly-field {
+  opacity: 0.75;
+  
+  .custom-input-item {
+    background-color: var(--ion-color-light-tint) !important;
+    border-color: var(--ion-color-light-shade) !important;
+  }
+}
+
+.text-area-item {
+  align-items: flex-start;
+  
+  ion-textarea {
+    --padding-top: 12px;
+    --padding-bottom: 12px;
+    min-height: 100px;
+  }
+}
+
+.section-group {
+  margin-top: 24px;
+  margin-bottom: 24px;
+}
+
+.section-title {
+  font-family: var(--font-family-headings);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ion-color-dark);
+  margin: 0 0 4px 0;
+}
+
+.section-subtitle {
+  font-size: 0.85rem;
+  color: var(--ion-color-medium);
+  margin: 0 0 16px 0;
+}
+
+.social-links-box {
+  background: var(--ion-color-light-tint);
+  border: 1px solid var(--ion-color-light-shade);
+  border-radius: 16px;
+  padding: 20px;
+  margin-top: 28px;
+  margin-bottom: 28px;
+
+  .section-title {
+    color: var(--ion-color-primary);
+  }
+}
+
+.platform-row {
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--ion-color-light-shade);
+  padding-bottom: 16px;
+
+  &:last-child {
+    margin-bottom: 0;
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+}
+
+.platform-title-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.social-icon {
+  font-size: 1.25rem;
+
+  &.instagram { color: #E1306C; }
+  &.youtube { color: #FF0000; }
+  &.twitter { color: #1DA1F2; }
+}
+
+.platform-name {
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: var(--ion-color-dark);
+}
+
+.platform-input-item {
+  --background: #ffffff;
+  border-radius: 10px;
+  border: 1px solid var(--ion-color-light-shade);
+  margin-right: 8px;
+  --padding-start: 10px;
+  --inner-padding-end: 10px;
+  
+  ion-input {
+    font-size: 0.875rem;
+    font-weight: 500;
+    --padding-top: 8px;
+    --padding-bottom: 8px;
+  }
+
+  &.no-margin {
+    margin-right: 0;
+  }
+}
+
+.lock-icon {
+  font-size: 0.875rem;
+  color: var(--ion-color-medium);
+}
+
+.past-work-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.add-link-btn {
+  --color: var(--ion-color-primary);
+  font-weight: 700;
+  margin: 0;
+  --padding-start: 0;
+  --padding-end: 0;
+}
+
+.link-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  gap: 8px;
+}
+
+.link-input-item {
+  flex: 1;
+  --background: #ffffff;
+  border-radius: 10px;
+  border: 1px solid var(--ion-color-light-shade);
+  --padding-start: 10px;
+  --inner-padding-end: 10px;
+
+  ion-input {
+    font-size: 0.875rem;
+    font-weight: 500;
+    --padding-top: 8px;
+    --padding-bottom: 8px;
+  }
+}
+
+.delete-link-btn {
+  --color: var(--ion-color-danger);
+  margin: 0;
+  --padding-start: 8px;
+  --padding-end: 8px;
+}
+
+.submit-btn {
+  margin-top: 32px;
+  height: 48px;
+}
+
+// Instagram connect step
+.instagram-connect-step {
+  text-align: center;
+  padding: 16px 8px;
+
+  .instagram-icon-wrapper {
+    width: 80px;
+    height: 80px;
+    background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%,#d6249f 60%,#285AEB 90%);
+    border-radius: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 3.5rem;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 24px rgba(214, 36, 159, 0.25);
+  }
+
+  h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--ion-color-dark);
+    margin: 0 0 10px 0;
+  }
+
+  p {
+    color: var(--ion-color-medium);
+    line-height: 1.5;
+    font-size: 0.95rem;
+    margin: 0 auto 32px auto;
+    max-width: 440px;
+  }
+
+  .instagram-btn {
+    --background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    color: #ffffff;
+    font-weight: 700;
+  }
+
+  .skip-btn {
+    margin-top: 16px;
+    --color: var(--ion-color-medium);
+    font-weight: 600;
+  }
+}

@@ -1,0 +1,30 @@
+<header class="app-header-container">
+  <div class="header-left">
+    <!-- Mobile Hamburger Toggle -->
+    <button *ngIf="!showBackButton" class="mobile-toggle-btn" (click)="onMenuClick()">
+      <ion-icon name="menu-outline"></ion-icon>
+    </button>
+
+    <!-- Back Button -->
+    <button *ngIf="showBackButton" class="back-btn" (click)="goBack()">
+      <ion-icon name="arrow-back-outline"></ion-icon>
+    </button>
+
+    <h1 class="page-title">{{ title }}</h1>
+  </div>
+
+  <div class="header-right">
+    <!-- Notification Button -->
+    <button class="icon-btn">
+      <ion-icon name="notifications-outline"></ion-icon>
+      <span class="notification-indicator"></span>
+    </button>
+
+    <!-- User Avatar Menu Button -->
+    <button class="avatar-menu-btn" (click)="viewProfile()">
+      <div class="avatar-circle">
+        {{ user?.fullName ? user.fullName.charAt(0).toUpperCase() : (user?.email ? user.email.charAt(0).toUpperCase() : 'U') }}
+      </div>
+    </button>
+  </div>
+</header>

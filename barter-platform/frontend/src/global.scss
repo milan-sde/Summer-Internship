@@ -43,7 +43,13 @@
 
 h1, h2, h3, h4, h5, h6, ion-title, .headings {
   font-family: var(--font-family-headings) !important;
-  font-weight: 600;
+  font-weight: 700;
+  color: var(--ion-color-dark);
+}
+
+body {
+  font-family: var(--font-family-body);
+  background-color: var(--ion-color-light);
 }
 
 .invalid {
@@ -54,91 +60,121 @@ h1, h2, h3, h4, h5, h6, ion-title, .headings {
   color: var(--ion-color-primary);
   text-decoration: none;
   cursor: pointer;
+  font-weight: 600;
+  transition: opacity 0.2s ease;
 
   &:hover {
-    text-decoration: underline;
+    opacity: 0.8;
+    text-decoration: none;
   }
 }
 
 .welcome-card {
-  background: linear-gradient(135deg, var(--ion-color-primary) 0%, var(--ion-color-primary-shade) 100%);
-  color: white;
+  background: linear-gradient(135deg, var(--ion-color-primary) 0%, var(--ion-color-primary-shade) 100%) !important;
+  color: white !important;
+  border: none !important;
+  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.15) !important;
 
-  ion-card-header, ion-card-content {
-    color: white;
+  ion-card-header, ion-card-content, ion-card-title, ion-card-subtitle {
+    color: white !important;
   }
 }
 
-ion-card[button] {
-  cursor: pointer;
-  transition: transform 0.2s;
+/* Global button overrides */
+ion-button {
+  --border-radius: 12px !important;
+  font-family: var(--font-family-body) !important;
+  font-weight: 600 !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  
+  &.button-solid {
+    --box-shadow: 0 2px 4px 0 rgba(37, 99, 235, 0.1) !important;
+    &:hover {
+      --box-shadow: 0 4px 10px 0 rgba(37, 99, 235, 0.2) !important;
+    }
+  }
+
+  &.button-outline {
+    --border-width: 1px !important;
+    --border-color: var(--ion-color-light-shade) !important;
+    --color: var(--ion-color-dark) !important;
+    
+    &:hover {
+      --background: var(--ion-color-light-tint) !important;
+    }
+  }
+}
+
+/* Reusable Premium Card class */
+.premium-card, ion-card {
+  --border-radius: 16px !important;
+  --background: #ffffff !important;
+  border: 1px solid var(--ion-color-light-shade) !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02), 0 1px 2px -1px rgba(0, 0, 0, 0.02) !important;
+  margin: 16px 0;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
 
   &:hover {
     transform: translateY(-2px);
+    box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.05), 0 4px 12px -8px rgba(0, 0, 0, 0.05) !important;
   }
 }
 
 /* Premium UI CSS Utilities */
 .glassmorphism-card {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: #ffffff;
+  border: 1px solid var(--ion-color-light-shade);
   border-radius: 16px;
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.08);
-  padding: 24px 16px;
+  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.02);
+  padding: 32px 24px;
 
   @media (max-width: 480px) {
-    padding: 16px 8px !important; /* Minimal horizontal padding on mobile to maximize width! */
+    padding: 24px 16px !important;
   }
 }
 
 /* Maximize screen width on mobile viewports */
 @media (max-width: 480px) {
   ion-content.ion-padding {
-    --padding-start: 10px !important;
-    --padding-end: 10px !important;
+    --padding-start: 16px !important;
+    --padding-end: 16px !important;
   }
-}
-
-
-.dark .glassmorphism-card {
-  background: rgba(28, 28, 30, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
 }
 
 .chip-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin: 15px 0;
+  gap: 8px;
+  margin: 16px 0;
 }
 
 .choice-chip {
-  background: var(--ion-color-step-100, #f4f5f8);
-  color: var(--ion-color-step-800, #222428);
+  background: var(--ion-color-light-tint);
+  color: var(--ion-color-medium);
   padding: 8px 16px;
   border-radius: 20px;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid var(--ion-color-step-200, #e0e0e0);
+  transition: all 0.2s ease;
+  border: 1px solid var(--ion-color-light-shade);
   display: inline-flex;
   align-items: center;
   user-select: none;
 
   &:hover {
-    transform: translateY(-1px);
-    background: var(--ion-color-step-200, #e0e0e0);
+    background: var(--ion-color-light-shade);
+    color: var(--ion-color-dark);
   }
 
   &.selected {
     background: var(--ion-color-primary);
     color: white;
     border-color: var(--ion-color-primary);
-    box-shadow: 0 4px 12px rgba(var(--ion-color-primary-rgb), 0.3);
+    box-shadow: 0 4px 12px rgba(var(--ion-color-primary-rgb), 0.2);
   }
 }
 
@@ -270,18 +306,18 @@ ion-card[button] {
 }
 
 .custom-input-item {
-  --background: var(--ion-color-step-50, #f8f9fa);
-  border-radius: 14px;
-  border: 1px solid var(--ion-color-step-200, #e0e0e0);
+  --background: var(--ion-color-light);
+  border-radius: 12px;
+  border: 1px solid var(--ion-color-light-shade);
   margin-bottom: 0;
   --padding-start: 14px;
   --inner-padding-end: 14px;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
+  transition: all 0.2s ease;
+  box-shadow: none;
 
   &:focus-within {
     border-color: var(--ion-color-primary);
-    box-shadow: 0 0 0 3px rgba(var(--ion-color-primary-rgb), 0.15);
+    box-shadow: 0 0 0 3px rgba(var(--ion-color-primary-rgb), 0.1);
     --background: white;
   }
 
@@ -290,14 +326,14 @@ ion-card[button] {
     --padding-bottom: 12px;
     font-weight: 500;
     font-size: 0.95rem;
-    color: var(--ion-color-step-900);
+    color: var(--ion-color-dark);
   }
 
   .input-icon {
-    color: var(--ion-color-step-500);
-    font-size: 1.3rem;
+    color: var(--ion-color-medium);
+    font-size: 1.25rem;
     margin-right: 12px;
-    transition: color 0.25s ease;
+    transition: color 0.2s ease;
   }
 
   &:focus-within .input-icon {

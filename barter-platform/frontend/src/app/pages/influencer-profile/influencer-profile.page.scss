@@ -1,32 +1,104 @@
-.profile-header-section {
+// src/app/pages/influencer-profile/influencer-profile.page.scss
+
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  width: 100vw;
+  background-color: var(--ion-color-light);
+}
+
+.main-viewport {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  min-width: 0;
+  height: 100vh;
+  overflow: hidden;
+}
 
-  @media (min-width: 576px) {
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
+ion-content {
+  --background: var(--ion-color-light);
+}
+
+.loading-state-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 80vh;
+  gap: 16px;
+  color: var(--ion-color-medium);
+  font-weight: 500;
+}
+
+.error-card-container {
+  text-align: center;
+  max-width: 480px;
+  margin: 40px auto;
+  background-color: #ffffff;
+  border: 1px solid var(--ion-color-light-shade);
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+
+  ion-icon {
+    font-size: 3rem;
+    color: var(--ion-color-danger);
+    margin-bottom: 12px;
   }
+
+  h4 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--ion-color-dark);
+    margin: 0 0 6px 0;
+  }
+
+  p {
+    font-size: 0.9rem;
+    color: var(--ion-color-medium);
+    margin: 0 0 20px 0;
+  }
+}
+
+.profile-page-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  @media (min-width: 992px) {
+    padding: 24px 8px;
+  }
+}
+
+.profile-header-card {
+  background-color: #ffffff;
+  border: 1px solid var(--ion-color-light-shade);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02), 0 1px 2px -1px rgba(0, 0, 0, 0.02);
 }
 
 .profile-header-top {
   display: flex;
   align-items: center;
   gap: 20px;
-  width: 100%;
+  margin-bottom: 20px;
 }
 
 .profile-avatar-wrapper {
-  width: 80px;
-  height: 80px;
+  width: 76px;
+  height: 76px;
   border-radius: 50%;
-  overflow: hidden;
-  border: 3px solid var(--ion-color-primary);
+  border: 1px solid var(--ion-color-light-shade);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--ion-color-primary-tint);
+  background-color: var(--ion-color-light-tint);
+  overflow: hidden;
   flex-shrink: 0;
 
   .profile-avatar-img {
@@ -36,27 +108,29 @@
   }
 
   .profile-avatar-initial {
-    font-size: 2.2rem;
-    font-weight: 800;
-    color: #fff;
+    font-family: var(--font-family-headings);
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--ion-color-primary);
   }
 }
 
 .profile-details-info {
-  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 
   .profile-name {
-    margin: 0;
     font-size: 1.4rem;
-    font-weight: 800;
-    color: var(--ion-color-step-900);
+    font-weight: 700;
+    color: var(--ion-color-dark);
+    margin: 0;
   }
 
   .profile-username {
-    margin: 4px 0 8px 0;
-    font-weight: 600;
-    color: var(--ion-color-step-600);
     font-size: 0.95rem;
+    color: var(--ion-color-medium);
+    margin: 0;
   }
 }
 
@@ -64,28 +138,64 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  margin-top: 4px;
 }
 
 .followers-count-badge {
   display: inline-flex;
   align-items: center;
-  background: rgba(var(--ion-color-primary-rgb), 0.08);
-  color: var(--ion-color-primary);
+  gap: 4px;
+  background-color: var(--ion-color-light-tint);
+  color: var(--ion-color-medium);
+  border: 1px solid var(--ion-color-light-shade);
   padding: 4px 10px;
   font-size: 0.8rem;
-  font-weight: 700;
-  border-radius: 20px;
+  font-weight: 600;
+  border-radius: 12px;
+
+  ion-icon {
+    font-size: 0.95rem;
+  }
 }
 
 .instagram-verified-tag {
   display: inline-flex;
   align-items: center;
-  background: rgba(225, 48, 108, 0.08);
-  color: #e1306c;
+  gap: 4px;
+  background-color: rgba(225, 48, 108, 0.05);
+  color: #E1306C;
+  border: 1px solid rgba(225, 48, 108, 0.15);
   padding: 4px 10px;
   font-size: 0.8rem;
-  font-weight: 700;
-  border-radius: 20px;
+  font-weight: 600;
+  border-radius: 12px;
+
+  ion-icon {
+    font-size: 0.95rem;
+  }
+}
+
+.profile-bio-container {
+  border-top: 1px solid var(--ion-color-light-shade);
+  padding-top: 16px;
+  margin-bottom: 16px;
+
+  h4 {
+    font-family: var(--font-family-headings);
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--ion-color-medium);
+    margin: 0 0 6px 0;
+  }
+
+  p {
+    font-size: 0.95rem;
+    color: var(--ion-color-dark);
+    line-height: 1.5;
+    margin: 0;
+  }
 }
 
 .chips-container-row {
@@ -96,84 +206,83 @@
   .info-chip {
     padding: 4px 10px;
     border-radius: 6px;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     font-weight: 600;
 
     &.category {
-      background: var(--ion-color-step-100);
-      color: var(--ion-color-step-700);
+      background-color: var(--ion-color-light-tint);
+      color: var(--ion-color-medium);
+      border: 1px solid var(--ion-color-light-shade);
     }
 
     &.country {
-      background: rgba(var(--ion-color-secondary-rgb), 0.08);
+      background-color: rgba(var(--ion-color-secondary-rgb), 0.05);
       color: var(--ion-color-secondary);
+      border: 1px solid rgba(var(--ion-color-secondary-rgb), 0.15);
     }
   }
 }
 
-.section-header-title {
-  font-size: 1.2rem;
+.section-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  &.last-section {
+    margin-bottom: 24px;
+  }
+}
+
+.section-title-header {
+  font-family: var(--font-family-headings);
+  font-size: 1.15rem;
   font-weight: 700;
-  color: var(--ion-color-step-800);
-  margin: 25px 0 15px 5px;
+  color: var(--ion-color-dark);
+  margin: 8px 0 0 4px;
   display: flex;
   align-items: center;
+  gap: 6px;
 
-  .section-title-icon {
-    font-size: 1.4rem;
-    margin-right: 8px;
+  ion-icon {
+    font-size: 1.3rem;
 
-    &.instagram {
-      color: #e1306c;
-    }
-
-    &.portfolio {
-      color: var(--ion-color-primary);
-    }
+    &.instagram-icon { color: #E1306C; }
+    &.portfolio-icon { color: var(--ion-color-primary); }
   }
 }
 
-/* Horizontal Scroll Container */
+// Instagram Horizontal reel
 .instagram-scroll-container {
   display: flex;
   overflow-x: auto;
-  gap: 15px;
-  padding: 5px 5px 15px 5px;
+  gap: 16px;
+  padding: 4px 4px 12px 4px;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
-
   &::-webkit-scrollbar {
-    height: 6px;
-  }
-  &::-webkit-scrollbar-track {
-    background: var(--ion-color-step-100);
-    border-radius: 10px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: var(--ion-color-step-300);
-    border-radius: 10px;
+    display: none;
   }
 }
 
 .no-media-placeholder {
   width: 100%;
   text-align: center;
-  background: var(--ion-color-step-50);
-  border: 1px dashed var(--ion-color-step-300);
+  background-color: #ffffff;
+  border: 1px dashed var(--ion-color-light-shade);
   border-radius: 12px;
-  padding: 30px 10px;
-  color: var(--ion-color-step-500);
-  font-weight: 500;
+  padding: 32px 16px;
+  color: var(--ion-color-medium);
+  font-size: 0.9rem;
 }
 
 .instagram-media-card {
-  width: 220px;
+  width: 200px;
   flex-shrink: 0;
+  background-color: #ffffff;
+  border: 1px solid var(--ion-color-light-shade);
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-  border: 1px solid var(--ion-color-step-150);
-  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
   display: flex;
   flex-direction: column;
 }
@@ -181,8 +290,8 @@
 .insta-thumbnail-box {
   position: relative;
   width: 100%;
-  padding-top: 100%; /* 1:1 square ratio */
-  background: #000;
+  padding-top: 100%;
+  background-color: var(--ion-color-light-tint);
 
   .insta-thumbnail-img {
     position: absolute;
@@ -196,35 +305,34 @@
 
 .insta-type-overlay {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  background: rgba(0, 0, 0, 0.5);
-  width: 28px;
-  height: 28px;
+  top: 8px;
+  right: 8px;
+  background-color: rgba(0, 0, 0, 0.4);
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+  color: #ffffff;
 
-  .insta-overlay-icon {
-    font-size: 1.1rem;
+  ion-icon {
+    font-size: 0.95rem;
   }
 }
 
 .insta-card-caption-box {
   padding: 12px;
-  flex-grow: 1;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  gap: 8px;
+  flex-grow: 1;
 
   .insta-caption-text {
-    margin: 0 0 8px 0;
+    margin: 0;
     font-size: 0.85rem;
-    color: var(--ion-color-step-800);
+    color: var(--ion-color-dark);
     line-height: 1.4;
-    font-weight: 500;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -232,18 +340,44 @@
   }
 
   .insta-date-tag {
-    font-size: 0.75rem;
-    color: var(--ion-color-step-500);
-    font-weight: 600;
+    font-size: 0.72rem;
+    color: var(--ion-color-medium);
+    font-weight: 500;
+    margin-top: auto;
   }
 }
 
-/* Portfolio grid container */
+// Portfolio Grid Catalog
+.empty-portfolio-placeholder {
+  text-align: center;
+  background-color: #ffffff;
+  border: 1px dashed var(--ion-color-light-shade);
+  border-radius: 12px;
+  padding: 32px 16px;
+  color: var(--ion-color-medium);
+  font-size: 0.9rem;
+}
+
+.portfolio-col {
+  padding: 8px;
+}
+
+.premium-portfolio-card {
+  background-color: #ffffff;
+  border: 1px solid var(--ion-color-light-shade);
+  border-radius: 12px;
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
 .portfolio-showcase-media-box {
   position: relative;
   width: 100%;
-  padding-top: 56.25%; /* 16:9 Ratio */
-  background: #000;
+  padding-top: 56.25%; /* 16:9 ratio */
+  background-color: #000000;
   overflow: hidden;
 
   .portfolio-showcase-media {
@@ -254,18 +388,30 @@
     height: 100%;
     object-fit: cover;
   }
+
+  .portfolio-showcase-category-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    color: #ffffff;
+    padding: 3px 8px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    border-radius: 6px;
+    z-index: 5;
+  }
 }
 
-.portfolio-showcase-category-badge {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  background: var(--ion-color-primary);
-  color: #fff;
-  padding: 4px 10px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  border-radius: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-  z-index: 5;
+.portfolio-showcase-content {
+  padding: 14px;
+  flex-grow: 1;
+
+  p {
+    margin: 0;
+    font-size: 0.88rem;
+    color: var(--ion-color-medium);
+    line-height: 1.4;
+  }
 }

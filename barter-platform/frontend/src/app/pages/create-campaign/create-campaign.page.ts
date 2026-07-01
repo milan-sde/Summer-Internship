@@ -45,6 +45,9 @@ import {
   calendarOutline,
 } from 'ionicons/icons';
 
+import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
+import { HeaderComponent } from '../../shared/components/header/header.component';
+
 @Component({
   selector: 'app-create-campaign',
   templateUrl: './create-campaign.page.html',
@@ -70,11 +73,18 @@ import {
     IonSelectOption,
     IonButton,
     IonText,
+    SidebarComponent,
+    HeaderComponent
   ],
 })
 export class CreateCampaignPage implements OnInit {
   campaignForm!: FormGroup;
   isSubmitting = false;
+  isSidebarOpen = false;
+
+  toggleSidebar() {
+    this.isSidebarOpen = !this.isSidebarOpen;
+  }
 
   categoriesList = ['Tech', 'Fashion', 'Food', 'Beauty', 'Other'];
   platformsList = ['Instagram', 'YouTube', 'Twitter'];

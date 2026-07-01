@@ -29,6 +29,9 @@ import {
 import { ProfileService } from 'src/app/services/profile.service';
 import { environment } from 'src/environments/environment';
 
+import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
+import { HeaderComponent } from '../../shared/components/header/header.component';
+
 @Component({
   selector: 'app-influencer-profile',
   templateUrl: './influencer-profile.page.html',
@@ -48,10 +51,17 @@ import { environment } from 'src/environments/environment';
     IonButtons,
     IonBackButton,
     IonCard,
-    IonCardContent
+    IonCardContent,
+    SidebarComponent,
+    HeaderComponent
   ]
 })
 export class InfluencerProfilePage implements OnInit {
+  isSidebarOpen = false;
+
+  toggleSidebar() {
+    this.isSidebarOpen = !this.isSidebarOpen;
+  }
   influencerId!: string;
   profile: any = null;
   instagramMedia: any[] = [];

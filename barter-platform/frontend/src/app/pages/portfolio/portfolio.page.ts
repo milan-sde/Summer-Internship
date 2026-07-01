@@ -24,6 +24,7 @@ import {
   IonBackButton,
   IonCard,
   IonCardContent,
+  IonText,
   AlertController,
   ToastController,
   LoadingController,
@@ -49,6 +50,9 @@ import { StorageService } from 'src/app/services/storage.service';
 import { ProfileService } from 'src/app/services/profile.service';
 import { environment } from 'src/environments/environment';
 
+import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
+import { HeaderComponent } from '../../shared/components/header/header.component';
+
 @Component({
   selector: 'app-portfolio',
   templateUrl: './portfolio.page.html',
@@ -73,6 +77,9 @@ import { environment } from 'src/environments/environment';
     IonBackButton,
     IonCard,
     IonCardContent,
+    IonText,
+    SidebarComponent,
+    HeaderComponent
   ],
 })
 export class PortfolioPage implements OnInit {
@@ -84,6 +91,11 @@ export class PortfolioPage implements OnInit {
   fileType: 'image' | 'video' | null = null;
   isUploading = false;
   isLoading = true;
+  isSidebarOpen = false;
+
+  toggleSidebar() {
+    this.isSidebarOpen = !this.isSidebarOpen;
+  }
 
   constructor(
     private fb: FormBuilder,
