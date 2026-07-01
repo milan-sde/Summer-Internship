@@ -272,6 +272,15 @@
                 >
                   Followers: {{ profileData.instagram.followersCount | number }}
                 </p>
+                <p
+                  style="
+                    margin: 2px 0 0 0;
+                    font-size: 0.85rem;
+                    color: var(--ion-color-step-600);
+                  "
+                >
+                  Media: {{ profileData.instagram.mediaCount || 0 | number }}
+                </p>
               </div>
 
               <!-- Sync Button -->
@@ -330,6 +339,15 @@
             >
               <ion-icon name="logo-instagram" slot="start"></ion-icon>
               Connect Instagram
+            </ion-button>
+            <ion-button
+              type="button"
+              size="small"
+              fill="clear"
+              routerLink="/instagram-catalogue"
+              style="margin-top: 8px"
+            >
+              Open Catalogue
             </ion-button>
           </div>
           }

@@ -6,6 +6,27 @@ This document acts as your comprehensive guide to how the Instagram integration 
 
 ---
 
+### Quick Setup: Facebook Developer App
+
+To run the OAuth flow locally, you need your own Facebook Developer App:
+
+1. Go to **[developers.facebook.com](https://developers.facebook.com)** → **My Apps** → **Create App** → choose **Business**.
+2. Add products: **Facebook Login** and **Instagram Graph API**.
+3. In **Facebook Login > Settings**, add `http://localhost:3000/api/instagram/callback` to **Valid OAuth Redirect URIs**.
+4. Ensure these permissions are listed (auto-approved in Development mode):
+   - `instagram_basic`, `pages_show_list`, `pages_read_engagement`, `public_profile`
+5. Copy your **App ID** and **App Secret** from **Settings > Basic** into `backend/.env`:
+   ```
+   FACEBOOK_APP_ID=<your-app-id>
+   FACEBOOK_APP_SECRET=<your-app-secret>
+   ```
+6. Add your personal Facebook account as a **Tester** under **App Roles > Roles**.
+7. Restart the backend and visit `http://localhost:3000/api/instagram/auth?origin=settings`.
+
+> Your app starts in **Development mode** — only Testers/Admins can log in. To go live, complete **App Review** later.
+
+---
+
 ## 1. Instagram Graph API vs. Basic Display API
 
 When integrating Instagram, Meta offers two separate APIs:

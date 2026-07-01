@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, TitleCasePipe } from '@angular/common';
 import {
   FormBuilder,
   FormGroup,
@@ -8,8 +8,9 @@ import {
   Validators,
 } from '@angular/forms';
 import { StorageService } from '../../services/storage.service';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { ProfileService } from 'src/app/services/profile.service';
+import { InstagramService } from 'src/app/services/instagram.service';
 import { environment } from 'src/environments/environment';
 import {
   IonHeader,
@@ -73,6 +74,7 @@ import {
     IonCol,
     IonButtons,
     IonBackButton,
+    TitleCasePipe,
   ],
 })
 export class ProfilePage implements OnInit {
@@ -128,8 +130,10 @@ export class ProfilePage implements OnInit {
   constructor(
     private fb: FormBuilder,
     private profileService: ProfileService,
+    private instagramService: InstagramService,
     private storage: StorageService,
     private router: Router,
+    private route: ActivatedRoute,
     private toastController: ToastController,
     private loadingController: LoadingController,
   ) {
@@ -157,6 +161,7 @@ export class ProfilePage implements OnInit {
     this.currentUser = this.storage.getUser();
     this.setupForm();
     this.loadProfileData();
+    this.checkInstagramCallback();
   }
 
   setupForm() {
@@ -229,14 +234,10 @@ export class ProfilePage implements OnInit {
                 this.profileData.platforms?.instagram?.username,
               instagramFollowers:
                 this.profileData.platforms?.instagram?.followers,
-              youtubeUsername:
-                this.profileData.platforms?.youtube?.username,
-              youtubeFollowers:
-                this.profileData.platforms?.youtube?.followers,
-              twitterUsername:
-                this.profileData.platforms?.twitter?.username,
-              twitterFollowers:
-                this.profileData.platforms?.twitter?.followers,
+              youtubeUsername: this.profileData.platforms?.youtube?.username,
+              youtubeFollowers: this.profileData.platforms?.youtube?.followers,
+              twitterUsername: this.profileData.platforms?.twitter?.username,
+              twitterFollowers: this.profileData.platforms?.twitter?.followers,
             });
 
             this.selectedCategories = this.profileData.categories || [];
@@ -265,7 +266,7 @@ export class ProfilePage implements OnInit {
       error: (error: any) => {
         console.error('Failed to load user profile details:', error);
         this.isLoading = false;
-      }
+      },
     });
   }
 
@@ -327,7 +328,11 @@ export class ProfilePage implements OnInit {
   // Helper to construct full avatar URL for static files
   getAvatarUrl(url: string | null | undefined): string {
     if (!url) return '';
-    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
+    if (
+      url.startsWith('http://') ||
+      url.startsWith('https://') ||
+      url.startsWith('data:')
+    ) {
       return url;
     }
     const backendBase = environment.apiUrl.replace('/api', '');
@@ -341,30 +346,35 @@ export class ProfilePage implements OnInit {
       this.selectedFile = file;
 
       // Show loader during immediate image upload
-      this.loadingController.create({
-        message: 'Uploading image...'
-      }).then((loading) => {
-        loading.present();
+      this.loadingController
+        .create({
+          message: 'Uploading image...',
+        })
+        .then((loading) => {
+          loading.present();
 
-        this.profileService.uploadAvatar(file).subscribe({
-          next: (response: any) => {
-            loading.dismiss();
-            if (response && response.success && response.data) {
-              const uploadedPath = response.data.avatar;
-              // Update visual preview immediately
-              this.avatarPreview = uploadedPath;
-              // Patch form control to store relative URL path
-              this.profileForm.patchValue({ avatarUrl: uploadedPath });
-              this.showToast('Image uploaded successfully!', 'success');
-            }
-          },
-          error: (error: any) => {
-            loading.dismiss();
-            console.error('Failed to upload avatar:', error);
-            this.showToast('Failed to upload image. Please try again.', 'danger');
-          }
+          this.profileService.uploadAvatar(file).subscribe({
+            next: (response: any) => {
+              loading.dismiss();
+              if (response && response.success && response.data) {
+                const uploadedPath = response.data.avatar;
+                // Update visual preview immediately
+                this.avatarPreview = uploadedPath;
+                // Patch form control to store relative URL path
+                this.profileForm.patchValue({ avatarUrl: uploadedPath });
+                this.showToast('Image uploaded successfully!', 'success');
+              }
+            },
+            error: (error: any) => {
+              loading.dismiss();
+              console.error('Failed to upload avatar:', error);
+              this.showToast(
+                'Failed to upload image. Please try again.',
+                'danger',
+              );
+            },
+          });
         });
-      });
     }
   }
 
@@ -512,29 +522,104 @@ export class ProfilePage implements OnInit {
       this.isSubmitting = true;
 
       // Show loader during profile update save operation
-      this.loadingController.create({
-        message: 'Updating your profile...'
-      }).then((loading) => {
-        loading.present();
+      this.loadingController
+        .create({
+          message: 'Updating your profile...',
+        })
+        .then((loading) => {
+          loading.present();
 
-        this.profileService.updateProfile(profileData).subscribe({
-          next: (profile: any) => {
-            loading.dismiss();
-            this.showToast('Profile updated successfully!', 'success');
-            this.router.navigate(['/dashboard']);
-            this.isSubmitting = false;
-          },
-          error: (error: any) => {
-            loading.dismiss();
-            console.error('Profile update failed:', error);
-            this.showToast(error.message || 'Profile update failed', 'danger');
-            this.isSubmitting = false;
-          }
+          this.profileService.updateProfile(profileData).subscribe({
+            next: (profile: any) => {
+              loading.dismiss();
+              this.showToast('Profile updated successfully!', 'success');
+              this.router.navigate(['/dashboard']);
+              this.isSubmitting = false;
+            },
+            error: (error: any) => {
+              loading.dismiss();
+              console.error('Profile update failed:', error);
+              this.showToast(
+                error.message || 'Profile update failed',
+                'danger',
+              );
+              this.isSubmitting = false;
+            },
+          });
         });
-      });
     } else {
       this.profileForm.markAllAsTouched();
     }
+  }
+
+  // Check if routed back from Meta OAuth redirect and display toaster feedback
+  checkInstagramCallback() {
+    this.route.queryParams.subscribe((params) => {
+      if (params['instagram'] === 'connected') {
+        this.showToast('Instagram connected successfully!', 'success');
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: { instagram: null, message: null },
+          queryParamsHandling: 'merge',
+        });
+        this.loadProfileData();
+      } else if (params['instagram'] === 'error') {
+        const errorMsg = params['message'] || 'Failed to connect Instagram';
+        this.showToast(errorMsg, 'danger');
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: { instagram: null, message: null },
+          queryParamsHandling: 'merge',
+        });
+      }
+    });
+  }
+
+  // Redirect top-level window to backend Instagram Auth endpoint with user token
+  connectInstagram() {
+    this.instagramService.getAuthUrl('settings').subscribe({
+      next: (response: any) => {
+        const authUrl = response?.data?.authUrl || response?.authUrl;
+        if (authUrl) {
+          window.location.href = authUrl;
+        } else {
+          this.showToast('Failed to start Instagram connection', 'danger');
+        }
+      },
+      error: (error: any) => {
+        console.error('Failed to get Instagram auth URL:', error);
+        this.showToast(
+          error.message || 'Failed to start Instagram connection',
+          'danger',
+        );
+      },
+    });
+  }
+
+  // Request backend manual synchronization of followers count and media feed
+  syncInstagram() {
+    this.loadingController
+      .create({
+        message: 'Syncing Instagram feed...',
+      })
+      .then((loading) => {
+        loading.present();
+        this.profileService.syncInstagram().subscribe({
+          next: (response: any) => {
+            loading.dismiss();
+            this.showToast('Instagram data synced successfully!', 'success');
+            this.loadProfileData();
+          },
+          error: (error: any) => {
+            loading.dismiss();
+            console.error('Failed to sync Instagram:', error);
+            this.showToast(
+              error.message || 'Failed to sync Instagram',
+              'danger',
+            );
+          },
+        });
+      });
   }
 
   async showValidationToast(message: string) {

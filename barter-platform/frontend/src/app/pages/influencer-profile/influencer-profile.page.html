@@ -171,9 +171,18 @@
         <div class="instagram-media-card">
           <!-- Thumbnail Container -->
           <div class="insta-thumbnail-box">
-            <!-- Thumbnail Image -->
+            @if (media.mediaType === 'VIDEO') {
+            <video
+              [src]="getMediaUrl(media.mediaUrl)"
+              [poster]="media.thumbnailUrl ? getMediaUrl(media.thumbnailUrl) : ''"
+              class="insta-thumbnail-img"
+              controls
+              playsinline
+              muted
+            ></video>
+            } @else {
             <img
-              [src]="media.mediaType === 'VIDEO' ? (media.thumbnailUrl || media.mediaUrl) : media.mediaUrl"
+              [src]="getMediaUrl(media.mediaUrl)"
               class="insta-thumbnail-img"
               alt="Instagram Post"
             />
@@ -181,10 +190,11 @@
             <!-- Type Icon Overlay -->
             <div class="insta-type-overlay">
               <ion-icon
-                [name]="media.mediaType === 'VIDEO' ? 'play-circle-outline' : 'image-outline'"
+                name="image-outline"
                 class="insta-overlay-icon"
               ></ion-icon>
             </div>
+            }
           </div>
 
           <!-- Caption -->

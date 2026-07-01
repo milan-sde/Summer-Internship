@@ -1,0 +1,104 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-button routerLink="/profile/settings">
+        <ion-icon name="arrow-back-outline" slot="start"></ion-icon>
+        Back
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="headings">Instagram Catalogue</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="refreshFromInstagram()">
+        <ion-icon name="sync-outline" slot="start"></ion-icon>
+        Sync
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding" [fullscreen]="true">
+  <div class="catalogue-shell">
+    <div class="catalogue-header glassmorphism-card ion-padding">
+      <div>
+        <h2>Instagram posts and reels</h2>
+        <p>Pick the pieces you want to surface in your portfolio.</p>
+      </div>
+      <div class="status-pill" [class.connected]="!!profileInstagram?.username">
+        <ion-icon name="logo-instagram"></ion-icon>
+        <span>
+          {{ profileInstagram?.username ? '@' + profileInstagram.username : 'Not
+          connected' }}
+        </span>
+      </div>
+    </div>
+
+    @if (isLoading) {
+    <div class="empty-state">
+      <p>Loading catalogue...</p>
+    </div>
+    } @if (!isLoading && instagramMedia.length === 0) {
+    <div class="empty-state glassmorphism-card ion-padding">
+      <ion-icon name="logo-instagram"></ion-icon>
+      <h3>No Instagram media yet</h3>
+      <p>
+        Connect and sync your Instagram account to bring posts and reels here.
+      </p>
+    </div>
+    } @if (!isLoading && instagramMedia.length > 0) {
+    <ion-grid class="ion-no-padding">
+      <ion-row>
+        @for (item of instagramMedia; track item.mediaId) {
+        <ion-col size="12" size-md="6" size-lg="4" class="card-col">
+          <ion-card class="catalogue-card">
+            <div class="media-frame">
+              @if (item.mediaType === 'VIDEO') {
+              <video
+                [src]="getMediaUrl(item.mediaUrl)"
+                [poster]="item.thumbnailUrl ? getMediaUrl(item.thumbnailUrl) : ''"
+                controls
+                playsinline
+                muted
+              ></video>
+              } @else {
+              <img [src]="getMediaUrl(item.mediaUrl)" alt="Instagram media" />
+              }
+              <span class="media-type-badge">{{ item.mediaType }}</span>
+            </div>
+
+            <ion-card-content>
+              <p class="caption">{{ item.caption || 'No caption' }}</p>
+              <div class="action-row">
+                <ion-button
+                  size="small"
+                  fill="solid"
+                  color="primary"
+                  (click)="togglePortfolioSelection(item)"
+                >
+                  <ion-icon
+                    [name]="item.selectedForPortfolio ? 'eye-off-outline' : 'checkmark-circle-outline'"
+                    slot="start"
+                  ></ion-icon>
+                  {{ item.selectedForPortfolio ? 'Hide from Portfolio' : 'Select
+                  for Portfolio' }}
+                </ion-button>
+
+                @if (item.permalink) {
+                <ion-button
+                  size="small"
+                  fill="clear"
+                  [href]="item.permalink"
+                  target="_blank"
+                >
+                  Open
+                </ion-button>
+                }
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+        }
+      </ion-row>
+    </ion-grid>
+    }
+  </div>
+</ion-content>

@@ -9,21 +9,16 @@
 
 <ion-content class="ion-padding" [fullscreen]="true">
   <div class="form-container">
-
     <!-- Title Area -->
     <div class="form-header">
       <h2>Check Your Email</h2>
       <p>We've sent a 6-digit verification code to</p>
-      <h3 class="verify-email-text">
-        {{ email }}
-      </h3>
+      <h3 class="verify-email-text">{{ email }}</h3>
     </div>
 
     <!-- Glassmorphic Card Container -->
     <div class="glassmorphism-card">
-
       <form [formGroup]="verifyOtpForm" (ngSubmit)="onSubmit()">
-
         <!-- Icon Banner -->
         <div class="mail-icon-container">
           <ion-icon name="mail-unread-outline"></ion-icon>
@@ -31,12 +26,25 @@
 
         <div class="otp-wrapper">
           <label class="otp-label">Enter 6-Digit Code *</label>
-          <ion-input-otp length="6" type="text" formControlName="otp" class="otp-input-component">
-            Didn't get a code? <a (click)="resendOtp()" [class.disabled]="!canResend" class="link" [style.opacity]="canResend ? 1 : 0.5">Resend the code</a>
+          <ion-input-otp
+            length="6"
+            type="text"
+            formControlName="otp"
+            class="otp-input-component"
+          >
+            Didn't get a code?
+            <a
+              (click)="resendOtp()"
+              [class.disabled]="!canResend"
+              class="link"
+              [style.opacity]="canResend ? 1 : 0.5"
+              >Resend the code</a
+            >
           </ion-input-otp>
         </div>
 
-        @if (verifyOtpForm.get('otp')?.invalid && verifyOtpForm.get('otp')?.touched) {
+        @if (verifyOtpForm.get('otp')?.invalid &&
+        verifyOtpForm.get('otp')?.touched) {
         <div class="otp-error-container">
           <ion-text color="danger">
             <small>Please enter a valid 6-digit code</small>
@@ -47,7 +55,9 @@
         <!-- Timer resend info -->
         @if (!canResend) {
         <div class="timer-container">
-          <ion-text color="medium">Resend code in <span>{{ timer }}s</span></ion-text>
+          <ion-text color="medium"
+            >Resend code in <span>{{ timer }}s</span></ion-text
+          >
         </div>
         }
 
@@ -55,13 +65,12 @@
           expand="block"
           type="submit"
           [disabled]="verifyOtpForm.invalid || isSubmitting"
-          class="submit-btn verify-button">
+          class="submit-btn verify-button"
+        >
           <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
           {{ isSubmitting ? 'Verifying...' : 'Verify Code' }}
         </ion-button>
-
       </form>
-
     </div>
   </div>
 </ion-content>

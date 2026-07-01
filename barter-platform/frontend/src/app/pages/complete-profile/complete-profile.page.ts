@@ -74,6 +74,8 @@ export class CompleteProfilePage implements OnInit {
   profileForm!: FormGroup;
   isSubmitting = false;
   currentUser: any;
+  isOnboardingCompleteStep = false; // Toggles Instagram step after form submit
+  instagramConnected = false;
 
   // Custom visual chips selections lists
   categoriesList = [
@@ -469,8 +471,12 @@ export class CompleteProfilePage implements OnInit {
               this.storage.setUser(this.currentUser);
             }
 
-            this.showToast('Profile created successfully! Welcome aboard!', 'success');
-            this.router.navigate(['/dashboard']);
+            this.showToast('Profile created successfully!', 'success');
+            if (this.currentUser?.role === 'INFLUENCER') {
+              this.isOnboardingCompleteStep = true;
+            } else {
+              this.router.navigate(['/dashboard']);
+            }
             this.isSubmitting = false;
           },
           error: (error: any) => {
@@ -484,6 +490,17 @@ export class CompleteProfilePage implements OnInit {
     } else {
       this.profileForm.markAllAsTouched();
     }
+  }
+
+  // Redirect the top-level window to the backend Instagram auth url with the current token
+  connectInstagram() {
+    const token = this.storage.getAccessToken();
+    window.location.href = `${environment.apiUrl}/instagram/auth?origin=onboarding&token=${token}`;
+  }
+
+  // Skip connecting Instagram and proceed to dashboard
+  skipInstagram() {
+    this.router.navigate(['/dashboard']);
   }
 
   async showValidationToast(message: string) {

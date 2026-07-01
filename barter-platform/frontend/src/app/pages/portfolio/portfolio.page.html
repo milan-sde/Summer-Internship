@@ -9,6 +9,92 @@
 
 <ion-content class="ion-padding" [fullscreen]="true">
   <div style="max-width: 800px; margin: 0 auto">
+    <!-- Instagram Media Section -->
+    <div class="glassmorphism-card ion-padding" style="margin-bottom: 25px">
+      <h3
+        class="headings"
+        style="
+          font-weight: 700;
+          color: var(--ion-color-step-800);
+          margin: 0 0 15px 0;
+          display: flex;
+          align-items: center;
+        "
+      >
+        <ion-icon
+          name="logo-instagram"
+          style="margin-right: 8px; color: var(--ion-color-primary)"
+        ></ion-icon>
+        Instagram Media
+      </h3>
+
+      @if (instagramMedia.length === 0) {
+      <p style="margin: 0; color: var(--ion-color-step-600)">
+        Sync your Instagram account to choose posts and reels for your
+        portfolio.
+      </p>
+      } @if (instagramMedia.length > 0) {
+      <ion-grid class="ion-no-padding">
+        <ion-row>
+          @for (item of instagramMedia; track item.mediaId) {
+          <ion-col size="12" size-md="6" class="ion-padding-bottom">
+            <ion-card style="margin: 0; overflow: hidden; border-radius: 12px">
+              <div style="position: relative; background: #000">
+                @if (item.mediaType === 'VIDEO') {
+                <video
+                  [src]="getMediaUrl(item.mediaUrl)"
+                  [poster]="item.thumbnailUrl ? getMediaUrl(item.thumbnailUrl) : ''"
+                  style="width: 100%; height: 240px; object-fit: cover"
+                  controls
+                  playsinline
+                  muted
+                ></video>
+                } @else {
+                <img
+                  [src]="getMediaUrl(item.mediaUrl)"
+                  alt="Instagram media"
+                  style="width: 100%; height: 240px; object-fit: cover"
+                />
+                }
+                <span
+                  style="
+                    position: absolute;
+                    top: 10px;
+                    left: 10px;
+                    background: rgba(0, 0, 0, 0.65);
+                    color: #fff;
+                    padding: 4px 10px;
+                    border-radius: 999px;
+                    font-size: 0.75rem;
+                    font-weight: 700;
+                  "
+                >
+                  {{ item.mediaType }}
+                </span>
+              </div>
+
+              <ion-card-content>
+                <p style="margin: 0 0 12px 0; color: var(--ion-color-step-800)">
+                  {{ item.caption || 'No caption' }}
+                </p>
+
+                <ion-button
+                  expand="block"
+                  size="small"
+                  (click)="toggleInstagramSelection(item)"
+                >
+                  {{ item.selectedForPortfolio ? 'Hide from Portfolio' : 'Select
+                  for Portfolio' }}
+                </ion-button>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+          }
+        </ion-row>
+      </ion-grid>
+      }
+    </div>
+
     <!-- Upload Section -->
     <div class="glassmorphism-card ion-padding" style="margin-bottom: 25px">
       <h3
@@ -138,6 +224,24 @@
         </ion-button>
       </form>
     </div>
+
+    <!-- Uploaded Portfolio Section -->
+    <h3
+      class="headings"
+      style="
+        font-weight: 700;
+        color: var(--ion-color-step-800);
+        margin: 0 0 15px 5px;
+        display: flex;
+        align-items: center;
+      "
+    >
+      <ion-icon
+        name="folder-open-outline"
+        style="margin-right: 8px; color: var(--ion-color-primary)"
+      ></ion-icon>
+      Uploaded Portfolio Items
+    </h3>
 
     <!-- Portfolio Display Section -->
     <h3

@@ -1,0 +1,368 @@
+{
+  "info": {
+    "_postman_id": "9263f10e-473c-4cae-b652-aa03f0e72ba5",
+    "name": "Instagram OAuth & Sync API",
+    "description": "Collection covering all Instagram endpoints of the barter-platform: Authorization url, OAuth callback redirect, profile sync, media sync, portfolio updates, and unlinking/disconnection flow.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get Auth URL",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwtToken}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/instagram/auth-url?origin=settings",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "instagram",
+            "auth-url"
+          ],
+          "query": [
+            {
+              "key": "origin",
+              "value": "settings",
+              "description": "Origin of connection request (settings or onboarding)"
+            }
+          ]
+        },
+        "description": "Returns a signed and encrypted Facebook Login OAuth redirect URL containing secure custom state."
+      },
+      "response": [
+        {
+          "name": "Success Response",
+          "originalRequest": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/instagram/auth-url?origin=settings",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "instagram",
+                "auth-url"
+              ],
+              "query": [
+                {
+                  "key": "origin",
+                  "value": "settings"
+                }
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "body": "{\n  \"success\": true,\n  \"data\": {\n    \"authUrl\": \"https://www.facebook.com/v18.0/dialog/oauth?client_id=your_facebook_app_id&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fapi%2Finstagram%2Fcallback&scope=instagram_basic%2Cpages_show_list%2Cpages_read_engagement%2Cpublic_profile&state=encrypted_state_value\"\n  }\n}"
+        }
+      ]
+    },
+    {
+      "name": "Redirect to Auth URL",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwtToken}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/instagram/auth?origin=settings",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "instagram",
+            "auth"
+          ],
+          "query": [
+            {
+              "key": "origin",
+              "value": "settings",
+              "description": "Origin of connection request (settings or onboarding)"
+            }
+          ]
+        },
+        "description": "Directly issues a 302 HTTP redirect to the Facebook Login OAuth page. Paste this endpoint in your browser."
+      },
+      "response": [
+        {
+          "name": "Redirect Response",
+          "status": "Found",
+          "code": 302,
+          "_postman_previewlanguage": "html",
+          "body": "Found. Redirecting to https://www.facebook.com/v18.0/dialog/oauth?..."
+        }
+      ]
+    },
+    {
+      "name": "OAuth Callback Handler",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/instagram/callback?code=oauth_authorization_code_from_facebook&state=encrypted_state_value",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "instagram",
+            "callback"
+          ],
+          "query": [
+            {
+              "key": "code",
+              "value": "oauth_authorization_code_from_facebook"
+            },
+            {
+              "key": "state",
+              "value": "encrypted_state_value"
+            }
+          ]
+        },
+        "description": "Meta Graph API redirects the user back to this URL. Exchanges authorization code for long-lived access tokens, discovers professional accounts, and redirects user back to Frontend."
+      },
+      "response": [
+        {
+          "name": "Redirect Response",
+          "status": "Found",
+          "code": 302,
+          "_postman_previewlanguage": "html",
+          "body": "Found. Redirecting to http://localhost:8100/profile/settings?instagram=connected"
+        }
+      ]
+    },
+    {
+      "name": "Sync Profile details",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwtToken}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/instagram/sync-profile",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "instagram",
+            "sync-profile"
+          ]
+        },
+        "description": "Triggers synchronization of Instagram profile details (username, profile picture, follower count) from Meta and updates Mongoose documents."
+      },
+      "response": [
+        {
+          "name": "Success Response",
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "body": "{\n  \"success\": true,\n  \"message\": \"Instagram profile synced successfully\",\n  \"data\": {\n    \"account\": {\n      \"id\": \"60c72b2f9b1d8a23c8f8b8b2\",\n      \"userId\": \"60c72b2f9b1d8a23c8f8b8a1\",\n      \"instagramId\": \"17841400000000000\",\n      \"username\": \"instagram_tester_jane\",\n      \"followersCount\": 8900,\n      \"mediaCount\": 25,\n      \"profilePicture\": \"https://mock-cdn.com/jane-avatar.jpg\",\n      \"connectedAt\": \"2026-06-08T08:00:00.000Z\"\n    }\n  }\n}"
+        }
+      ]
+    },
+    {
+      "name": "Sync Media feed",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwtToken}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/instagram/sync-media",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "instagram",
+            "sync-media"
+          ]
+        },
+        "description": "Synchronizes latest 25 media items (posts/videos/carousels) into local cache catalog, keeping existing portfolio selections."
+      },
+      "response": [
+        {
+          "name": "Success Response",
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "body": "{\n  \"success\": true,\n  \"message\": \"Instagram media synced successfully\",\n  \"data\": {\n    \"media\": [\n      {\n        \"id\": \"60d13c9b1d8a23c8f8b8c1\",\n        \"userId\": \"60c72b2f9b1d8a23c8f8b8a1\",\n        \"mediaId\": \"ig_post_1001\",\n        \"mediaType\": \"IMAGE\",\n        \"mediaUrl\": \"https://mock-cdn.com/sunset.jpg\",\n        \"permalink\": \"https://www.instagram.com/p/sunset1001/\",\n        \"caption\": \"Loving the sunset! #lifestyle\",\n        \"selectedForPortfolio\": false,\n        \"source\": \"instagram\"\n      }\n    ]\n  }\n}"
+        }
+      ]
+    },
+    {
+      "name": "Sync All Instagram Data",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwtToken}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/instagram/sync",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "instagram",
+            "sync"
+          ]
+        },
+        "description": "Combines profile and media sync inside a single HTTP API call."
+      },
+      "response": [
+        {
+          "name": "Success Response",
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "body": "{\n  \"success\": true,\n  \"message\": \"Instagram profile and media synced successfully\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "Update Portfolio Selection",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwtToken}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"mediaId\": \"ig_post_1001\",\n  \"selectedForPortfolio\": true\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/instagram/portfolio",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "instagram",
+            "portfolio"
+          ]
+        },
+        "description": "Enables or disables selected status of a specific cached Instagram media item to display it in the influencer's public portfolio."
+      },
+      "response": [
+        {
+          "name": "Success Response",
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "body": "{\n  \"success\": true,\n  \"message\": \"Instagram portfolio selection updated successfully\",\n  \"data\": {\n    \"media\": {\n      \"id\": \"60d13c9b1d8a23c8f8b8c1\",\n      \"userId\": \"60c72b2f9b1d8a23c8f8b8a1\",\n      \"mediaId\": \"ig_post_1001\",\n      \"mediaType\": \"IMAGE\",\n      \"mediaUrl\": \"https://mock-cdn.com/sunset.jpg\",\n      \"permalink\": \"https://www.instagram.com/p/sunset1001/\",\n      \"selectedForPortfolio\": true,\n      \"source\": \"instagram\"\n    }\n  }\n}"
+        }
+      ]
+    },
+    {
+      "name": "Disconnect Instagram",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwtToken}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/instagram/disconnect",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "instagram",
+            "disconnect"
+          ]
+        },
+        "description": "Permanently disconnects Instagram account. Deletes InstagramAccount, cached MediaCatalogue, unlinks Profile configuration, and updates total follower stats."
+      },
+      "response": [
+        {
+          "name": "Success Response",
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "body": "{\n  \"success\": true,\n  \"message\": \"Instagram account disconnected successfully\"\n}"
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "jwtToken",
+      "value": "replace_with_your_jwt_auth_token",
+      "type": "string"
+    }
+  ]
+}

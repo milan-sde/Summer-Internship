@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, LowerCasePipe } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { ProfileService } from '../../services/profile.service';
 import { StorageService } from '../../services/storage.service';
@@ -36,6 +36,7 @@ import {
   peopleOutline,
   personOutline,
   barChartOutline,
+  folderOpenOutline,
 } from 'ionicons/icons';
 
 @Component({
@@ -77,6 +78,7 @@ export class DashboardPage implements OnInit {
     private profileService: ProfileService,
     private storage: StorageService,
     private router: Router,
+    private route: ActivatedRoute,
     private loadingController: LoadingController,
     private toastController: ToastController,
   ) {
@@ -86,12 +88,37 @@ export class DashboardPage implements OnInit {
       peopleOutline,
       personOutline,
       barChartOutline,
+      folderOpenOutline,
     });
   }
 
   ngOnInit() {
     this.user = this.storage.getUser();
     this.loadProfile();
+    this.checkInstagramCallback();
+  }
+
+  // Monitor query parameters for successful Instagram OAuth callbacks
+  checkInstagramCallback() {
+    this.route.queryParams.subscribe(params => {
+      if (params['instagram'] === 'connected') {
+        this.showToast('Instagram connected successfully!', 'success');
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: { instagram: null, message: null },
+          queryParamsHandling: 'merge'
+        });
+        this.loadProfile();
+      } else if (params['instagram'] === 'error') {
+        const errorMsg = params['message'] || 'Failed to connect Instagram';
+        this.showToast(errorMsg, 'danger');
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: { instagram: null, message: null },
+          queryParamsHandling: 'merge'
+        });
+      }
+    });
   }
 
   // Load authenticated user profile details from API via subscribe
@@ -121,6 +148,10 @@ export class DashboardPage implements OnInit {
 
   viewProfile() {
     this.router.navigate(['/profile']);
+  }
+
+  viewPortfolio() {
+    this.router.navigate(['/portfolio']);
   }
 
   // Process user logout API request and clear local session storage via subscribe

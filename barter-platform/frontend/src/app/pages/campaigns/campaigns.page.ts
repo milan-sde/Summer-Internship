@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { CampaignService, ICampaign } from '../../services/campaign.service';
@@ -55,6 +55,7 @@ import {
   templateUrl: './campaigns.page.html',
   styleUrls: ['./campaigns.page.scss'],
   standalone: true,
+  changeDetection:ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     RouterLink,
@@ -347,14 +348,17 @@ export class CampaignsPage implements OnInit {
     }
   }
 
+  goToInfluencerProfile(influencerId: string) {
+    this.router.navigate(['/influencers', influencerId]);
+  }
+
   onCreateCampaign() {
     this.router.navigate(['/create-campaign']);
   }
 
   doRefresh(event: any) {
-    this.loadCampaigns(() => {
-      event.target.complete();
-    });
+    event.target.complete();
+    this.loadCampaigns();
   }
 
   viewProfile() {
