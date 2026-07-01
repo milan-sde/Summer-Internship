@@ -84,6 +84,9 @@ ion-content {
 
 .avatar-picker-wrapper {
   position: relative;
+  display: inline-block;
+  width: 90px;
+  height: 90px;
   cursor: pointer;
 }
 
@@ -92,7 +95,7 @@ ion-content {
   height: 90px;
   border-radius: 50%;
   background-color: var(--ion-color-light-shade);
-  border: 2px solid #ffffff;
+  border: 2px solid var(--app-bg-card);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
   display: flex;
   align-items: center;
@@ -114,8 +117,12 @@ ion-content {
 
 .camera-badge {
   position: absolute;
-  bottom: 0;
-  right: 0;
+  /* Overlap the bottom-right edge of the 90px circle.
+     Badge is 28px wide; circle radius ~45px.
+     sin(45°)*45 ≈ 32px → offset from center = 32px
+     from bottom/right edges: 45 - 32 + 28/2 = 27px → ~4px from edge */
+  bottom: 4px;
+  right: 4px;
   width: 28px;
   height: 28px;
   border-radius: 50%;
@@ -124,9 +131,10 @@ ion-content {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  font-size: 0.95rem;
-  border: 2px solid #ffffff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+  font-size: 0.9rem;
+  border: 2.5px solid var(--app-bg-card);
+  z-index: 10;
 }
 
 .avatar-picker-label {

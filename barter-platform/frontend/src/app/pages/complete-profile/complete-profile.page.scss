@@ -102,8 +102,9 @@
 
 .camera-badge {
   position: absolute;
-  bottom: 0;
-  right: 0;
+  /* 100px circle, 32px badge → sit on bottom-right arc: ~6px from edge */
+  bottom: 6px;
+  right: 6px;
   background-color: var(--ion-color-primary);
   color: #ffffff;
   width: 32px;
@@ -112,9 +113,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
   cursor: pointer;
-  border: 2px solid #ffffff;
+  border: 2.5px solid var(--app-bg-card);
+  z-index: 10;
 
   ion-icon {
     font-size: 1rem;
@@ -187,8 +189,8 @@
 }
 
 .social-links-box {
-  background: var(--ion-color-light-tint);
-  border: 1px solid var(--ion-color-light-shade);
+  background: var(--app-bg-tint);
+  border: 1px solid var(--app-border-color);
   border-radius: 16px;
   padding: 20px;
   margin-top: 28px;
@@ -201,7 +203,7 @@
 
 .platform-row {
   margin-bottom: 16px;
-  border-bottom: 1px solid var(--ion-color-light-shade);
+  border-bottom: 1px solid var(--app-border-color);
   padding-bottom: 16px;
 
   &:last-child {
@@ -233,9 +235,9 @@
 }
 
 .platform-input-item {
-  --background: #ffffff;
+  --background: var(--app-bg-input);
   border-radius: 10px;
-  border: 1px solid var(--ion-color-light-shade);
+  border: 1px solid var(--app-border-color);
   margin-right: 8px;
   --padding-start: 10px;
   --inner-padding-end: 10px;
@@ -281,9 +283,9 @@
 
 .link-input-item {
   flex: 1;
-  --background: #ffffff;
+  --background: var(--app-bg-input);
   border-radius: 10px;
-  border: 1px solid var(--ion-color-light-shade);
+  border: 1px solid var(--app-border-color);
   --padding-start: 10px;
   --inner-padding-end: 10px;
 
