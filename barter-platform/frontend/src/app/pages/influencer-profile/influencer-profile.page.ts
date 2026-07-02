@@ -14,7 +14,8 @@ import {
   IonButtons,
   IonBackButton,
   IonCard,
-  IonCardContent
+  IonCardContent,
+  IonModal
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -24,7 +25,11 @@ import {
   folderOpenOutline,
   playCircleOutline,
   imageOutline,
-  videocamOutline
+  videocamOutline,
+  closeOutline,
+  eyeOutline,
+  openOutline,
+  personOutline
 } from 'ionicons/icons';
 import { ProfileService } from 'src/app/services/profile.service';
 import { environment } from 'src/environments/environment';
@@ -52,6 +57,7 @@ import { HeaderComponent } from '../../shared/components/header/header.component
     IonBackButton,
     IonCard,
     IonCardContent,
+    IonModal,
     SidebarComponent,
     HeaderComponent
   ]
@@ -69,6 +75,23 @@ export class InfluencerProfilePage implements OnInit {
   isLoading = true;
   errorMsg: string | null = null;
 
+  // Instagram Shop Modal details
+  isDetailModalOpen = false;
+  selectedItem: any = null;
+  selectedItemType: 'catalog' | 'instagram' | null = null;
+
+  openDetail(item: any, type: 'catalog' | 'instagram') {
+    this.selectedItem = item;
+    this.selectedItemType = type;
+    this.isDetailModalOpen = true;
+  }
+
+  closeDetail() {
+    this.isDetailModalOpen = false;
+    this.selectedItem = null;
+    this.selectedItemType = null;
+  }
+
   constructor(
     private route: ActivatedRoute,
     private profileService: ProfileService,
@@ -81,7 +104,11 @@ export class InfluencerProfilePage implements OnInit {
       folderOpenOutline,
       playCircleOutline,
       imageOutline,
-      videocamOutline
+      videocamOutline,
+      closeOutline,
+      eyeOutline,
+      openOutline,
+      personOutline
     });
   }
 

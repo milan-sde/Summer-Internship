@@ -11,6 +11,7 @@ import {
   IonGrid,
   IonHeader,
   IonIcon,
+  IonModal,
   IonRow,
   IonTitle,
   IonToolbar,
@@ -24,6 +25,10 @@ import {
   logoInstagram,
   playCircleOutline,
   syncOutline,
+  closeOutline,
+  eyeOutline,
+  openOutline,
+  personOutline,
 } from 'ionicons/icons';
 import { ProfileService } from 'src/app/services/profile.service';
 import {
@@ -55,6 +60,7 @@ import { HeaderComponent } from '../../shared/components/header/header.component
     IonCol,
     IonCard,
     IonCardContent,
+    IonModal,
     SidebarComponent,
     HeaderComponent
   ],
@@ -66,8 +72,22 @@ export class InstagramCataloguePage implements OnInit {
   isLoading = true;
   isSidebarOpen = false;
 
+  // Instagram Shop detail modal state
+  isDetailModalOpen = false;
+  selectedItem: any = null;
+
   toggleSidebar() {
     this.isSidebarOpen = !this.isSidebarOpen;
+  }
+
+  openDetail(item: any) {
+    this.selectedItem = item;
+    this.isDetailModalOpen = true;
+  }
+
+  closeDetail() {
+    this.isDetailModalOpen = false;
+    this.selectedItem = null;
   }
 
   constructor(
@@ -84,6 +104,10 @@ export class InstagramCataloguePage implements OnInit {
       logoInstagram,
       playCircleOutline,
       syncOutline,
+      closeOutline,
+      eyeOutline,
+      openOutline,
+      personOutline,
     });
   }
 
@@ -148,6 +172,9 @@ export class InstagramCataloguePage implements OnInit {
       .subscribe({
         next: () => {
           item.selectedForPortfolio = nextValue;
+          if (this.selectedItem && (this.selectedItem.mediaId === item.mediaId || this.selectedItem.id === item.id)) {
+            this.selectedItem.selectedForPortfolio = nextValue;
+          }
           this.showToast(
             nextValue ? 'Selected for portfolio' : 'Hidden from portfolio',
             'success',

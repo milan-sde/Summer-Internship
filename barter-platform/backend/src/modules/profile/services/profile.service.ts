@@ -462,9 +462,6 @@ export class ProfileService {
 
     // 2. Fetch cached Instagram Media and Portfolio uploads in parallel
     const instagramQuery: any = { userId: profile.userId };
-    if (!showAll) {
-      instagramQuery.selectedForPortfolio = true;
-    }
 
     const instagramMediaPromise = InstagramMedia.find(instagramQuery)
       .sort({ createdAt: -1 })

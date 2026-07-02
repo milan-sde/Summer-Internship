@@ -8,192 +8,22 @@
 
     <ion-content class="ion-padding" [fullscreen]="true">
       <div class="portfolio-container">
-        <!-- Upload Section -->
-        <div class="glassmorphism-card">
-          <h3 class="section-title-header">
-            <ion-icon name="cloud-upload-outline" class="primary-icon"></ion-icon>
-            Upload Portfolio Item
-          </h3>
-
-          <form [formGroup]="uploadForm" (ngSubmit)="onSubmit()">
-            <!-- Interactive File Picker Container -->
-            <input
-              type="file"
-              #fileInput
-              (change)="onFileSelected($event)"
-              accept="image/*,video/*"
-              style="display: none"
-            />
-
-            <div
-              class="file-picker-container"
-              (click)="!filePreview && fileInput.click()"
-              [class.has-preview]="filePreview"
-            >
-              <!-- Default Selector Display -->
-              @if (!filePreview) {
-              <div class="file-picker-placeholder">
-                <ion-icon name="cloud-upload-outline" class="upload-icon"></ion-icon>
-                <p class="upload-text-main">Click to select Image or Video</p>
-                <p class="upload-text-sub">Supports JPG, PNG, MP4 up to 50MB</p>
-              </div>
-              }
-
-              <!-- Preview Content Display -->
-              @if (filePreview) {
-              <div class="preview-wrapper">
-                <!-- Close Button to Reset Selected File -->
-                <button
-                  type="button"
-                  class="preview-close-btn"
-                  (click)="clearSelectedFile(); $event.stopPropagation();"
-                >
-                  &times;
-                </button>
-
-                <!-- Image Preview -->
-                @if (fileType === 'image') {
-                <img [src]="filePreview" class="preview-media" alt="Upload Preview" />
-                }
-
-                <!-- Video Preview -->
-                @if (fileType === 'video') {
-                <video
-                  [src]="filePreview"
-                  class="preview-media"
-                  controls
-                  muted
-                ></video>
-                }
-              </div>
-              }
-            </div>
-
-            <!-- Caption Field -->
-            <div class="custom-input-group" style="margin-top: 16px">
-              <div class="caption-label-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <label class="custom-input-label" style="margin-bottom: 0;">Caption *</label>
-                <ion-button
-                  type="button"
-                  fill="clear"
-                  size="small"
-                  class="ai-generate-btn"
-                  (click)="openAiModal()"
-                  style="--color: var(--ion-color-primary); font-weight: 600; display: flex; align-items: center; gap: 4px; margin: 0; --padding-start: 0; --padding-end: 0;"
-                >
-                  <ion-icon name="sparkles" slot="start"></ion-icon>
-                  ✨ Generate with AI
-                </ion-button>
-              </div>
-              <ion-item lines="none" class="custom-input-item text-area-item">
-                <ion-textarea
-                  formControlName="caption"
-                  rows="3"
-                  placeholder="Describe this work item..."
-                ></ion-textarea>
-              </ion-item>
-              @if (uploadForm.get('caption')?.touched && uploadForm.get('caption')?.invalid) {
-              <div class="validation-error">
-                <ion-text color="danger">
-                  <small>Caption is required (max 500 characters).</small>
-                </ion-text>
-              </div>
-              }
-            </div>
-
-            <!-- Category Field -->
-            <div class="custom-input-group">
-              <label class="custom-input-label">Category / Platform *</label>
-              <ion-item lines="none" class="custom-input-item">
-                <ion-input
-                  type="text"
-                  formControlName="category"
-                  placeholder="e.g. Unboxing Video, Fashion Shoot, Travel Reel"
-                ></ion-input>
-              </ion-item>
-              @if (uploadForm.get('category')?.touched && uploadForm.get('category')?.invalid) {
-              <div class="validation-error">
-                <ion-text color="danger">
-                  <small>Category is required (max 100 characters).</small>
-                </ion-text>
-              </div>
-              }
-            </div>
-
-            <!-- Submit Button -->
-            <ion-button
-              expand="block"
-              type="submit"
-              [disabled]="isUploading"
-              class="submit-btn"
-            >
-              {{ isUploading ? 'Uploading Item...' : 'Upload to Portfolio' }}
-            </ion-button>
-          </form>
-        </div>
-
-        <!-- Instagram Media Section -->
-        <div class="glassmorphism-card">
-          <h3 class="section-title-header">
-            <ion-icon name="logo-instagram" class="instagram-icon"></ion-icon>
-            Instagram Media Selection
-          </h3>
-          <p class="section-subtitle">
-            Choose connected posts and reels to display directly in your showcase portfolio
-          </p>
-
-          @if (instagramMedia.length === 0) {
-          <div class="empty-media-placeholder">
-            <p>Sync your Instagram account in Profile settings to choose posts and reels for your portfolio.</p>
+        
+        <!-- Header Section -->
+        <div class="portfolio-header-section">
+          <div class="header-titles">
+            <h2>Showcase Portfolio</h2>
+            <p>Manage custom uploads and select Instagram posts to display on your public catalog.</p>
           </div>
-          } @if (instagramMedia.length > 0) {
-          <ion-grid class="ion-no-padding">
-            <ion-row>
-              @for (item of instagramMedia; track item.mediaId) {
-              <ion-col size="12" size-md="6" class="media-col">
-                <div class="premium-portfolio-card">
-                  <div class="card-media-container">
-                    @if (item.mediaType === 'VIDEO') {
-                    <video
-                      [src]="getMediaUrl(item.mediaUrl)"
-                      [poster]="item.thumbnailUrl ? getMediaUrl(item.thumbnailUrl) : ''"
-                      class="card-media"
-                      controls
-                      playsinline
-                      muted
-                    ></video>
-                    } @else {
-                    <img
-                      [src]="getMediaUrl(item.mediaUrl)"
-                      alt="Instagram media"
-                      class="card-media"
-                    />
-                    }
-                    <span class="card-category-badge">{{ item.mediaType }}</span>
-                  </div>
-
-                  <div class="portfolio-showcase-content">
-                    <p class="insta-caption-text">{{ item.caption || 'No caption' }}</p>
-                    <ion-button
-                      expand="block"
-                      size="small"
-                      fill="outline"
-                      (click)="toggleInstagramSelection(item)"
-                      class="instagram-toggle-btn"
-                      [color]="item.selectedForPortfolio ? 'danger' : 'primary'"
-                    >
-                      {{ item.selectedForPortfolio ? 'Hide from Portfolio' : 'Show on Portfolio' }}
-                    </ion-button>
-                  </div>
-                </div>
-              </ion-col>
-              }
-            </ion-row>
-          </ion-grid>
-          }
+          <div class="header-actions">
+            <ion-button (click)="openUploadModal()" class="upload-trigger-btn" color="primary">
+              <ion-icon name="add-outline" slot="start"></ion-icon>
+              Upload New Item
+            </ion-button>
+          </div>
         </div>
 
-        <!-- Uploaded Portfolio Section / My Catalog -->
+        <!-- Custom Uploaded Portfolio Section / My Catalog -->
         <div class="section-container">
           <h3 class="section-title-header">
             <ion-icon name="folder-open-outline" class="primary-icon"></ion-icon>
@@ -208,67 +38,342 @@
           </div>
           }
 
-          <!-- Empty State -->
-          @if (!isLoading && portfolioItems.length === 0) {
+          <!-- Catalog Content -->
+          @if (!isLoading) {
+          <div class="instagram-shop-grid">
+            <!-- First Card: Add New Item Trigger Card -->
+            <div class="grid-card add-new-trigger-card" (click)="openUploadModal()">
+              <div class="add-card-content">
+                <ion-icon name="add-outline" class="add-card-icon"></ion-icon>
+                <span class="add-card-label">Add Item</span>
+              </div>
+            </div>
+
+            <!-- Items -->
+            @for (item of portfolioItems; track item.id) {
+            <div class="grid-card media-card" (click)="openDetail(item, 'catalog')">
+              <div class="media-container">
+                @if (item.mediaType === 'image') {
+                <img [src]="getMediaUrl(item.mediaUrl)" alt="Portfolio Showcase" class="grid-media-el" />
+                }
+                @if (item.mediaType === 'video') {
+                <video [src]="getMediaUrl(item.mediaUrl)" class="grid-media-el" muted playsinline></video>
+                <div class="media-type-icon-badge">
+                  <ion-icon name="play-circle-outline"></ion-icon>
+                </div>
+                }
+                
+                <!-- Hover Overlay -->
+                <div class="grid-hover-overlay">
+                  <div class="overlay-text-content">
+                    <span class="overlay-category">{{ item.title }}</span>
+                    <span class="overlay-action">
+                      <ion-icon name="eye-outline" class="action-icon"></ion-icon>
+                      View Details
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            }
+          </div>
+          }
+        </div>
+
+        <!-- Instagram Media Section -->
+        <div class="section-container border-top-divider">
+          <div class="section-title-row">
+            <h3 class="section-title-header">
+              <ion-icon name="logo-instagram" class="instagram-icon"></ion-icon>
+              Instagram Media Showcase
+            </h3>
+            <p class="section-subtitle">
+              Choose connected posts and reels to display directly in your showcase portfolio catalog
+            </p>
+          </div>
+
+          @if (instagramMedia.length === 0) {
           <div class="empty-media-placeholder">
-            <ion-icon name="folder-open-outline" class="empty-folder-icon"></ion-icon>
-            <h4>No uploaded items yet</h4>
-            <p>Upload images or videos above to showcase your work directly to brands!</p>
+            <ion-icon name="logo-instagram" class="empty-folder-icon" style="color: #E1306C; font-size: 2.5rem;"></ion-icon>
+            <h4>No connected Instagram posts</h4>
+            <p>Sync your Instagram account in Profile settings to choose posts and reels for your portfolio.</p>
           </div>
           }
 
-          <!-- Items Grid -->
-          @if (!isLoading && portfolioItems.length > 0) {
-          <ion-grid class="ion-no-padding">
-            <ion-row>
-              @for (item of portfolioItems; track item.id) {
-              <ion-col size="12" size-md="6" class="media-col">
-                <div class="premium-portfolio-card">
-                  <!-- Media Container -->
-                  <div class="card-media-container">
-                    @if (item.mediaType === 'image') {
-                    <img
-                      [src]="getMediaUrl(item.mediaUrl)"
-                      class="card-media"
-                      alt="Portfolio Image"
-                    />
-                    }
-                    @if (item.mediaType === 'video') {
-                    <video
-                      [src]="getMediaUrl(item.mediaUrl)"
-                      class="card-media"
-                      controls
-                      playsinline
-                    ></video>
-                    }
-                    <span class="card-category-badge">{{ item.title }}</span>
-                  </div>
+          @if (instagramMedia.length > 0) {
+          <div class="instagram-shop-grid">
+            @for (item of instagramMedia; track item.mediaId) {
+            <div 
+              class="grid-card media-card" 
+              (click)="openDetail(item, 'instagram')"
+            >
+              <div class="media-container">
+                @if (item.mediaType === 'VIDEO') {
+                <video 
+                  [src]="getMediaUrl(item.mediaUrl)" 
+                  [poster]="item.thumbnailUrl ? getMediaUrl(item.thumbnailUrl) : ''"
+                  class="grid-media-el"
+                  muted
+                  playsinline
+                ></video>
+                <div class="media-type-icon-badge">
+                  <ion-icon name="play-circle-outline"></ion-icon>
+                </div>
+                } @else {
+                <img [src]="getMediaUrl(item.mediaUrl)" alt="Instagram media" class="grid-media-el" />
+                }
 
-                  <!-- Content Area -->
-                  <div class="portfolio-showcase-content">
-                    <p>{{ item.description }}</p>
-                    <div class="card-action-row">
-                      <ion-button
-                        fill="clear"
-                        color="danger"
-                        size="small"
-                        (click)="confirmDelete(item)"
-                        class="delete-item-btn"
-                      >
-                        <ion-icon name="trash-outline" slot="start"></ion-icon>
-                        Delete Item
-                      </ion-button>
-                    </div>
+                <!-- Hover Overlay -->
+                <div class="grid-hover-overlay">
+                  <div class="overlay-text-content">
+                    <span class="overlay-action">
+                      <ion-icon name="eye-outline" class="action-icon"></ion-icon>
+                      View Details
+                    </span>
                   </div>
                 </div>
-              </ion-col>
-              }
-            </ion-row>
-          </ion-grid>
+              </div>
+            </div>
+            }
+          </div>
           }
         </div>
+
       </div>
     </ion-content>
+
+    <!-- Upload Portfolio Item Modal -->
+    <ion-modal [isOpen]="isUploadModalOpen" (didDismiss)="closeUploadModal()" class="instagram-upload-modal">
+      <ng-template>
+        <div class="modal-shell-container">
+          <div class="modal-custom-header">
+            <h3>
+              <ion-icon name="cloud-upload-outline" class="modal-header-icon"></ion-icon>
+              Upload Portfolio Media
+            </h3>
+            <button type="button" class="close-modal-x-btn" (click)="closeUploadModal()">&times;</button>
+          </div>
+
+          <div class="modal-custom-body">
+            <form [formGroup]="uploadForm" (ngSubmit)="onSubmit()">
+              <!-- Interactive File Picker Container -->
+              <input
+                type="file"
+                #fileInput
+                (change)="onFileSelected($event)"
+                accept="image/*,video/*"
+                style="display: none"
+              />
+
+              <div
+                class="file-picker-container"
+                (click)="!filePreview && fileInput.click()"
+                [class.has-preview]="filePreview"
+              >
+                <!-- Default Selector Display -->
+                @if (!filePreview) {
+                <div class="file-picker-placeholder">
+                  <ion-icon name="cloud-upload-outline" class="upload-icon"></ion-icon>
+                  <p class="upload-text-main">Click to select Image or Video</p>
+                  <p class="upload-text-sub">Supports JPG, PNG, MP4 up to 50MB</p>
+                </div>
+                }
+
+                <!-- Preview Content Display -->
+                @if (filePreview) {
+                <div class="preview-wrapper">
+                  <!-- Close Button to Reset Selected File -->
+                  <button
+                    type="button"
+                    class="preview-close-btn"
+                    (click)="clearSelectedFile(); $event.stopPropagation();"
+                  >
+                    &times;
+                  </button>
+
+                  <!-- Image Preview -->
+                  @if (fileType === 'image') {
+                  <img [src]="filePreview" class="preview-media" alt="Upload Preview" />
+                  }
+
+                  <!-- Video Preview -->
+                  @if (fileType === 'video') {
+                  <video
+                    [src]="filePreview"
+                    class="preview-media"
+                    controls
+                    muted
+                  ></video>
+                  }
+                </div>
+                }
+              </div>
+
+              <!-- Caption Field -->
+              <div class="custom-input-group" style="margin-top: 16px">
+                <div class="caption-label-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <label class="custom-input-label" style="margin-bottom: 0;">Caption *</label>
+                  <ion-button
+                    type="button"
+                    fill="clear"
+                    size="small"
+                    class="ai-generate-btn"
+                    (click)="openAiModal()"
+                    style="--color: var(--ion-color-primary); font-weight: 600; display: flex; align-items: center; gap: 4px; margin: 0; --padding-start: 0; --padding-end: 0;"
+                  >
+                    <ion-icon name="sparkles" slot="start"></ion-icon>
+                    ✨ Generate with AI
+                  </ion-button>
+                </div>
+                <ion-item lines="none" class="custom-input-item text-area-item">
+                  <ion-textarea
+                    formControlName="caption"
+                    rows="3"
+                    placeholder="Describe this work item..."
+                  ></ion-textarea>
+                </ion-item>
+                @if (uploadForm.get('caption')?.touched && uploadForm.get('caption')?.invalid) {
+                <div class="validation-error">
+                  <ion-text color="danger">
+                    <small>Caption is required (max 500 characters).</small>
+                  </ion-text>
+                </div>
+                }
+              </div>
+
+              <!-- Category Field -->
+              <div class="custom-input-group">
+                <label class="custom-input-label">Category / Platform *</label>
+                <ion-item lines="none" class="custom-input-item">
+                  <ion-input
+                    type="text"
+                    formControlName="category"
+                    placeholder="e.g. Unboxing Video, Fashion Shoot, Travel Reel"
+                  ></ion-input>
+                </ion-item>
+                @if (uploadForm.get('category')?.touched && uploadForm.get('category')?.invalid) {
+                <div class="validation-error">
+                  <ion-text color="danger">
+                    <small>Category is required (max 100 characters).</small>
+                  </ion-text>
+                </div>
+                }
+              </div>
+
+              <!-- Submit Buttons -->
+              <div class="modal-action-buttons">
+                <ion-button type="button" fill="clear" color="medium" (click)="closeUploadModal()" [disabled]="isUploading">
+                  Cancel
+                </ion-button>
+                <ion-button
+                  type="submit"
+                  [disabled]="isUploading"
+                  class="submit-btn"
+                >
+                  {{ isUploading ? 'Uploading Item...' : 'Upload to Portfolio' }}
+                </ion-button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </ng-template>
+    </ion-modal>
+
+    <!-- Instagram Shop Detail Viewer Modal -->
+    <ion-modal [isOpen]="isDetailModalOpen" (didDismiss)="closeDetail()" class="instagram-detail-modal">
+      <ng-template>
+        @if (selectedItem) {
+        <div class="detail-modal-container">
+          <button type="button" class="detail-close-btn" (click)="closeDetail()">&times;</button>
+          
+          <div class="detail-modal-content-wrapper">
+            <!-- Left Side: Media Panel -->
+            <div class="detail-media-panel">
+              @if (selectedItemType === 'catalog') {
+                @if (selectedItem.mediaType === 'image') {
+                  <img [src]="getMediaUrl(selectedItem.mediaUrl)" alt="Portfolio Detail" />
+                } @else if (selectedItem.mediaType === 'video') {
+                  <video [src]="getMediaUrl(selectedItem.mediaUrl)" controls autoplay playsinline></video>
+                }
+              } @else {
+                @if (selectedItem.mediaType === 'VIDEO') {
+                  <video [src]="getMediaUrl(selectedItem.mediaUrl)" [poster]="selectedItem.thumbnailUrl ? getMediaUrl(selectedItem.thumbnailUrl) : ''" controls autoplay playsinline></video>
+                } @else {
+                  <img [src]="getMediaUrl(selectedItem.mediaUrl)" alt="Instagram Post Detail" />
+                }
+              }
+            </div>
+
+            <!-- Right Side: Info Panel -->
+            <div class="detail-info-panel">
+              <!-- Header / Profile Segment -->
+              <div class="detail-author-header">
+                <div class="author-avatar-wrapper">
+                  <ion-icon [name]="selectedItemType === 'instagram' ? 'logo-instagram' : 'person-outline'" [class.instagram-logo]="selectedItemType === 'instagram'"></ion-icon>
+                </div>
+                <div class="author-info-meta">
+                  <h4>{{ selectedItemType === 'instagram' ? 'Instagram Media' : (selectedItem.title || 'Portfolio Showcase Item') }}</h4>
+                  <p class="author-subtitle">
+                    {{ selectedItemType === 'instagram' ? 'Connected Feed Post' : 'Custom Upload Item' }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Main Scrolling Caption Area -->
+              <div class="detail-scrollable-body">
+                <!-- Platform / Category Badge -->
+                <div class="detail-metadata-badges">
+                  @if (selectedItemType === 'catalog') {
+                    <span class="detail-badge category">{{ selectedItem.title }}</span>
+                    <span class="detail-badge platform-badge custom-badge">Showcase</span>
+                  } @else {
+                    <span class="detail-badge platform-badge instagram-badge">Instagram</span>
+                    <span class="detail-badge type">{{ selectedItem.mediaType }}</span>
+                  }
+                </div>
+                
+                <p class="detail-caption-text">
+                  {{ selectedItemType === 'instagram' ? (selectedItem.caption || 'No caption text.') : (selectedItem.description || 'No caption text.') }}
+                </p>
+                
+                @if (selectedItem.timestamp) {
+                  <span class="detail-timestamp-date">Synced: {{ selectedItem.timestamp | date:'mediumDate' }}</span>
+                }
+              </div>
+
+              <!-- Footer Actions Area -->
+              <div class="detail-footer-actions">
+                @if (selectedItemType === 'catalog') {
+                  <ion-button expand="block" color="danger" fill="solid" (click)="confirmDelete(selectedItem)" class="detail-delete-btn">
+                    <ion-icon name="trash-outline" slot="start"></ion-icon>
+                    Delete Portfolio Item
+                  </ion-button>
+                } @else {
+                  @if (selectedItem.permalink) {
+                    <ion-button
+                      expand="block"
+                      fill="solid"
+                      [href]="selectedItem.permalink"
+                      target="_blank"
+                      color="primary"
+                      style="margin: 0; --border-radius: 8px; font-weight: 600;"
+                    >
+                      <ion-icon name="logo-instagram" slot="start"></ion-icon>
+                      View on Instagram
+                    </ion-button>
+                  } @else {
+                    <div style="font-size: 0.8rem; color: var(--ion-color-medium); text-align: center; font-weight: 500;">
+                      Instagram Feed Post
+                    </div>
+                  }
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+        }
+      </ng-template>
+    </ion-modal>
 
     <!-- AI Caption Assistant Modal -->
     <ion-modal [isOpen]="isAiModalOpen" (didDismiss)="isAiModalOpen = false" class="ai-caption-modal">

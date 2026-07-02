@@ -11,7 +11,7 @@
         <div class="catalogue-header-card">
           <div class="header-text-block">
             <h2>Instagram Posts & Reels</h2>
-            <p>Select posts to display in your portfolio showcase.</p>
+            <p>Select which synced posts to display in your portfolio showcase.</p>
           </div>
           
           <div class="header-actions-block">
@@ -21,7 +21,7 @@
                 {{ profileInstagram?.username ? '@' + profileInstagram.username : 'Not connected' }}
               </span>
             </div>
-            
+
             <ion-button (click)="refreshFromInstagram()" class="sync-media-btn">
               <ion-icon name="sync-outline" slot="start"></ion-icon>
               Sync Media
@@ -48,64 +48,120 @@
 
         <!-- Catalogue Grid -->
         @if (!isLoading && instagramMedia.length > 0) {
-        <ion-grid class="ion-no-padding">
-          <ion-row>
-            @for (item of instagramMedia; track item.mediaId) {
-            <ion-col size="12" size-sm="6" size-lg="4" class="card-col">
-              <div class="premium-portfolio-card">
-                <div class="card-media-container">
-                  @if (item.mediaType === 'VIDEO') {
-                  <video
-                    [src]="getMediaUrl(item.mediaUrl)"
-                    [poster]="item.thumbnailUrl ? getMediaUrl(item.thumbnailUrl) : ''"
-                    controls
-                    playsinline
-                    muted
-                  ></video>
-                  } @else {
-                  <img [src]="getMediaUrl(item.mediaUrl)" alt="Instagram media" />
-                  }
-                  <span class="card-category-badge">{{ item.mediaType }}</span>
-                </div>
+        <div class="instagram-shop-grid">
+          @for (item of instagramMedia; track item.mediaId) {
+          <div 
+            class="grid-card media-card" 
+            (click)="openDetail(item)"
+          >
+            <div class="media-container">
+              @if (item.mediaType === 'VIDEO') {
+              <video 
+                [src]="getMediaUrl(item.mediaUrl)" 
+                [poster]="item.thumbnailUrl ? getMediaUrl(item.thumbnailUrl) : ''"
+                class="grid-media-el"
+                muted
+                playsinline
+              ></video>
+              <div class="media-type-icon-badge">
+                <ion-icon name="play-circle-outline"></ion-icon>
+              </div>
+              } @else {
+              <img [src]="getMediaUrl(item.mediaUrl)" alt="Instagram media" class="grid-media-el" />
+              }
 
-                <div class="portfolio-showcase-content">
-                  <p class="insta-caption-text">{{ item.caption || 'No caption' }}</p>
-                  
-                  <div class="card-action-row-buttons">
-                    <ion-button
-                      size="small"
-                      [fill]="item.selectedForPortfolio ? 'solid' : 'outline'"
-                      (click)="togglePortfolioSelection(item)"
-                      [color]="item.selectedForPortfolio ? 'danger' : 'primary'"
-                      class="toggle-select-btn"
-                    >
-                      <ion-icon
-                        [name]="item.selectedForPortfolio ? 'eye-off-outline' : 'checkmark-circle-outline'"
-                        slot="start"
-                      ></ion-icon>
-                      {{ item.selectedForPortfolio ? 'Hide from Showcase' : 'Show on Showcase' }}
-                    </ion-button>
-
-                    @if (item.permalink) {
-                    <ion-button
-                      size="small"
-                      fill="clear"
-                      [href]="item.permalink"
-                      target="_blank"
-                      class="open-instagram-link"
-                    >
-                      Open Link
-                    </ion-button>
-                    }
-                  </div>
+              <!-- Hover Overlay -->
+              <div class="grid-hover-overlay">
+                <div class="overlay-text-content">
+                  <span class="overlay-action">
+                    <ion-icon name="eye-outline" class="action-icon"></ion-icon>
+                    View Details
+                  </span>
                 </div>
               </div>
-            </ion-col>
-            }
-          </ion-row>
-        </ion-grid>
+            </div>
+          </div>
+          }
+        </div>
         }
       </div>
     </ion-content>
+
+    <!-- Instagram Shop Detail Viewer Modal -->
+    <ion-modal [isOpen]="isDetailModalOpen" (didDismiss)="closeDetail()" class="instagram-detail-modal">
+      <ng-template>
+        @if (selectedItem) {
+        <div class="detail-modal-container">
+          <button type="button" class="detail-close-btn" (click)="closeDetail()">&times;</button>
+          
+          <div class="detail-modal-content-wrapper">
+            <!-- Left Side: Media Panel -->
+            <div class="detail-media-panel">
+              @if (selectedItem.mediaType === 'VIDEO') {
+                <video [src]="getMediaUrl(selectedItem.mediaUrl)" [poster]="selectedItem.thumbnailUrl ? getMediaUrl(selectedItem.thumbnailUrl) : ''" controls autoplay playsinline></video>
+              } @else {
+                <img [src]="getMediaUrl(selectedItem.mediaUrl)" alt="Instagram Post Detail" />
+              }
+            </div>
+
+            <!-- Right Side: Info Panel -->
+            <div class="detail-info-panel">
+              <!-- Header / Profile Segment -->
+              <div class="detail-author-header">
+                <div class="author-avatar-wrapper">
+                  <ion-icon name="logo-instagram" class="instagram-logo"></ion-icon>
+                </div>
+                <div class="author-info-meta">
+                  <h4>Instagram Post</h4>
+                  <p class="author-subtitle">
+                    {{ profileInstagram?.username ? '@' + profileInstagram.username : '@influencer' }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Main Scrolling Caption Area -->
+              <div class="detail-scrollable-body">
+                <!-- Platform / Category Badge -->
+                <div class="detail-metadata-badges">
+                  <span class="detail-badge platform-badge instagram-badge">Instagram</span>
+                  <span class="detail-badge type">{{ selectedItem.mediaType }}</span>
+                </div>
+                
+                <p class="detail-caption-text">
+                  {{ selectedItem.caption || 'No caption text.' }}
+                </p>
+                
+                @if (selectedItem.timestamp) {
+                  <span class="detail-timestamp-date">Synced: {{ selectedItem.timestamp | date:'mediumDate' }}</span>
+                }
+              </div>
+
+              <!-- Footer Actions Area -->
+              <div class="detail-footer-actions">
+                @if (selectedItem.permalink) {
+                  <ion-button
+                    expand="block"
+                    fill="solid"
+                    [href]="selectedItem.permalink"
+                    target="_blank"
+                    color="primary"
+                    style="margin: 0; --border-radius: 8px; font-weight: 600;"
+                  >
+                    <ion-icon name="logo-instagram" slot="start"></ion-icon>
+                    View on Instagram
+                  </ion-button>
+                } @else {
+                  <div style="font-size: 0.8rem; color: var(--ion-color-medium); text-align: center; font-weight: 500;">
+                    Instagram Feed Post
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+        }
+      </ng-template>
+    </ion-modal>
+
   </div>
 </div>

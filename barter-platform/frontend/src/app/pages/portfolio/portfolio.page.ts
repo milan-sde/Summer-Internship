@@ -45,6 +45,14 @@ import {
   folderOpenOutline,
   sparkles,
   sparklesOutline,
+  addOutline,
+  closeOutline,
+  eyeOutline,
+  eyeOffOutline,
+  checkmarkCircleOutline,
+  openOutline,
+  playCircleOutline,
+  ellipsisHorizontalOutline,
 } from 'ionicons/icons';
 import {
   PortfolioService,
@@ -112,8 +120,36 @@ export class PortfolioPage implements OnInit {
   isGenerating = false;
   aiForm!: FormGroup;
 
+  // Instagram Shop style modals state
+  isUploadModalOpen = false;
+  isDetailModalOpen = false;
+  selectedItem: any = null;
+  selectedItemType: 'catalog' | 'instagram' | null = null;
+
   toggleSidebar() {
     this.isSidebarOpen = !this.isSidebarOpen;
+  }
+
+  openUploadModal() {
+    this.clearSelectedFile();
+    this.uploadForm.reset();
+    this.isUploadModalOpen = true;
+  }
+
+  closeUploadModal() {
+    this.isUploadModalOpen = false;
+  }
+
+  openDetail(item: any, type: 'catalog' | 'instagram') {
+    this.selectedItem = item;
+    this.selectedItemType = type;
+    this.isDetailModalOpen = true;
+  }
+
+  closeDetail() {
+    this.isDetailModalOpen = false;
+    this.selectedItem = null;
+    this.selectedItemType = null;
   }
 
   constructor(
@@ -137,13 +173,20 @@ export class PortfolioPage implements OnInit {
       folderOpenOutline,
       sparkles,
       sparklesOutline,
+      addOutline,
+      closeOutline,
+      eyeOutline,
+      eyeOffOutline,
+      checkmarkCircleOutline,
+      openOutline,
+      playCircleOutline,
+      ellipsisHorizontalOutline,
     });
   }
 
   ngOnInit() {
     this.initForm();
-    this.loadPortfolio();
-    this.loadInstagramMedia();
+    this.loadShowcaseData();
   }
 
   // Set up form with validators using Reactive Forms
@@ -163,32 +206,21 @@ export class PortfolioPage implements OnInit {
     });
   }
 
-  // Load the current influencer portfolio from the backend using RxJS subscribe()
-  loadPortfolio() {
-    this.isLoading = true;
-    this.portfolioService.getMyPortfolio().subscribe({
-      next: (response: any) => {
-        if (response && response.success && response.data) {
-          this.portfolioItems = response.data.portfolio || [];
-        }
-        this.isLoading = false;
-      },
-      error: (error: any) => {
-        console.error('Failed to load portfolio items:', error);
-        this.showToast('Failed to load portfolio items.', 'danger');
-        this.isLoading = false;
-      },
-    });
-  }
-
-  loadInstagramMedia() {
+  // Load the current influencer portfolio and synced Instagram feed in a single API call
+  loadShowcaseData() {
     const currentUser = this.storage.getUser();
     if (!currentUser?.id) {
+      this.isLoading = false;
       return;
     }
 
+    this.isLoading = true;
     this.profileService.getInfluencerProfile(currentUser.id).subscribe({
       next: (data: any) => {
+        // Load portfolio catalog items
+        this.portfolioItems = data?.portfolioMedia || [];
+
+        // Load synced Instagram feed items
         this.instagramMedia = (data?.instagramMedia || []).map((item: any) => ({
           id: item.id || item._id,
           mediaId: item.mediaId || item.instagramMediaId || item.id || item._id,
@@ -201,9 +233,12 @@ export class PortfolioPage implements OnInit {
           source: item.source || 'instagram',
           timestamp: item.timestamp,
         }));
+        this.isLoading = false;
       },
       error: (error: any) => {
-        console.error('Failed to load Instagram media:', error);
+        console.error('Failed to load showcase data:', error);
+        this.showToast('Failed to load showcase data.', 'danger');
+        this.isLoading = false;
       },
     });
   }
@@ -216,6 +251,9 @@ export class PortfolioPage implements OnInit {
       .subscribe({
         next: () => {
           item.selectedForPortfolio = nextValue;
+          if (this.selectedItem && (this.selectedItem.mediaId === item.mediaId || this.selectedItem.id === item.id)) {
+            this.selectedItem.selectedForPortfolio = nextValue;
+          }
           this.showToast(
             nextValue
               ? 'Instagram item selected for portfolio'
@@ -302,7 +340,8 @@ export class PortfolioPage implements OnInit {
               this.uploadForm.reset();
               this.clearSelectedFile();
               this.isUploading = false;
-              this.loadPortfolio(); // Refresh list to show new item
+              this.closeUploadModal();
+              this.loadShowcaseData(); // Refresh list to show new item
             },
             error: (error: any) => {
               loading.dismiss();
@@ -353,6 +392,7 @@ export class PortfolioPage implements OnInit {
           next: (response: any) => {
             loading.dismiss();
             this.showToast('Portfolio item deleted successfully!', 'success');
+            this.closeDetail();
 
             // State Update: Filter out deleted item locally to refresh UI instantly
             this.portfolioItems = this.portfolioItems.filter(
