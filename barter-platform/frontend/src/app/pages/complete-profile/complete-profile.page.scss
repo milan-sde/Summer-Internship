@@ -235,19 +235,7 @@
 }
 
 .platform-input-item {
-  --background: var(--app-bg-input);
-  border-radius: 10px;
-  border: 1px solid var(--app-border-color);
   margin-right: 8px;
-  --padding-start: 10px;
-  --inner-padding-end: 10px;
-  
-  ion-input {
-    font-size: 0.875rem;
-    font-weight: 500;
-    --padding-top: 8px;
-    --padding-bottom: 8px;
-  }
 
   &.no-margin {
     margin-right: 0;
@@ -283,18 +271,6 @@
 
 .link-input-item {
   flex: 1;
-  --background: var(--app-bg-input);
-  border-radius: 10px;
-  border: 1px solid var(--app-border-color);
-  --padding-start: 10px;
-  --inner-padding-end: 10px;
-
-  ion-input {
-    font-size: 0.875rem;
-    font-weight: 500;
-    --padding-top: 8px;
-    --padding-bottom: 8px;
-  }
 }
 
 .delete-link-btn {

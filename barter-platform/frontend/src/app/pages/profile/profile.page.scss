@@ -4,7 +4,7 @@
   display: flex;
   min-height: 100vh;
   width: 100vw;
-  background-color: var(--ion-color-light);
+  background-color: var(--app-bg);
 }
 
 .main-viewport {
@@ -17,7 +17,7 @@
 }
 
 ion-content {
-  --background: var(--ion-color-light);
+  --background: var(--app-bg);
 }
 
 .loading-state-container {
@@ -33,17 +33,25 @@ ion-content {
 
 .onboarding-wrapper {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding: 24px 0;
+  padding: 24px 16px;
   min-height: 85vh;
   width: 100%;
+
+  @media (min-width: 768px) {
+    padding: 32px 24px;
+  }
 }
 
 .form-container {
   width: 100%;
-  max-width: 680px;
+  max-width: 720px;
   margin: 0 auto;
+
+  @media (min-width: 1024px) {
+    max-width: 860px;
+  }
 }
 
 .form-header {
@@ -67,10 +75,30 @@ ion-content {
 .glassmorphism-card {
   background-color: var(--app-bg-card);
   border: 1px solid var(--app-border-color);
-  border-radius: 16px;
-  padding: 24px;
+  border-radius: 20px;
+  padding: 20px 16px;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02), 0 1px 2px -1px rgba(0, 0, 0, 0.02);
   margin-bottom: 32px;
+
+  @media (min-width: 576px) {
+    padding: 28px 24px;
+  }
+
+  @media (min-width: 768px) {
+    padding: 36px 40px;
+  }
+}
+
+// Two-column responsive grid for form fields
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+
+  @media (min-width: 640px) {
+    grid-template-columns: 1fr 1fr;
+    gap: 0 20px;
+  }
 }
 
 // Avatar Picker
@@ -353,8 +381,8 @@ ion-content {
 
 // Platform manual row inputs
 .platform-row {
-  background-color: var(--ion-color-light-tint);
-  border: 1px solid var(--ion-color-light-shade);
+  background-color: var(--app-bg-tint);
+  border: 1px solid var(--app-border-color);
   border-radius: 12px;
   padding: 14px;
   margin-bottom: 12px;
@@ -373,7 +401,12 @@ ion-content {
   display: flex;
   align-items: center;
   gap: 8px;
-  min-width: 140px;
+  min-width: 130px;
+
+  @media (min-width: 576px) {
+    min-width: 150px;
+    flex-shrink: 0;
+  }
 
   .social-icon {
     font-size: 1.35rem;
@@ -391,23 +424,8 @@ ion-content {
 }
 
 .platform-input-item {
-  --background: #ffffff;
-  border-radius: 8px;
-  border: 1px solid var(--ion-color-light-shade);
-  margin-right: 8px;
-  --padding-start: 10px;
-  --inner-padding-end: 10px;
-
-  &.no-margin {
-    margin-right: 0;
-  }
-
-  ion-input {
-    --padding-top: 8px;
-    --padding-bottom: 8px;
-    font-size: 0.9rem;
-    font-weight: 500;
-  }
+  margin-right: 0;
+  flex: 1;
 
   .lock-icon {
     font-size: 0.95rem;
@@ -442,17 +460,6 @@ ion-content {
 
 .link-input-item {
   flex: 1;
-  --background: #ffffff;
-  border-radius: 8px;
-  border: 1px solid var(--ion-color-light-shade);
-  --padding-start: 10px;
-  --inner-padding-end: 10px;
-
-  ion-input {
-    --padding-top: 8px;
-    --padding-bottom: 8px;
-    font-size: 0.9rem;
-  }
 }
 
 .delete-link-btn {

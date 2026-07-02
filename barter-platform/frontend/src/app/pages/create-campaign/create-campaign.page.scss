@@ -1,10 +1,27 @@
-// src/app/pages/create-campaign/create-campaign.page.scss
+:host {
+  --ui-bg: #f3f6fb;
+  --ui-surface: rgba(255, 255, 255, 0.88);
+  --ui-surface-solid: #ffffff;
+  --ui-border-soft: rgba(18, 28, 45, 0.08);
+  --ui-border-strong: rgba(25, 41, 70, 0.14);
+  --ui-text: #131927;
+  --ui-text-muted: #5e6b82;
+  --ui-brand: #2f6cf6;
+  --ui-brand-strong: #1f56d8;
+  --ui-shadow-soft: 0 10px 30px rgba(27, 52, 103, 0.08);
+  --ui-shadow-card: 0 18px 45px rgba(27, 52, 103, 0.14);
+  --ui-radius-lg: 22px;
+  --ui-radius-md: 16px;
+  --ui-radius-sm: 12px;
+  --ui-font-title: "Plus Jakarta Sans", "Avenir Next", "Segoe UI", sans-serif;
+  --ui-font-body: "Manrope", "SF Pro Text", "Segoe UI", sans-serif;
+}
 
 .app-layout {
   display: flex;
   min-height: 100vh;
   width: 100vw;
-  background-color: var(--ion-color-light);
+  background: var(--ui-bg);
 }
 
 .main-viewport {
@@ -16,130 +33,319 @@
   overflow: hidden;
 }
 
-ion-content {
-  --background: var(--ion-color-light);
+ion-content.campaign-content {
+  --background:
+    radial-gradient(
+      circle at 8% -15%,
+      rgba(47, 108, 246, 0.18),
+      transparent 44%
+    ),
+    radial-gradient(
+      circle at 92% -5%,
+      rgba(244, 92, 68, 0.12),
+      transparent 30%
+    ),
+    linear-gradient(180deg, #f8faff 0%, #f3f6fb 55%, #eff3fa 100%);
 }
 
 .onboarding-wrapper {
   display: flex;
-  align-items: center;
   justify-content: center;
-  padding: 24px 0;
-  min-height: 85vh;
   width: 100%;
+  padding: 18px 0 30px;
 }
 
-.form-container {
-  width: 100%;
-  max-width: 680px;
+.campaign-shell {
+  width: min(100%, 900px);
   margin: 0 auto;
+  display: grid;
+  gap: 18px;
 }
 
 .form-header {
-  text-align: center;
-  margin-bottom: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  background: linear-gradient(
+    140deg,
+    rgba(255, 255, 255, 0.93),
+    rgba(255, 255, 255, 0.78)
+  );
+  border-radius: var(--ui-radius-lg);
+  box-shadow: var(--ui-shadow-soft);
+  padding: 18px;
+  text-align: left;
+  backdrop-filter: blur(6px);
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    font: 700 0.76rem/1 var(--ui-font-title);
+    color: var(--ui-brand-strong);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    border-radius: 999px;
+    padding: 7px 11px;
+    background: rgba(47, 108, 246, 0.1);
+    margin-bottom: 10px;
+  }
 
   h2 {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--ion-color-dark);
-    margin: 0 0 8px 0;
+    margin: 0 0 8px;
+    font-family: var(--ui-font-title);
+    font-size: clamp(1.35rem, 2.8vw, 2.05rem);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: var(--ui-text);
   }
 
   p {
-    font-size: 0.95rem;
-    color: var(--ion-color-medium);
     margin: 0;
+    font-family: var(--ui-font-body);
+    font-size: 0.96rem;
+    line-height: 1.6;
+    color: var(--ui-text-muted);
+  }
+}
+
+.form-surface {
+  border-radius: var(--ui-radius-lg);
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  background: linear-gradient(
+    170deg,
+    rgba(255, 255, 255, 0.95),
+    rgba(255, 255, 255, 0.86)
+  );
+  box-shadow: var(--ui-shadow-card);
+  backdrop-filter: blur(8px);
+}
+
+form {
+  display: grid;
+  gap: 14px;
+}
+
+.form-section {
+  border-radius: var(--ui-radius-md);
+  background: var(--ui-surface-solid);
+  border: 1px solid var(--ui-border-soft);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  padding: 16px;
+}
+
+.section-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 14px;
+
+  ion-icon {
+    font-size: 1.2rem;
+    color: var(--ui-brand-strong);
+    margin-top: 2px;
+  }
+
+  h3 {
+    margin: 0;
+    color: var(--ui-text);
+    font: 700 1rem/1.2 var(--ui-font-title);
+    letter-spacing: -0.01em;
+  }
+
+  p {
+    margin: 5px 0 0;
+    color: var(--ui-text-muted);
+    font: 600 0.82rem/1.45 var(--ui-font-body);
   }
 }
 
 .custom-input-group {
-  margin-bottom: 20px;
+  margin-bottom: 12px;
   width: 100%;
+}
+
+.custom-input-group:last-child {
+  margin-bottom: 0;
 }
 
 .custom-input-label {
   display: block;
-  font-family: var(--font-family-headings);
-  font-weight: 700;
-  font-size: 0.9rem;
-  color: var(--ion-color-step-700);
+  font: 700 0.8rem/1.2 var(--ui-font-title);
+  color: #344158;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   margin-bottom: 8px;
   padding-left: 2px;
 }
 
 .custom-input-item {
-  --background: #ffffff;
-  border-radius: 12px;
-  border: 1px solid var(--ion-color-light-shade);
-  margin-bottom: 0;
+  --background: var(--ui-surface);
   --padding-start: 14px;
   --inner-padding-end: 14px;
-  transition: all 0.2s ease;
-  box-shadow: none;
+  border-radius: var(--ui-radius-sm);
+  border: 1px solid var(--ui-border-soft);
+  box-shadow: 0 1px 1px rgba(30, 41, 60, 0.03);
+  margin: 0;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
 
-  &:focus-within {
-    border-color: var(--ion-color-primary);
-    box-shadow: 0 0 0 3px rgba(var(--ion-color-primary-rgb), 0.1);
+  &:hover {
+    border-color: var(--ui-border-strong);
   }
 
-  ion-input, ion-textarea, ion-select {
-    --padding-top: 12px;
-    --padding-bottom: 12px;
-    font-weight: 500;
-    font-size: 0.95rem;
-    color: var(--ion-color-dark);
+  &:focus-within {
+    border-color: rgba(47, 108, 246, 0.58);
+    box-shadow: 0 0 0 4px rgba(47, 108, 246, 0.13);
+    transform: translateY(-1px);
+  }
+
+  ion-input,
+  ion-textarea,
+  ion-select {
+    --padding-top: 11px;
+    --padding-bottom: 11px;
+    font: 600 0.93rem/1.3 var(--ui-font-body);
+    color: var(--ui-text);
   }
 
   .input-icon {
-    color: var(--ion-color-medium);
-    font-size: 1.25rem;
-    margin-right: 12px;
+    color: #73809a;
+    font-size: 1.12rem;
+    margin-right: 10px;
     transition: color 0.2s ease;
   }
 
   &:focus-within .input-icon {
-    color: var(--ion-color-primary);
+    color: var(--ui-brand-strong);
   }
 }
 
 .text-area-item {
   align-items: flex-start;
-  
+
   ion-textarea {
     --padding-top: 12px;
     --padding-bottom: 12px;
-    min-height: 100px;
+    min-height: 108px;
+    line-height: 1.55;
   }
 }
 
-// Two column desktop padding helpers
-.responsive-col-left {
-  padding-right: 0;
-  @media (min-width: 768px) {
-    padding-right: 12px;
-  }
+.form-grid {
+  margin-top: 2px;
 }
 
+.responsive-col-left,
 .responsive-col-right {
   padding-left: 0;
-  @media (min-width: 768px) {
-    padding-left: 12px;
-  }
+  padding-right: 0;
 }
 
 .validation-error {
-  margin-top: 4px;
+  margin-top: 6px;
   padding-left: 2px;
-  
+
   small {
-    font-weight: 500;
-    font-size: 0.8rem;
+    font: 700 0.75rem/1.3 var(--ui-font-body);
+    letter-spacing: 0.01em;
   }
 }
 
+.date-error-banner,
+.validation-warning-banner {
+  margin-top: 2px;
+  border-radius: 10px;
+  background: rgba(214, 48, 49, 0.08);
+  border: 1px solid rgba(214, 48, 49, 0.22);
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+
+  ion-icon {
+    color: var(--ion-color-danger);
+    font-size: 0.95rem;
+  }
+
+  small {
+    font-weight: 700;
+  }
+}
+
+.form-actions {
+  padding-top: 2px;
+  display: grid;
+  gap: 9px;
+}
+
 .submit-btn {
-  margin-top: 32px;
-  height: 48px;
-  font-size: 0.95rem;
+  margin-top: 0;
+  min-height: 48px;
+  font-family: var(--ui-font-title);
+  font-size: 0.9rem;
+  letter-spacing: 0.01em;
+  --border-radius: 13px;
+  --box-shadow: 0 10px 24px rgba(47, 108, 246, 0.3);
+  --background: linear-gradient(135deg, #2f6cf6 0%, #1f56d8 100%);
+  --background-hover: linear-gradient(135deg, #2861dd 0%, #1a49b8 100%);
+  --background-activated: linear-gradient(135deg, #2355c4 0%, #153c98 100%);
+  transition: transform 0.2s ease;
+
+  &:not(.button-disabled):hover {
+    transform: translateY(-1px);
+  }
+}
+
+@media (min-width: 768px) {
+  .onboarding-wrapper {
+    padding: 26px 0 36px;
+  }
+
+  .campaign-shell {
+    gap: 20px;
+  }
+
+  .form-header {
+    padding: 24px;
+  }
+
+  .form-surface {
+    padding: 22px;
+  }
+
+  .form-section {
+    padding: 20px;
+  }
+
+  .responsive-col-left {
+    padding-right: 10px;
+  }
+
+  .responsive-col-right {
+    padding-left: 10px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .onboarding-wrapper {
+    padding: 32px 0 40px;
+  }
+
+  .campaign-shell {
+    width: min(100%, 980px);
+    gap: 22px;
+  }
+
+  .form-header {
+    padding: 26px;
+  }
+
+  .form-surface {
+    padding: 24px;
+  }
+
+  .form-section {
+    padding: 22px;
+  }
 }

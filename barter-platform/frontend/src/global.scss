@@ -145,14 +145,31 @@ ion-button {
 
 /* Premium UI CSS Utilities */
 .glassmorphism-card {
-  background: var(--app-bg-card);
+  background-color: var(--app-bg-card);
   border: 1px solid var(--app-border-color);
-  border-radius: 16px;
-  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.02);
-  padding: 32px 24px;
+  border-radius: 20px;
+  padding: 20px 16px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02), 0 1px 2px -1px rgba(0, 0, 0, 0.02);
+  margin-bottom: 32px;
 
-  @media (max-width: 480px) {
-    padding: 24px 16px !important;
+  @media (min-width: 576px) {
+    padding: 28px 24px;
+  }
+
+  @media (min-width: 768px) {
+    padding: 36px 40px;
+  }
+}
+
+/* Two-column responsive grid for form layouts */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+
+  @media (min-width: 640px) {
+    grid-template-columns: 1fr 1fr;
+    gap: 0 20px;
   }
 }
 
@@ -325,7 +342,7 @@ ion-button {
   padding-left: 2px;
 }
 
-.custom-input-item {
+.custom-input-item, .platform-input-item, .link-input-item {
   --background: var(--app-bg-input);
   border-radius: 12px;
   border: 1px solid var(--app-border-color);
@@ -337,7 +354,7 @@ ion-button {
 
   &:focus-within {
     border-color: var(--ion-color-primary);
-    box-shadow: 0 0 0 3px rgba(var(--ion-color-primary-rgb), 0.1);
+    box-shadow: 0 0 0 3px rgba(var(--ion-color-primary-rgb), 0.15);
     --background: var(--app-bg-input);
   }
 
@@ -430,19 +447,17 @@ ion-button {
   color: var(--ion-color-step-800);
 }
 
+.platform-inputs-wrapper {
+  display: flex;
+  flex: 1;
+  gap: 10px;
+}
+
 .platform-input-item {
-  --background: white;
-  border-radius: 8px;
-  border: 1px solid var(--ion-color-step-200, #e0e0e0);
   margin-right: 6px;
 
   &.no-margin {
     margin-right: 0;
-  }
-
-  ion-input {
-    font-size: 0.85rem;
-    font-weight: 500;
   }
 }
 
@@ -453,9 +468,9 @@ ion-button {
 
 .past-work-header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  margin-bottom: 6px;
+  align-items: center;
+  margin-top: 16px;
 }
 
 .add-link-btn {
@@ -473,14 +488,17 @@ ion-button {
 
 .link-input-item {
   flex: 1;
-  --background: var(--ion-color-step-50, #f8f9fa);
-  border-radius: 12px;
-  border: 1px solid var(--ion-color-step-200, #e0e0e0);
   margin-right: 8px;
+}
 
-  ion-input {
-    font-size: 0.85rem;
-    font-weight: 500;
+/* Nesting overrides for input fields inside tinted platform/social boxes to maintain clean design and contrast */
+.platform-row, .social-links-box {
+  .platform-input-item, .link-input-item {
+    --background: var(--app-bg-card);
+    
+    &:focus-within {
+      --background: var(--app-bg-card);
+    }
   }
 }
 

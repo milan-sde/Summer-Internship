@@ -61,72 +61,77 @@
 
               <!-- ================= INFLUENCER FORM FIELDS ================= -->
               @if (currentUser?.role === 'INFLUENCER') {
-              <!-- Full Name Input -->
-              <div class="custom-input-group">
-                <label class="custom-input-label">Full Name *</label>
-                <ion-item lines="none" class="custom-input-item">
-                  <ion-icon
-                    name="person-outline"
-                    slot="start"
-                    class="input-icon"
-                  ></ion-icon>
-                  <ion-input
-                    type="text"
-                    formControlName="fullName"
-                    placeholder="Enter your full name"
-                  ></ion-input>
-                </ion-item>
+
+              <!-- Two-column responsive grid for basic fields -->
+              <div class="form-grid">
+
+                <!-- Full Name Input -->
+                <div class="custom-input-group">
+                  <label class="custom-input-label">Full Name *</label>
+                  <ion-item lines="none" class="custom-input-item">
+                    <ion-icon
+                      name="person-outline"
+                      slot="start"
+                      class="input-icon"
+                    ></ion-icon>
+                    <ion-input
+                      type="text"
+                      formControlName="fullName"
+                      placeholder="Enter your full name"
+                    ></ion-input>
+                  </ion-item>
+                </div>
+
+                <!-- Phone Number Input -->
+                <div class="custom-input-group">
+                  <label class="custom-input-label">Phone Number *</label>
+                  <ion-item lines="none" class="custom-input-item">
+                    <ion-icon
+                      name="call-outline"
+                      slot="start"
+                      class="input-icon"
+                    ></ion-icon>
+                    <ion-input
+                      type="tel"
+                      formControlName="phoneNumber"
+                      placeholder="+1234567890"
+                    ></ion-input>
+                  </ion-item>
+                </div>
+
+                <!-- Influencer Username Input -->
+                <div class="custom-input-group">
+                  <label class="custom-input-label">Influencer Username *</label>
+                  <ion-item lines="none" class="custom-input-item">
+                    <ion-icon
+                      name="at-outline"
+                      slot="start"
+                      class="input-icon"
+                    ></ion-icon>
+                    <ion-input
+                      type="text"
+                      formControlName="username"
+                      placeholder="username"
+                    ></ion-input>
+                  </ion-item>
+                </div>
+
+                <!-- Email Input -->
+                <div class="custom-input-group readonly-group">
+                  <label class="custom-input-label">Email (Read-only)</label>
+                  <ion-item lines="none" class="custom-input-item">
+                    <ion-icon
+                      name="mail-outline"
+                      slot="start"
+                      class="input-icon"
+                    ></ion-icon>
+                    <ion-input type="email" formControlName="email"></ion-input>
+                  </ion-item>
+                </div>
+
               </div>
 
-              <!-- Phone Number Input -->
-              <div class="custom-input-group">
-                <label class="custom-input-label">Phone Number *</label>
-                <ion-item lines="none" class="custom-input-item">
-                  <ion-icon
-                    name="call-outline"
-                    slot="start"
-                    class="input-icon"
-                  ></ion-icon>
-                  <ion-input
-                    type="tel"
-                    formControlName="phoneNumber"
-                    placeholder="+1234567890"
-                  ></ion-input>
-                </ion-item>
-              </div>
-
-              <!-- Influencer Username Input -->
-              <div class="custom-input-group">
-                <label class="custom-input-label">Influencer Username *</label>
-                <ion-item lines="none" class="custom-input-item">
-                  <ion-icon
-                    name="person-outline"
-                    slot="start"
-                    class="input-icon"
-                  ></ion-icon>
-                  <span class="username-prefix">@</span>
-                  <ion-input
-                    type="text"
-                    formControlName="username"
-                    placeholder="username"
-                  ></ion-input>
-                </ion-item>
-              </div>
-
-              <!-- Email Input -->
-              <div class="custom-input-group readonly-group">
-                <label class="custom-input-label">Email (Read-only)</label>
-                <ion-item lines="none" class="custom-input-item">
-                  <ion-icon
-                    name="mail-outline"
-                    slot="start"
-                    class="input-icon"
-                  ></ion-icon>
-                  <ion-input type="email" formControlName="email"></ion-input>
-                </ion-item>
-              </div>
-
-              <!-- Bio Input -->
+              <!-- Bio spans full width -->
               <div class="custom-input-group">
                 <label class="custom-input-label">Bio *</label>
                 <ion-item lines="none" class="custom-input-item text-area-item">
@@ -254,33 +259,27 @@
                     ></ion-icon>
                     <span class="platform-name">Instagram</span>
                   </div>
-                  <ion-grid class="ion-no-padding">
-                    <ion-row>
-                      <ion-col size="7" class="ion-no-padding">
-                        <ion-item lines="none" class="platform-input-item">
-                          <ion-input
-                            type="text"
-                            formControlName="instagramUsername"
-                            placeholder="username"
-                          ></ion-input>
-                        </ion-item>
-                      </ion-col>
-                      <ion-col size="5" class="ion-no-padding">
-                        <ion-item lines="none" class="platform-input-item no-margin">
-                          <ion-input
-                            type="number"
-                            formControlName="instagramFollowers"
-                            placeholder="Followers"
-                          ></ion-input>
-                          <ion-icon
-                            name="lock-closed-outline"
-                            slot="end"
-                            class="lock-icon"
-                          ></ion-icon>
-                        </ion-item>
-                      </ion-col>
-                    </ion-row>
-                  </ion-grid>
+                  <div class="platform-inputs-wrapper">
+                    <ion-item lines="none" class="platform-input-item">
+                      <ion-input
+                        type="text"
+                        formControlName="instagramUsername"
+                        placeholder="username"
+                      ></ion-input>
+                    </ion-item>
+                    <ion-item lines="none" class="platform-input-item">
+                      <ion-input
+                        type="number"
+                        formControlName="instagramFollowers"
+                        placeholder="Followers"
+                      ></ion-input>
+                      <ion-icon
+                        name="lock-closed-outline"
+                        slot="end"
+                        class="lock-icon"
+                      ></ion-icon>
+                    </ion-item>
+                  </div>
                 </div>
 
                 <!-- YouTube Row -->
@@ -292,33 +291,27 @@
                     ></ion-icon>
                     <span class="platform-name">YouTube</span>
                   </div>
-                  <ion-grid class="ion-no-padding">
-                    <ion-row>
-                      <ion-col size="7" class="ion-no-padding">
-                        <ion-item lines="none" class="platform-input-item">
-                          <ion-input
-                            type="text"
-                            formControlName="youtubeUsername"
-                            placeholder="channelhandle"
-                          ></ion-input>
-                        </ion-item>
-                      </ion-col>
-                      <ion-col size="5" class="ion-no-padding">
-                        <ion-item lines="none" class="platform-input-item no-margin">
-                          <ion-input
-                            type="number"
-                            formControlName="youtubeFollowers"
-                            placeholder="Subscribers"
-                          ></ion-input>
-                          <ion-icon
-                            name="lock-closed-outline"
-                            slot="end"
-                            class="lock-icon"
-                          ></ion-icon>
-                        </ion-item>
-                      </ion-col>
-                    </ion-row>
-                  </ion-grid>
+                  <div class="platform-inputs-wrapper">
+                    <ion-item lines="none" class="platform-input-item">
+                      <ion-input
+                        type="text"
+                        formControlName="youtubeUsername"
+                        placeholder="channelhandle"
+                      ></ion-input>
+                    </ion-item>
+                    <ion-item lines="none" class="platform-input-item">
+                      <ion-input
+                        type="number"
+                        formControlName="youtubeFollowers"
+                        placeholder="Subscribers"
+                      ></ion-input>
+                      <ion-icon
+                        name="lock-closed-outline"
+                        slot="end"
+                        class="lock-icon"
+                      ></ion-icon>
+                    </ion-item>
+                  </div>
                 </div>
 
                 <!-- Twitter Row -->
@@ -330,33 +323,27 @@
                     ></ion-icon>
                     <span class="platform-name">X (Twitter)</span>
                   </div>
-                  <ion-grid class="ion-no-padding">
-                    <ion-row>
-                      <ion-col size="7" class="ion-no-padding">
-                        <ion-item lines="none" class="platform-input-item">
-                          <ion-input
-                            type="text"
-                            formControlName="twitterUsername"
-                            placeholder="yourhandle"
-                          ></ion-input>
-                        </ion-item>
-                      </ion-col>
-                      <ion-col size="5" class="ion-no-padding">
-                        <ion-item lines="none" class="platform-input-item no-margin">
-                          <ion-input
-                            type="number"
-                            formControlName="twitterFollowers"
-                            placeholder="Followers"
-                          ></ion-input>
-                          <ion-icon
-                            name="lock-closed-outline"
-                            slot="end"
-                            class="lock-icon"
-                          ></ion-icon>
-                        </ion-item>
-                      </ion-col>
-                    </ion-row>
-                  </ion-grid>
+                  <div class="platform-inputs-wrapper">
+                    <ion-item lines="none" class="platform-input-item">
+                      <ion-input
+                        type="text"
+                        formControlName="twitterUsername"
+                        placeholder="yourhandle"
+                      ></ion-input>
+                    </ion-item>
+                    <ion-item lines="none" class="platform-input-item">
+                      <ion-input
+                        type="number"
+                        formControlName="twitterFollowers"
+                        placeholder="Followers"
+                      ></ion-input>
+                      <ion-icon
+                        name="lock-closed-outline"
+                        slot="end"
+                        class="lock-icon"
+                      ></ion-icon>
+                    </ion-item>
+                  </div>
                 </div>
               </div>
 
@@ -405,75 +392,68 @@
 
               <!-- ================= BRAND FORM FIELDS ================= -->
               @if (currentUser?.role === 'BRAND') {
-              <ion-grid class="ion-no-padding">
-                <ion-row>
-                  <ion-col size="12" size-md="6" class="ion-no-padding responsive-col-left">
-                    <!-- First Name Input -->
-                    <div class="custom-input-group">
-                      <label class="custom-input-label">First Name *</label>
-                      <ion-item lines="none" class="custom-input-item">
-                        <ion-icon
-                          name="person-outline"
-                          slot="start"
-                          class="input-icon"
-                        ></ion-icon>
-                        <ion-input
-                          type="text"
-                          formControlName="firstName"
-                          placeholder="John"
-                        ></ion-input>
-                      </ion-item>
-                    </div>
-                  </ion-col>
-                  <ion-col size="12" size-md="6" class="ion-no-padding responsive-col-right">
-                    <!-- Last Name Input -->
-                    <div class="custom-input-group">
-                      <label class="custom-input-label">Last Name *</label>
-                      <ion-item lines="none" class="custom-input-item">
-                        <ion-icon
-                          name="person-outline"
-                          slot="start"
-                          class="input-icon"
-                        ></ion-icon>
-                        <ion-input
-                          type="text"
-                          formControlName="lastName"
-                          placeholder="Doe"
-                        ></ion-input>
-                      </ion-item>
-                    </div>
-                  </ion-col>
-                </ion-row>
-              </ion-grid>
-
-              <!-- Contact No. Input -->
-              <div class="custom-input-group">
-                <label class="custom-input-label">Contact No. *</label>
-                <ion-item lines="none" class="custom-input-item">
-                  <ion-icon
-                    name="call-outline"
-                    slot="start"
-                    class="input-icon"
-                  ></ion-icon>
-                  <ion-input
-                    type="tel"
-                    formControlName="phoneNumber"
-                    placeholder="+1234567890"
-                  ></ion-input>
-                </ion-item>
-              </div>
-
-              <!-- Email Input -->
-              <div class="custom-input-group readonly-group">
-                <label class="custom-input-label">Email (Read-only)</label>
-                <ion-item lines="none" class="custom-input-item">
-                  <ion-icon
-                    name="mail-outline"
-                    slot="start"
-                    class="input-icon"
-                  ></ion-icon>
-                  <ion-input type="email" formControlName="email"></ion-input>
-                </ion-item>
+              <!-- Two-column responsive grid for basic fields -->
+              <div class="form-grid">
+                <!-- First Name Input -->
+                <div class="custom-input-group">
+                  <label class="custom-input-label">First Name *</label>
+                  <ion-item lines="none" class="custom-input-item">
+                    <ion-icon
+                      name="person-outline"
+                      slot="start"
+                      class="input-icon"
+                    ></ion-icon>
+                    <ion-input
+                      type="text"
+                      formControlName="firstName"
+                      placeholder="John"
+                    ></ion-input>
+                  </ion-item>
+                </div>
+                <!-- Last Name Input -->
+                <div class="custom-input-group">
+                  <label class="custom-input-label">Last Name *</label>
+                  <ion-item lines="none" class="custom-input-item">
+                    <ion-icon
+                      name="person-outline"
+                      slot="start"
+                      class="input-icon"
+                    ></ion-icon>
+                    <ion-input
+                      type="text"
+                      formControlName="lastName"
+                      placeholder="Doe"
+                    ></ion-input>
+                  </ion-item>
+                </div>
+                <!-- Contact No. Input -->
+                <div class="custom-input-group">
+                  <label class="custom-input-label">Contact No. *</label>
+                  <ion-item lines="none" class="custom-input-item">
+                    <ion-icon
+                      name="call-outline"
+                      slot="start"
+                      class="input-icon"
+                    ></ion-icon>
+                    <ion-input
+                      type="tel"
+                      formControlName="phoneNumber"
+                      placeholder="+1234567890"
+                    ></ion-input>
+                  </ion-item>
+                </div>
+                <!-- Email Input -->
+                <div class="custom-input-group readonly-group">
+                  <label class="custom-input-label">Email (Read-only)</label>
+                  <ion-item lines="none" class="custom-input-item">
+                    <ion-icon
+                      name="mail-outline"
+                      slot="start"
+                      class="input-icon"
+                    ></ion-icon>
+                    <ion-input type="email" formControlName="email"></ion-input>
+                  </ion-item>
+                </div>
               </div>
 
               <!-- Brand Description Input -->

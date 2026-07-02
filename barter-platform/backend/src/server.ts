@@ -15,6 +15,7 @@ import campaignRoutes from "@modules/campaign/routes/campaign.routes";
 import portfolioRoutes from "@modules/portfolio/routes/portfolio.routes";
 import instagramRoutes from "@modules/instagram/routes/instagram.routes";
 import influencerRoutes from "@modules/profile/routes/influencer.routes";
+import aiRoutes from "@modules/ai/routes/ai.routes";
 import { requireOnboarding } from "@shared/middlewares/onboarding.guard";
 
 //load environment variables:
@@ -97,6 +98,9 @@ app.use("/api/instagram", instagramRoutes);
 
 //influencer profile routes:
 app.use("/api/influencers", influencerRoutes);
+
+// AI routes:
+app.use("/api/ai", aiRoutes);
 
 app.get(
   "/api/dashboard",

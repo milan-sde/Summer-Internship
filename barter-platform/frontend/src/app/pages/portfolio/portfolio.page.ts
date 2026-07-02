@@ -25,6 +25,12 @@ import {
   IonCard,
   IonCardContent,
   IonText,
+  IonModal,
+  IonSelect,
+  IonSelectOption,
+  IonToggle,
+  IonLabel,
+  IonSpinner,
   AlertController,
   ToastController,
   LoadingController,
@@ -37,11 +43,14 @@ import {
   imageOutline,
   videocamOutline,
   folderOpenOutline,
+  sparkles,
+  sparklesOutline,
 } from 'ionicons/icons';
 import {
   PortfolioService,
   PortfolioItem,
 } from 'src/app/services/portfolio.service';
+import { AiService } from 'src/app/services/ai.service';
 import {
   InstagramService,
   InstagramMediaItem,
@@ -78,6 +87,12 @@ import { HeaderComponent } from '../../shared/components/header/header.component
     IonCard,
     IonCardContent,
     IonText,
+    IonModal,
+    IonSelect,
+    IonSelectOption,
+    IonToggle,
+    IonLabel,
+    IonSpinner,
     SidebarComponent,
     HeaderComponent
   ],
@@ -93,6 +108,10 @@ export class PortfolioPage implements OnInit {
   isLoading = true;
   isSidebarOpen = false;
 
+  isAiModalOpen = false;
+  isGenerating = false;
+  aiForm!: FormGroup;
+
   toggleSidebar() {
     this.isSidebarOpen = !this.isSidebarOpen;
   }
@@ -107,6 +126,7 @@ export class PortfolioPage implements OnInit {
     private toastController: ToastController,
     private loadingController: LoadingController,
     private router: Router,
+    private aiService: AiService,
   ) {
     addIcons({
       arrowBackOutline,
@@ -115,6 +135,8 @@ export class PortfolioPage implements OnInit {
       imageOutline,
       videocamOutline,
       folderOpenOutline,
+      sparkles,
+      sparklesOutline,
     });
   }
 
@@ -129,6 +151,15 @@ export class PortfolioPage implements OnInit {
     this.uploadForm = this.fb.group({
       caption: ['', [Validators.required, Validators.maxLength(500)]],
       category: ['', [Validators.required, Validators.maxLength(100)]],
+    });
+
+    this.aiForm = this.fb.group({
+      description: ['', [Validators.required]],
+      tone: ['Casual', [Validators.required]],
+      length: ['Medium', [Validators.required]],
+      platform: ['Instagram', [Validators.required]],
+      includeEmojis: [true],
+      includeHashtags: [true],
     });
   }
 
@@ -378,5 +409,52 @@ export class PortfolioPage implements OnInit {
       buttons: ['OK'],
     });
     await toast.present();
+  }
+
+  openAiModal() {
+    this.aiForm.reset({
+      description: '',
+      tone: 'Casual',
+      length: 'Medium',
+      platform: 'Instagram',
+      includeEmojis: true,
+      includeHashtags: true,
+    });
+    this.isAiModalOpen = true;
+  }
+
+  closeAiModal() {
+    this.isAiModalOpen = false;
+  }
+
+  generateAiCaption() {
+    if (this.aiForm.invalid) {
+      this.aiForm.markAllAsTouched();
+      return;
+    }
+
+    this.isGenerating = true;
+    this.aiService.generateCaption(this.aiForm.value).subscribe({
+      next: (response) => {
+        this.isGenerating = false;
+        if (response && response.success && response.data?.caption) {
+          this.uploadForm.patchValue({
+            caption: response.data.caption,
+          });
+          this.showToast('Caption generated successfully!', 'success');
+          this.closeAiModal();
+        } else {
+          this.showToast('Failed to generate caption. Please try again.', 'danger');
+        }
+      },
+      error: (error) => {
+        this.isGenerating = false;
+        console.error('Caption generation failed:', error);
+        this.showToast(
+          error.error?.error?.message || error.message || 'Failed to generate caption',
+          'danger'
+        );
+      },
+    });
   }
 }
