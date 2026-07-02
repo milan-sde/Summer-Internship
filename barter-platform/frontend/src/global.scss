@@ -90,7 +90,8 @@ ion-content {
 }
 
 .welcome-card {
-  background: linear-gradient(135deg, var(--ion-color-primary) 0%, var(--ion-color-primary-shade) 100%) !important;
+  border-radius: 16px;
+  background: var(--ion-color-primary) !important;
   color: white !important;
   border: none !important;
   box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.15) !important;
@@ -109,7 +110,7 @@ ion-button {
   letter-spacing: 0 !important;
   margin-top: 8px;
   margin-bottom: 8px;
-  
+
   &.button-solid {
     --box-shadow: 0 2px 4px 0 rgba(37, 99, 235, 0.1) !important;
     &:hover {
@@ -121,7 +122,7 @@ ion-button {
     --border-width: 1px !important;
     --border-color: var(--ion-color-light-shade) !important;
     --color: var(--ion-color-dark) !important;
-    
+
     &:hover {
       --background: var(--ion-color-light-tint) !important;
     }
@@ -495,7 +496,7 @@ ion-button {
 .platform-row, .social-links-box {
   .platform-input-item, .link-input-item {
     --background: var(--app-bg-card);
-    
+
     &:focus-within {
       --background: var(--app-bg-card);
     }
