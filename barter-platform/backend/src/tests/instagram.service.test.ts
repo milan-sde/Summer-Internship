@@ -60,11 +60,12 @@ describe("InstagramService", () => {
   });
 
   describe("getAuthUrl", () => {
-    it("should generate a valid Facebook OAuth redirect URL containing encrypted state", () => {
+    it("should generate a valid Instagram OAuth redirect URL containing encrypted state", () => {
       const authUrl = instagramService.getAuthUrl(testUser._id.toString(), "settings");
-      expect(authUrl).toContain("https://www.facebook.com/");
+      expect(authUrl).toContain("https://api.instagram.com/oauth/authorize");
       expect(authUrl).toContain("client_id=");
       expect(authUrl).toContain("state=");
+      expect(authUrl).toContain("scope=instagram_business_basic,instagram_business_content_publish");
 
       // Parse state
       const url = new URL(authUrl);
@@ -77,14 +78,14 @@ describe("InstagramService", () => {
     });
 
     it("should throw a ValidationError if required environment configuration is missing", () => {
-      const origAppId = process.env.FACEBOOK_APP_ID;
-      delete process.env.FACEBOOK_APP_ID;
+      const origAppId = process.env.INSTAGRAM_APP_ID;
+      delete process.env.INSTAGRAM_APP_ID;
       try {
         expect(() => {
           instagramService.getAuthUrl(testUser._id.toString(), "settings");
         }).toThrow(ValidationError);
       } finally {
-        process.env.FACEBOOK_APP_ID = origAppId;
+        process.env.INSTAGRAM_APP_ID = origAppId;
       }
     });
   });
@@ -106,7 +107,7 @@ describe("InstagramService", () => {
       ).rejects.toThrow(ValidationError);
     });
 
-    it("should successfully upgrade token, find business page, and connect account", async () => {
+    it("should successfully upgrade token, query profile, and connect account", async () => {
       const stateObj = {
         userId: testUser._id.toString(),
         origin: "onboarding",
@@ -115,55 +116,36 @@ describe("InstagramService", () => {
       const encryptedState = encrypt(JSON.stringify(stateObj));
 
       // Mock fetch responses for OAuth handshake & discovery:
-      // 1. Short-lived token exchange
-      // 2. Long-lived token upgrade
-      // 3. FB Pages accounts list
-      // 4. IG Profile statistics
-      // 5. Media list fetch (triggered inside handleOAuthCallback)
-      fetchSpy.mockImplementation((url: string) => {
+      // 1. Short-lived token exchange (POST api.instagram.com/oauth/access_token)
+      // 2. Long-lived token upgrade (GET graph.instagram.com/access_token)
+      // 3. IG Profile details (GET graph.instagram.com/me?fields=id,username,media_count,followers_count)
+      // 4. Media list fetch (GET graph.instagram.com/me/media)
+      fetchSpy.mockImplementation((url: string, options?: any) => {
         const u = url.toString();
-        if (u.includes("/oauth/access_token") && u.includes("code=")) {
+        if (u.includes("api.instagram.com/oauth/access_token")) {
           return Promise.resolve({
             ok: true,
-            json: () => Promise.resolve({ access_token: "short_lived_token_123" }),
+            json: () => Promise.resolve({ access_token: "short_lived_token_123", user_id: "ig_business_id_456" }),
           } as any);
         }
-        if (u.includes("/oauth/access_token") && u.includes("fb_exchange_token=")) {
+        if (u.includes("graph.instagram.com/access_token") && u.includes("grant_type=ig_exchange_token")) {
           return Promise.resolve({
             ok: true,
             json: () => Promise.resolve({ access_token: mockAccessToken, expires_in: 3600 }),
           } as any);
         }
-        if (u.includes("/me/accounts")) {
+        if (u.includes("graph.instagram.com/me") && !u.includes("/media")) {
           return Promise.resolve({
             ok: true,
             json: () => Promise.resolve({
-              data: [
-                {
-                  id: "facebook_page_id",
-                  name: "My Page",
-                  instagram_business_account: {
-                    id: "ig_business_id_456",
-                    username: "tester_ig",
-                    profile_picture_url: "https://mock.com/avatar.png",
-                  },
-                },
-              ],
-            }),
-          } as any);
-        }
-        if (u.includes("/ig_business_id_456") && !u.includes("/media")) {
-          return Promise.resolve({
-            ok: true,
-            json: () => Promise.resolve({
+              id: "ig_business_id_456",
               username: "tester_ig",
-              followers_count: 5000,
               media_count: 2,
-              profile_picture_url: "https://mock.com/avatar.png",
+              followers_count: 5000,
             }),
           } as any);
         }
-        if (u.includes("/media")) {
+        if (u.includes("graph.instagram.com/me/media")) {
           return Promise.resolve({
             ok: true,
             json: () => Promise.resolve({
@@ -202,7 +184,7 @@ describe("InstagramService", () => {
       expect(profile?.stats.followers).toBe(5000);
     });
 
-    it("should throw ValidationError if Facebook Pages API reports error", async () => {
+    it("should throw ValidationError if short-lived token exchange reports error", async () => {
       const stateObj = {
         userId: testUser._id.toString(),
         origin: "settings",
@@ -212,57 +194,13 @@ describe("InstagramService", () => {
 
       fetchSpy.mockImplementation((url: string) => {
         const u = url.toString();
-        if (u.includes("/oauth/access_token")) {
-          return Promise.resolve({
-            ok: true,
-            json: () => Promise.resolve({ access_token: "short_lived" }),
-          } as any);
-        }
-        if (u.includes("/me/accounts")) {
+        if (u.includes("api.instagram.com/oauth/access_token")) {
           return Promise.resolve({
             ok: false,
-            json: () => Promise.resolve({ error: { message: "Graph error message" } }),
+            json: () => Promise.resolve({ error_message: "OAuth exchange failed" }),
           } as any);
         }
         return Promise.reject(new Error(`Unhandled URL: ${u}`));
-      });
-
-      await expect(
-        instagramService.handleOAuthCallback("testCode", encryptedState)
-      ).rejects.toThrow(ValidationError);
-    });
-
-    it("should throw ValidationError if no connected Instagram Business account is found on Facebook pages", async () => {
-      const stateObj = {
-        userId: testUser._id.toString(),
-        origin: "settings",
-        timestamp: Date.now(),
-      };
-      const encryptedState = encrypt(JSON.stringify(stateObj));
-
-      fetchSpy.mockImplementation((url: string) => {
-        const u = url.toString();
-        if (u.includes("/oauth/access_token")) {
-          return Promise.resolve({
-            ok: true,
-            json: () => Promise.resolve({ access_token: "short_lived" }),
-          } as any);
-        }
-        if (u.includes("/me/accounts")) {
-          return Promise.resolve({
-            ok: true,
-            json: () => Promise.resolve({
-              data: [
-                {
-                  id: "facebook_page_id",
-                  name: "My Page"
-                  // No instagram_business_account
-                },
-              ],
-            }),
-          } as any);
-        }
-        return Promise.reject(new Error(`Unhandled: ${u}`));
       });
 
       await expect(
@@ -285,14 +223,14 @@ describe("InstagramService", () => {
 
       fetchSpy.mockImplementation((url: string) => {
         const u = url.toString();
-        if (u.includes("/ig_business_id_456")) {
+        if (u.includes("graph.instagram.com/me")) {
           return Promise.resolve({
             ok: true,
             json: () => Promise.resolve({
+              id: "ig_business_id_456",
               username: "tester_ig_updated",
-              followers_count: 7500,
               media_count: 5,
-              profile_picture_url: "https://mock.com/avatar-updated.png",
+              followers_count: 7500,
             }),
           } as any);
         }
@@ -307,7 +245,6 @@ describe("InstagramService", () => {
       const profile = await Profile.findOne({ userId: testUser._id });
       expect(profile?.instagram?.followersCount).toBe(7500);
       expect(profile?.instagram?.username).toBe("tester_ig_updated");
-      expect(profile?.instagram?.profilePicture).toBe("https://mock.com/avatar-updated.png");
       expect(profile?.platforms?.instagram?.followers).toBe(7500);
       expect(profile?.stats.followers).toBe(7500);
     });
@@ -367,7 +304,7 @@ describe("InstagramService", () => {
 
       fetchSpy.mockImplementation((url: string) => {
         const u = url.toString();
-        if (u.includes("/ig_business_id_456/media")) {
+        if (u.includes("graph.instagram.com/me/media")) {
           return Promise.resolve({
             ok: true,
             json: () => Promise.resolve({

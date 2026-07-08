@@ -57,13 +57,12 @@ export class InstagramService {
   }
 
   getAuthUrl(userId: string, origin: InstagramConnectionOrigin): string {
-    const appId = process.env.FACEBOOK_APP_ID;
+    const appId = process.env.INSTAGRAM_APP_ID;
     const redirectUri = process.env.INSTAGRAM_REDIRECT_URI;
-    const apiVersion = getApiVersion();
 
     if (!appId || !redirectUri) {
       throw new ValidationError(
-        "Facebook App ID or Redirect URI is not configured",
+        "Instagram App ID or Redirect URI is not configured",
       );
     }
 
@@ -74,12 +73,11 @@ export class InstagramService {
     };
 
     const encryptedState = encrypt(JSON.stringify(stateObj));
-    const scope =
-      "instagram_basic,pages_show_list,pages_read_engagement,public_profile";
+    const scope = "instagram_business_basic,instagram_business_content_publish";
 
-    return `https://www.facebook.com/${apiVersion}/dialog/oauth?client_id=${appId}&redirect_uri=${encodeURIComponent(
+    return `https://api.instagram.com/oauth/authorize?client_id=${appId}&redirect_uri=${encodeURIComponent(
       redirectUri,
-    )}&scope=${scope}&state=${encodeURIComponent(encryptedState)}`;
+    )}&scope=${scope}&response_type=code&state=${encodeURIComponent(encryptedState)}`;
   }
 
   async handleOAuthCallback(
@@ -97,25 +95,25 @@ export class InstagramService {
       throw new ValidationError("Invalid or tampered OAuth state parameter");
     }
 
-    const appId = process.env.FACEBOOK_APP_ID;
-    const appSecret = process.env.FACEBOOK_APP_SECRET;
+    const appId = process.env.INSTAGRAM_APP_ID;
+    const appSecret = process.env.INSTAGRAM_APP_SECRET;
     const redirectUri = process.env.INSTAGRAM_REDIRECT_URI;
-    const apiVersion = getApiVersion();
 
     if (!appId || !appSecret || !redirectUri) {
       throw new ValidationError(
-        "Meta App credentials are not fully configured in backend environment",
+        "Instagram App credentials are not fully configured in backend environment",
       );
     }
 
-    const shortLivedToken = await this.exchangeCodeForToken(
+    const { shortLivedToken, instagramId } = await this.exchangeCodeForShortToken(
       code,
       appId,
       appSecret,
       redirectUri,
     );
+
     const longLivedTokenResponse = await fetch(
-      `https://graph.facebook.com/${apiVersion}/oauth/access_token?grant_type=fb_exchange_token&client_id=${appId}&client_secret=${appSecret}&fb_exchange_token=${shortLivedToken}`,
+      `https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=${appSecret}&access_token=${shortLivedToken}`,
     );
     const longLivedTokenData =
       (await longLivedTokenResponse.json()) as MetaTokenResponse;
@@ -135,16 +133,31 @@ export class InstagramService {
     const expiresSeconds = longLivedTokenData.expires_in || 60 * 24 * 60 * 60;
     const tokenExpiresAt = new Date(Date.now() + expiresSeconds * 1000);
 
-    const connectedAccount = await this.findInstagramAccount(longLivedToken);
+    const profileResponse = await fetch(
+      `https://graph.instagram.com/me?fields=id,username,media_count,followers_count&access_token=${longLivedToken}`,
+    );
+    const profileData = (await profileResponse.json()) as any;
+
+    if (!profileResponse.ok || profileData.error) {
+      throw new ValidationError(
+        profileData.error?.message || "Failed to retrieve Instagram profile details",
+      );
+    }
+
+    const username = profileData.username || "";
+    const mediaCount = profileData.media_count || 0;
+    const followersCount = profileData.followers_count || 0;
+    const profilePicture = "";
+
     const encryptedToken = encrypt(longLivedToken);
 
     const account = await this.repository.upsertAccount({
       userId: new mongoose.Types.ObjectId(stateObj.userId),
-      instagramId: connectedAccount.instagramId,
-      username: connectedAccount.username,
-      followersCount: connectedAccount.followersCount,
-      mediaCount: connectedAccount.mediaCount,
-      profilePicture: connectedAccount.profilePicture,
+      instagramId,
+      username,
+      followersCount,
+      mediaCount,
+      profilePicture,
       accessToken: encryptedToken,
       tokenExpiresAt,
       connectedAt: new Date(),
@@ -171,11 +184,10 @@ export class InstagramService {
     }
 
     const token = decrypt(account.accessToken);
-    const apiVersion = getApiVersion();
     const profileResponse = await fetch(
-      `https://graph.facebook.com/${apiVersion}/${account.instagramId}?fields=username,profile_picture_url,followers_count,media_count&access_token=${token}`,
+      `https://graph.instagram.com/me?fields=id,username,media_count,followers_count&access_token=${token}`,
     );
-    const profileData = (await profileResponse.json()) as MetaProfileResponse;
+    const profileData = (await profileResponse.json()) as any;
 
     if (!profileResponse.ok || profileData.error) {
       throw new ValidationError(
@@ -184,11 +196,10 @@ export class InstagramService {
       );
     }
 
-    const followersCount = profileData.followers_count || 0;
+    const followersCount = profileData.followers_count !== undefined ? profileData.followers_count : (account.followersCount || 0);
     const mediaCount = profileData.media_count || account.mediaCount || 0;
     const username = profileData.username || account.username;
-    const profilePicture =
-      profileData.profile_picture_url || account.profilePicture;
+    const profilePicture = account.profilePicture || "";
 
     const updatedAccount = await this.repository.upsertAccount({
       userId: new mongoose.Types.ObjectId(userId),
@@ -219,9 +230,8 @@ export class InstagramService {
       existingItems.map((item) => [item.mediaId, item.selectedForPortfolio]),
     );
 
-    const apiVersion = getApiVersion();
     const mediaResponse = await fetch(
-      `https://graph.facebook.com/${apiVersion}/${account.instagramId}/media?fields=id,caption,media_type,media_url,permalink,thumbnail_url,timestamp&limit=25&access_token=${token}`,
+      `https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,permalink,thumbnail_url,timestamp&limit=25&access_token=${token}`,
     );
     const mediaData = (await mediaResponse.json()) as MetaMediaResponse;
 
@@ -428,74 +438,39 @@ export class InstagramService {
     };
   }
 
-  private async exchangeCodeForToken(
+  private async exchangeCodeForShortToken(
     code: string,
     appId: string,
     appSecret: string,
     redirectUri: string,
-  ): Promise<string> {
-    const apiVersion = getApiVersion();
-    const tokenResponse = await fetch(
-      `https://graph.facebook.com/${apiVersion}/oauth/access_token?client_id=${appId}&redirect_uri=${encodeURIComponent(
-        redirectUri,
-      )}&client_secret=${appSecret}&code=${code}`,
-    );
-    const tokenData = (await tokenResponse.json()) as MetaTokenResponse;
+  ): Promise<{ shortLivedToken: string; instagramId: string }> {
+    const formData = new URLSearchParams();
+    formData.append("client_id", appId);
+    formData.append("client_secret", appSecret);
+    formData.append("grant_type", "authorization_code");
+    formData.append("redirect_uri", redirectUri);
+    formData.append("code", code);
+
+    const tokenResponse = await fetch("https://api.instagram.com/oauth/access_token", {
+      method: "POST",
+      body: formData,
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
+
+    const tokenData = (await tokenResponse.json()) as any;
 
     if (!tokenResponse.ok || tokenData.error || !tokenData.access_token) {
       throw new ValidationError(
-        tokenData.error?.message || "Failed to exchange authorization code",
+        tokenData.error_message || tokenData.error?.message || "Failed to exchange authorization code",
       );
     }
 
-    return tokenData.access_token;
-  }
-
-  private async findInstagramAccount(accessToken: string) {
-    const apiVersion = getApiVersion();
-    const pagesResponse = await fetch(
-      `https://graph.facebook.com/${apiVersion}/me/accounts?fields=instagram_business_account{id,username,profile_picture_url},name&access_token=${accessToken}`,
-    );
-    const pagesData = (await pagesResponse.json()) as MetaPageResponse;
-
-    if (!pagesResponse.ok || pagesData.error) {
-      throw new ValidationError(
-        pagesData.error?.message || "Failed to retrieve Facebook pages list",
-      );
-    }
-
-    for (const page of pagesData.data || []) {
-      const instagramAccount = page.instagram_business_account;
-      if (instagramAccount?.id) {
-        const profileResponse = await fetch(
-          `https://graph.facebook.com/${apiVersion}/${instagramAccount.id}?fields=username,profile_picture_url,followers_count,media_count&access_token=${accessToken}`,
-        );
-        const profileData =
-          (await profileResponse.json()) as MetaProfileResponse;
-
-        if (!profileResponse.ok || profileData.error) {
-          throw new ValidationError(
-            profileData.error?.message ||
-              "Failed to retrieve Instagram profile data",
-          );
-        }
-
-        return {
-          instagramId: instagramAccount.id,
-          username: profileData.username || instagramAccount.username || "",
-          followersCount: profileData.followers_count || 0,
-          mediaCount: profileData.media_count || 0,
-          profilePicture:
-            profileData.profile_picture_url ||
-            instagramAccount.profile_picture_url ||
-            "",
-        };
-      }
-    }
-
-    throw new ValidationError(
-      "No connected Instagram Creator or Business account found on your Facebook Pages. Please link a professional Instagram account to a Facebook Page.",
-    );
+    return {
+      shortLivedToken: tokenData.access_token,
+      instagramId: String(tokenData.user_id),
+    };
   }
 
   private async syncProfileDocument(
