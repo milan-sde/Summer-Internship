@@ -20,8 +20,23 @@ import {
   IonRefresher,
   IonRefresherContent,
   IonSelect,
-  IonSelectOption
+  IonSelectOption,
+  IonModal,
+  IonItem,
+  IonInput,
+  IonTextarea,
+  IonSpinner,
+  IonBadge,
+  IonToggle,
+  IonText,
+  IonGrid,
+  IonRow,
+  IonCol,
+  ToastController,
+  LoadingController
 } from '@ionic/angular/standalone';
+import { FormsModule, FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { AiService } from 'src/app/services/ai.service';
 import { addIcons } from 'ionicons';
 import {
   logoInstagram,
@@ -40,6 +55,7 @@ import {
   shirtOutline,
   restaurantOutline,
   sparklesOutline,
+  sparkles,
   ellipsisHorizontalOutline,
   chevronDownOutline,
   swapVerticalOutline,
@@ -47,7 +63,16 @@ import {
   closeCircleOutline,
   personOutline,
   chevronUpOutline,
-  playCircleOutline
+  playCircleOutline,
+  documentTextOutline,
+  cloudUploadOutline,
+  imageOutline,
+  videocamOutline,
+  openOutline,
+  closeOutline,
+  alertCircleOutline,
+  refreshOutline,
+  copyOutline
 } from 'ionicons/icons';
 
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
@@ -61,6 +86,7 @@ import { HeaderComponent } from '../../shared/components/header/header.component
   changeDetection:ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
+    FormsModule,
     RouterLink,
     IonHeader,
     IonToolbar,
@@ -76,6 +102,18 @@ import { HeaderComponent } from '../../shared/components/header/header.component
     IonRefresherContent,
     IonSelect,
     IonSelectOption,
+    IonModal,
+    IonItem,
+    IonInput,
+    IonTextarea,
+    IonSpinner,
+    IonBadge,
+    IonToggle,
+    IonText,
+    IonGrid,
+    IonRow,
+    IonCol,
+    ReactiveFormsModule,
     SidebarComponent,
     HeaderComponent
   ]
@@ -84,6 +122,10 @@ export class CampaignsPage implements OnInit {
   currentUser: any;
   campaigns: ICampaign[] = [];
   isSidebarOpen = false;
+
+  isAiModalOpen = false;
+  isGenerating = false;
+  aiForm!: FormGroup;
 
   toggleSidebar() {
     this.isSidebarOpen = !this.isSidebarOpen;
@@ -110,7 +152,11 @@ export class CampaignsPage implements OnInit {
     private storage: StorageService,
     private profileService: ProfileService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private toastController: ToastController,
+    private loadingController: LoadingController,
+    private fb: FormBuilder,
+    private aiService: AiService
   ) {
     addIcons({
       logoInstagram,
@@ -129,6 +175,7 @@ export class CampaignsPage implements OnInit {
       shirtOutline,
       restaurantOutline,
       sparklesOutline,
+      sparkles,
       ellipsisHorizontalOutline,
       chevronDownOutline,
       swapVerticalOutline,
@@ -136,13 +183,34 @@ export class CampaignsPage implements OnInit {
       closeCircleOutline,
       personOutline,
       chevronUpOutline,
-      playCircleOutline
+      playCircleOutline,
+      documentTextOutline,
+      cloudUploadOutline,
+      imageOutline,
+      videocamOutline,
+      openOutline,
+      closeOutline,
+      alertCircleOutline,
+      refreshOutline,
+      copyOutline
     });
   }
 
   ngOnInit() {
     this.currentUser = this.storage.getUser();
     this.loadCampaigns();
+    this.initForm();
+  }
+
+  initForm() {
+    this.aiForm = this.fb.group({
+      description: ['', [Validators.required]],
+      tone: ['Casual', [Validators.required]],
+      length: ['Medium', [Validators.required]],
+      platform: ['Instagram', [Validators.required]],
+      includeEmojis: [true],
+      includeHashtags: [true],
+    });
   }
 
   ionViewWillEnter() {
@@ -384,5 +452,343 @@ export class CampaignsPage implements OnInit {
 
   viewProfile() {
     this.router.navigate(['/profile']);
+  }
+
+  // ================= CONTENT WORKSPACE STATE =================
+  isContentModalOpen = false;
+  selectedCampaignForContent: any = null;
+  currentSubmission: any = null;
+  submissionCaption = '';
+  submissionMediaType: 'IMAGE' | 'VIDEO' = 'IMAGE';
+  submissionFile: File | null = null;
+  submissionFilePreview: string | null = null;
+  isSubmittingContent = false;
+  isPublishingToInstagram = false;
+
+  // ================= CONTENT REVIEW STATE =================
+  isReviewModalOpen = false;
+  selectedCampaignForReview: any = null;
+  selectedApplicantForReview: any = null;
+  reviewSubmissionData: any = null;
+  brandReviewFeedback = '';
+  isReviewingContent = false;
+
+  // Open the Influencer Content Submission workspace
+  openContentWorkspace(campaign: any) {
+    this.selectedCampaignForContent = campaign;
+    this.isContentModalOpen = true;
+    this.currentSubmission = null;
+    this.submissionCaption = '';
+    this.submissionMediaType = 'IMAGE';
+    this.submissionFile = null;
+    this.submissionFilePreview = null;
+    this.cdr.markForCheck();
+
+    this.campaignService.getSubmissionByInfluencer(campaign.id, this.currentUser.id).subscribe({
+      next: (response: any) => {
+        if (response.success && response.data?.submission) {
+          this.currentSubmission = response.data.submission;
+          this.submissionCaption = this.currentSubmission.caption || '';
+          this.submissionMediaType = this.currentSubmission.mediaType || 'IMAGE';
+          this.submissionFilePreview = this.getAvatarUrl(this.currentSubmission.mediaUrl);
+        }
+        this.cdr.markForCheck();
+      },
+      error: (error: any) => {
+        console.error('Failed to load submission details:', error);
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  closeContentWorkspace() {
+    this.isContentModalOpen = false;
+    this.cdr.markForCheck();
+  }
+
+  onSubmissionFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.submissionFile = file;
+      this.submissionFilePreview = URL.createObjectURL(file);
+      this.cdr.markForCheck();
+    }
+  }
+
+  async saveSubmissionDraft() {
+    if (!this.selectedCampaignForContent) return;
+
+    if (!this.currentSubmission && !this.submissionFile) {
+      this.showToast('Please upload an image or video file for your deliverable', 'danger');
+      return;
+    }
+
+    this.isSubmittingContent = true;
+    this.cdr.markForCheck();
+
+    const campaignId = this.selectedCampaignForContent.id;
+
+    if (this.currentSubmission) {
+      // Update existing draft/revision
+      this.campaignService.updateSubmission(
+        campaignId,
+        this.currentSubmission.id,
+        this.submissionFile || undefined,
+        this.submissionMediaType,
+        this.submissionCaption
+      ).subscribe({
+        next: (response: any) => {
+          this.isSubmittingContent = false;
+          if (response.success && response.data?.submission) {
+            this.currentSubmission = response.data.submission;
+            this.submissionFilePreview = this.getAvatarUrl(this.currentSubmission.mediaUrl);
+            this.submissionFile = null;
+            this.showToast('Deliverable draft saved successfully!', 'success');
+          }
+          this.cdr.markForCheck();
+        },
+        error: (error: any) => {
+          this.isSubmittingContent = false;
+          console.error('Failed to save draft:', error);
+          this.showToast(error?.error?.message || 'Failed to save deliverable draft', 'danger');
+          this.cdr.markForCheck();
+        }
+      });
+    } else {
+      // Create new draft
+      this.campaignService.createSubmission(
+        campaignId,
+        this.submissionFile!,
+        this.submissionMediaType,
+        this.submissionCaption
+      ).subscribe({
+        next: (response: any) => {
+          this.isSubmittingContent = false;
+          if (response.success && response.data?.submission) {
+            this.currentSubmission = response.data.submission;
+            this.submissionFilePreview = this.getAvatarUrl(this.currentSubmission.mediaUrl);
+            this.submissionFile = null;
+            this.showToast('Deliverable draft created successfully!', 'success');
+          }
+          this.cdr.markForCheck();
+        },
+        error: (error: any) => {
+          this.isSubmittingContent = false;
+          console.error('Failed to create draft:', error);
+          this.showToast(error?.error?.message || 'Failed to save deliverable draft', 'danger');
+          this.cdr.markForCheck();
+        }
+      });
+    }
+  }
+
+  submitDeliverable() {
+    if (!this.selectedCampaignForContent || !this.currentSubmission) return;
+
+    this.isSubmittingContent = true;
+    this.cdr.markForCheck();
+
+    this.campaignService.submitContent(
+      this.selectedCampaignForContent.id,
+      this.currentSubmission.id
+    ).subscribe({
+      next: (response: any) => {
+        this.isSubmittingContent = false;
+        if (response.success && response.data?.submission) {
+          this.currentSubmission = response.data.submission;
+          this.showToast('Deliverable submitted successfully to brand for review!', 'success');
+        }
+        this.cdr.markForCheck();
+      },
+      error: (error: any) => {
+        this.isSubmittingContent = false;
+        console.error('Failed to submit content:', error);
+        this.showToast(error?.error?.message || 'Failed to submit content', 'danger');
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  publishDeliverableToInstagram() {
+    if (!this.selectedCampaignForContent || !this.currentSubmission) return;
+
+    this.isPublishingToInstagram = true;
+    this.cdr.markForCheck();
+
+    this.campaignService.publishToInstagram(
+      this.selectedCampaignForContent.id,
+      this.currentSubmission.id
+    ).subscribe({
+      next: (response: any) => {
+        this.isPublishingToInstagram = false;
+        if (response.success && response.data?.submission) {
+          this.currentSubmission = response.data.submission;
+          this.showToast('Successfully published approved deliverable directly to Instagram!', 'success');
+        }
+        this.cdr.markForCheck();
+      },
+      error: (error: any) => {
+        this.isPublishingToInstagram = false;
+        console.error('Failed to publish to Instagram:', error);
+        if (error?.error?.data?.submission) {
+          this.currentSubmission = error.error.data.submission;
+        }
+        this.showToast(error?.error?.message || 'Instagram publishing failed. Please check access token.', 'danger');
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  addDeliverableToPortfolio() {
+    if (!this.selectedCampaignForContent || !this.currentSubmission) return;
+
+    this.loadingController.create({
+      message: 'Adding to your portfolio showcase...'
+    }).then((loading) => {
+      loading.present();
+
+      this.campaignService.addSubmissionToPortfolio(
+        this.selectedCampaignForContent.id,
+        this.currentSubmission.id
+      ).subscribe({
+        next: (response: any) => {
+          loading.dismiss();
+          this.showToast('Successfully added campaign deliverable to your portfolio!', 'success');
+          this.cdr.markForCheck();
+        },
+        error: (error: any) => {
+          loading.dismiss();
+          console.error('Failed to add to portfolio:', error);
+          this.showToast(error?.error?.message || 'Failed to add deliverable to portfolio', 'danger');
+          this.cdr.markForCheck();
+        }
+      });
+    });
+  }
+
+  // Open the Brand Content Review workspace
+  openContentReview(campaign: any, applicant: any) {
+    this.selectedCampaignForReview = campaign;
+    this.selectedApplicantForReview = applicant;
+    this.isReviewModalOpen = true;
+    this.reviewSubmissionData = null;
+    this.brandReviewFeedback = '';
+    this.cdr.markForCheck();
+
+    this.campaignService.getSubmissionByInfluencer(campaign.id, applicant.influencerId).subscribe({
+      next: (response: any) => {
+        if (response.success && response.data?.submission) {
+          this.reviewSubmissionData = response.data.submission;
+        }
+        this.cdr.markForCheck();
+      },
+      error: (error: any) => {
+        console.error('Failed to load review submission details:', error);
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  closeContentReview() {
+    this.isReviewModalOpen = false;
+    this.cdr.markForCheck();
+  }
+
+  reviewDeliverable(status: 'APPROVED' | 'CHANGES_REQUESTED') {
+    if (!this.selectedCampaignForReview || !this.reviewSubmissionData) return;
+
+    if (status === 'CHANGES_REQUESTED' && (!this.brandReviewFeedback || !this.brandReviewFeedback.trim())) {
+      this.showToast('Please provide feedback explaining the changes required', 'danger');
+      return;
+    }
+
+    this.isReviewingContent = true;
+    this.cdr.markForCheck();
+
+    this.campaignService.reviewContent(
+      this.selectedCampaignForReview.id,
+      this.reviewSubmissionData.id,
+      status,
+      this.brandReviewFeedback
+    ).subscribe({
+      next: (response: any) => {
+        this.isReviewingContent = false;
+        if (response.success && response.data?.submission) {
+          this.reviewSubmissionData = response.data.submission;
+          const msg = status === 'APPROVED' ? 'Deliverable approved successfully!' : 'Changes requested successfully';
+          this.showToast(msg, 'success');
+        }
+        this.cdr.markForCheck();
+      },
+      error: (error: any) => {
+        this.isReviewingContent = false;
+        console.error('Failed to review deliverable:', error);
+        this.showToast(error?.error?.message || 'Failed to review deliverable', 'danger');
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  // Display toast feedback messages
+  async showToast(message: string, color: string = 'primary') {
+    const toast = await this.toastController.create({
+      message: message,
+      color: color,
+      duration: 3000,
+      position: 'top',
+      buttons: ['OK'],
+    });
+    await toast.present();
+  }
+
+  openAiModal() {
+    this.aiForm.reset({
+      description: '',
+      tone: 'Casual',
+      length: 'Medium',
+      platform: 'Instagram',
+      includeEmojis: true,
+      includeHashtags: true,
+    });
+    this.isAiModalOpen = true;
+    this.cdr.markForCheck();
+  }
+
+  closeAiModal() {
+    this.isAiModalOpen = false;
+    this.cdr.markForCheck();
+  }
+
+  generateAiCaption() {
+    if (this.aiForm.invalid) {
+      this.aiForm.markAllAsTouched();
+      return;
+    }
+
+    this.isGenerating = true;
+    this.cdr.markForCheck();
+
+    this.aiService.generateCaption(this.aiForm.value).subscribe({
+      next: (response) => {
+        this.isGenerating = false;
+        if (response && response.success && response.data?.caption) {
+          this.submissionCaption = response.data.caption;
+          this.showToast('Caption generated successfully!', 'success');
+          this.closeAiModal();
+        } else {
+          this.showToast('Failed to generate caption. Please try again.', 'danger');
+        }
+        this.cdr.markForCheck();
+      },
+      error: (error) => {
+        this.isGenerating = false;
+        console.error('Caption generation failed:', error);
+        this.showToast(
+          error.error?.error?.message || error.message || 'Failed to generate caption',
+          'danger'
+        );
+        this.cdr.markForCheck();
+      },
+    });
   }
 }

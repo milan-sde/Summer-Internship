@@ -6,7 +6,9 @@ export class AiService {
   constructor() {
     this.apiKey = process.env.GEMINI_API_KEY || "";
     if (!this.apiKey) {
-      console.warn("WARNING: GEMINI_API_KEY is not defined in the environment variables.");
+      console.warn(
+        "WARNING: GEMINI_API_KEY is not defined in the environment variables.",
+      );
     }
   }
 
@@ -15,14 +17,21 @@ export class AiService {
       throw new Error("Gemini API key is not configured");
     }
 
-    const { description, tone, length, platform, includeEmojis, includeHashtags } = dto;
+    const {
+      description,
+      tone,
+      length,
+      platform,
+      includeEmojis,
+      includeHashtags,
+    } = dto;
 
     const lengthInstruction =
       length === "Short"
         ? "one short punchy sentence or line"
         : length === "Medium"
-        ? "a few engaging sentences"
-        : "a detailed, comprehensive paragraph";
+          ? "a few engaging sentences"
+          : "a detailed, comprehensive paragraph";
 
     const prompt = `You are an expert social media copywriter. Generate a caption for the following post:
 - Platform: ${platform}

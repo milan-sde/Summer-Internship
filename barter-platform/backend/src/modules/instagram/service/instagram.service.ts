@@ -297,6 +297,137 @@ export class InstagramService {
     return decrypt(account.accessToken);
   }
 
+  /**
+   * Publishes approved content to the official Instagram Graph API.
+   * Handles both IMAGE posts and VIDEO (Reels) posts.
+   * Swaps local development URLs for a public placeholder asset during testing to satisfy Meta Graph API requirements.
+   */
+  async publishContent(
+    userId: string,
+    mediaUrl: string,
+    caption: string,
+    mediaType: "IMAGE" | "VIDEO"
+  ): Promise<{ instagramMediaId: string; instagramPermalink: string }> {
+    const account = await this.repository.findAccountByUserId(userId);
+    if (!account) {
+      throw new ValidationError("Instagram account is not connected for this profile");
+    }
+
+    const token = decrypt(account.accessToken);
+    const instagramId = account.instagramId;
+    const apiVersion = getApiVersion();
+
+    // 1. Swapping local server URLs for a public fallback when running locally
+    let publicMediaUrl = mediaUrl;
+    if (mediaUrl.includes("localhost") || mediaUrl.includes("127.0.0.1") || !mediaUrl.startsWith("http")) {
+      const hostUrl = process.env.BACKEND_URL || "http://localhost:3000";
+      const fullUrl = mediaUrl.startsWith("/") ? `${hostUrl}${mediaUrl}` : mediaUrl;
+      
+      if (fullUrl.includes("localhost") || fullUrl.includes("127.0.0.1")) {
+        if (mediaType === "VIDEO") {
+          publicMediaUrl = "https://www.w3schools.com/html/mov_bbb.mp4"; // Sample public MP4 video
+        } else {
+          publicMediaUrl = "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=800"; // Sample Instagram image
+        }
+        console.log(`[Instagram Service] Replacing local URL '${fullUrl}' with public fallback: '${publicMediaUrl}'`);
+      } else {
+        publicMediaUrl = fullUrl;
+      }
+    }
+
+    // 2. Step 1: Create media container
+    console.log(`[Instagram Service] Creating media container for ${mediaType}...`);
+    let containerUrl = `https://graph.facebook.com/${apiVersion}/${instagramId}/media?caption=${encodeURIComponent(
+      caption
+    )}&access_token=${token}`;
+
+    if (mediaType === "VIDEO") {
+      containerUrl += `&media_type=REELS&video_url=${encodeURIComponent(publicMediaUrl)}`;
+    } else {
+      containerUrl += `&image_url=${encodeURIComponent(publicMediaUrl)}`;
+    }
+
+    const containerResponse = await fetch(containerUrl, { method: "POST" });
+    const containerData = (await containerResponse.json()) as any;
+
+    if (!containerResponse.ok || containerData.error || !containerData.id) {
+      throw new ValidationError(
+        containerData.error?.message || "Failed to create Instagram media container"
+      );
+    }
+
+    const containerId = containerData.id;
+    console.log(`[Instagram Service] Media container created successfully. ID: ${containerId}`);
+
+    // 3. Step 2: For Video, poll container status until FINISHED
+    if (mediaType === "VIDEO") {
+      console.log(`[Instagram Service] Polling status for video container: ${containerId}...`);
+      let isFinished = false;
+      let retries = 0;
+      const maxRetries = 30; // 30 retries * 5000ms = 150 seconds
+
+      while (!isFinished && retries < maxRetries) {
+        await new Promise((resolve) => setTimeout(resolve, 5000));
+        retries++;
+
+        const statusResponse = await fetch(
+          `https://graph.facebook.com/${apiVersion}/${containerId}?fields=status_code,status&access_token=${token}`
+        );
+        const statusData = (await statusResponse.json()) as any;
+
+        if (!statusResponse.ok || statusData.error) {
+          throw new ValidationError(
+            statusData.error?.message || "Failed to check video container processing status"
+          );
+        }
+
+        const statusCode = statusData.status_code;
+        console.log(`[Instagram Service] Video container status (Attempt ${retries}/${maxRetries}): ${statusCode}`);
+
+        if (statusCode === "FINISHED") {
+          isFinished = true;
+        } else if (statusCode === "ERROR" || statusCode === "EXPIRED") {
+          throw new ValidationError(
+            statusData.error?.message || `Video processing failed with state: ${statusCode}`
+          );
+        }
+      }
+
+      if (!isFinished) {
+        throw new ValidationError("Video processing timed out on Instagram servers. Please try again.");
+      }
+    }
+
+    // 4. Step 3: Publish the media container
+    console.log(`[Instagram Service] Publishing media container: ${containerId}...`);
+    const publishUrl = `https://graph.facebook.com/${apiVersion}/${instagramId}/media_publish?creation_id=${containerId}&access_token=${token}`;
+    const publishResponse = await fetch(publishUrl, { method: "POST" });
+    const publishData = (await publishResponse.json()) as any;
+
+    if (!publishResponse.ok || publishData.error || !publishData.id) {
+      throw new ValidationError(
+        publishData.error?.message || "Failed to publish media container to Instagram"
+      );
+    }
+
+    const mediaId = publishData.id;
+    console.log(`[Instagram Service] Media published successfully. Media ID: ${mediaId}`);
+
+    // 5. Step 4: Fetch permalink and timestamp
+    console.log(`[Instagram Service] Fetching permalink for media ID: ${mediaId}...`);
+    const mediaDetailResponse = await fetch(
+      `https://graph.facebook.com/${apiVersion}/${mediaId}?fields=permalink,timestamp&access_token=${token}`
+    );
+    const mediaDetailData = (await mediaDetailResponse.json()) as any;
+
+    const permalink = mediaDetailData.permalink || `https://www.instagram.com/p/${mediaId}/`;
+    
+    return {
+      instagramMediaId: mediaId,
+      instagramPermalink: permalink,
+    };
+  }
+
   private async exchangeCodeForToken(
     code: string,
     appId: string,

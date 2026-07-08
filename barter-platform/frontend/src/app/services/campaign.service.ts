@@ -125,4 +125,106 @@ export class CampaignService {
       { withCredentials: true },
     );
   }
+
+  // Get deliverables submission list for a campaign
+  getSubmissions(campaignId: string): Observable<any> {
+    return this.http.get(
+      `${this.apiUrl}/campaigns/${campaignId}/submissions`,
+      { withCredentials: true }
+    );
+  }
+
+  // Get submission details for specific influencer collaboration
+  getSubmissionByInfluencer(campaignId: string, influencerId: string): Observable<any> {
+    return this.http.get(
+      `${this.apiUrl}/campaigns/${campaignId}/submissions/influencer/${influencerId}`,
+      { withCredentials: true }
+    );
+  }
+
+  // Upload/Create a new content submission draft (Influencers only)
+  createSubmission(
+    campaignId: string,
+    file: File,
+    mediaType: 'IMAGE' | 'VIDEO',
+    caption?: string
+  ): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('mediaType', mediaType);
+    if (caption) {
+      formData.append('caption', caption);
+    }
+    return this.http.post(
+      `${this.apiUrl}/campaigns/${campaignId}/submissions`,
+      formData,
+      { withCredentials: true }
+    );
+  }
+
+  // Update a submission draft or edit and resubmit (Influencers only)
+  updateSubmission(
+    campaignId: string,
+    submissionId: string,
+    file?: File,
+    mediaType?: 'IMAGE' | 'VIDEO',
+    caption?: string
+  ): Observable<any> {
+    const formData = new FormData();
+    if (file) {
+      formData.append('file', file);
+    }
+    if (mediaType) {
+      formData.append('mediaType', mediaType);
+    }
+    if (caption !== undefined) {
+      formData.append('caption', caption);
+    }
+    return this.http.put(
+      `${this.apiUrl}/campaigns/${campaignId}/submissions/${submissionId}`,
+      formData,
+      { withCredentials: true }
+    );
+  }
+
+  // Submit draft content to the brand for review (Influencers only)
+  submitContent(campaignId: string, submissionId: string): Observable<any> {
+    return this.http.post(
+      `${this.apiUrl}/campaigns/${campaignId}/submissions/${submissionId}/submit`,
+      {},
+      { withCredentials: true }
+    );
+  }
+
+  // Approve or request changes on content submission (Brands only)
+  reviewContent(
+    campaignId: string,
+    submissionId: string,
+    status: 'APPROVED' | 'CHANGES_REQUESTED',
+    feedback?: string
+  ): Observable<any> {
+    return this.http.post(
+      `${this.apiUrl}/campaigns/${campaignId}/submissions/${submissionId}/review`,
+      { status, feedback },
+      { withCredentials: true }
+    );
+  }
+
+  // Publish approved content to Instagram (Influencers only)
+  publishToInstagram(campaignId: string, submissionId: string): Observable<any> {
+    return this.http.post(
+      `${this.apiUrl}/campaigns/${campaignId}/submissions/${submissionId}/publish`,
+      {},
+      { withCredentials: true }
+    );
+  }
+
+  // Copy published campaign deliverable to the influencer's portfolio
+  addSubmissionToPortfolio(campaignId: string, submissionId: string): Observable<any> {
+    return this.http.post(
+      `${this.apiUrl}/campaigns/${campaignId}/submissions/${submissionId}/to-portfolio`,
+      {},
+      { withCredentials: true }
+    );
+  }
 }

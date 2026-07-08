@@ -5,7 +5,7 @@ import { UserRepository } from "@modules/users/repositories/user.repository";
 import { UserRole } from "@modules/users/models/user.model";
 import { Profile } from "@modules/profile/models/profile.model";
 import { User } from "@modules/users/models/user.model";
-import { InstagramService } from "@modules/instagram/services/instagram.service";
+import { InstagramService } from "@modules/instagram/service/instagram.service";
 import { InstagramMedia } from "@modules/instagram/models/instagram-media.model";
 import { InstagramAccount } from "@modules/instagram/models/instagram-account.model";
 
