@@ -62,7 +62,12 @@ export class AuthService {
   // Helper: Generate and send OTP email
   private async sendOtp(email: string): Promise<void> {
     const otp = this.otpService.generateAndStoreOtp(email);
-    await this.emailService.sendOtpEmail(email, otp);
+    try {
+      await this.emailService.sendOtpEmail(email, otp);
+    } catch (error) {
+      this.otpService.deleteOtp(email);
+      throw new ValidationError("Unable to send verification email. Please try again.");
+    }
   }
 
   // Verify email using the OTP code
@@ -267,7 +272,12 @@ export class AuthService {
 
     // Resend OTP
     const otp = this.otpService.resendOtp(email);
-    await this.emailService.sendOtpEmail(email, otp);
+    try {
+      await this.emailService.sendOtpEmail(email, otp);
+    } catch (error) {
+      this.otpService.deleteOtp(email);
+      throw new ValidationError("Unable to send verification email. Please try again.");
+    }
 
     console.log(`📧 OTP resent to ${email}`);
   }
