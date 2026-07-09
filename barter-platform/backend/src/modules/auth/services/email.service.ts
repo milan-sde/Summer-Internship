@@ -128,9 +128,11 @@ If you didn't request this, please ignore this email.
 </html>`,
       });
 
+      console.log("Email provider request completed");
       if (response.error) {
         throw response.error;
       }
+      console.log("Email delivery request accepted");
     } catch (error: any) {
       console.error(`❌ Error sending email to ${email}:`, error.message || error);
       throw new Error("Email delivery failed");

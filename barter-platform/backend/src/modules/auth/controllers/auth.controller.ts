@@ -16,8 +16,10 @@ const authService = new AuthService();
 
 // Register: Send OTP to user email
 export const register = asyncHandler(async (req: Request, res: Response) => {
+  console.log("Registration request reached controller");
   await authService.register(req.body);
 
+  console.log("Registration response returned");
   res.status(201).json({
     success: true,
     message: "OTP sent to your email. Please verify to continue.",

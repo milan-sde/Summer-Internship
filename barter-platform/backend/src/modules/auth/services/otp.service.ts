@@ -61,6 +61,7 @@ export class OtpService {
       createdAt: new Date(),
     });
 
+    console.log("OTP record prepared");
     return code;
   }
 

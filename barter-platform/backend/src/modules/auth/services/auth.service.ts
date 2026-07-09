@@ -63,6 +63,7 @@ export class AuthService {
   private async sendOtp(email: string): Promise<void> {
     const otp = this.otpService.generateAndStoreOtp(email);
     try {
+      console.log("Calling email service");
       await this.emailService.sendOtpEmail(email, otp);
     } catch (error) {
       this.otpService.deleteOtp(email);
