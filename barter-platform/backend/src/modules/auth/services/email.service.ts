@@ -1,58 +1,29 @@
 import { ValidationError } from "@shared/errors/app-error";
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
-interface EmailOptions {
-  to: string;
-  subject: string;
-  text?: string;
-  html?: string;
-}
-
-// Email Service to send/simulate emails using Nodemailer
+// Email Service to send/simulate emails using Resend SDK
 export class EmailService {
-  private transporter: nodemailer.Transporter | null = null;
+  private resend: Resend | null = null;
   private useMock = false;
 
   constructor() {
-    const host = process.env.SMTP_HOST;
-    const port = process.env.SMTP_PORT;
-    const user = process.env.SMTP_USER;
-    const pass = process.env.SMTP_PASS;
+    const resendApiKey = process.env.RESEND_API_KEY;
 
-    if (!host || !port || !user || !pass) {
+    if (!resendApiKey) {
       if (process.env.NODE_ENV === "development") {
-        console.warn("⚠️ SMTP credentials not fully configured. Email service will run in mock mode.");
+        console.warn("⚠️ RESEND_API_KEY not configured. Email service will run in mock mode.");
         this.useMock = true;
       } else {
-        console.error("❌ SMTP credentials missing in production! Email service will fail to send emails.");
+        console.error("❌ RESEND_API_KEY missing in production! Email service will fail to send emails.");
       }
       return;
     }
 
     try {
-      this.transporter = nodemailer.createTransport({
-        host,
-        port: parseInt(port, 10),
-        secure: process.env.SMTP_SECURE === "true", // true for 465, false for 587/other ports
-        auth: {
-          user,
-          pass,
-        },
-        connectionTimeout: 10000, // 10 seconds connection timeout
-        greetingTimeout: 10000,   // 10 seconds greeting timeout
-        socketTimeout: 15000,     // 15 seconds socket inactivity timeout
-      });
-
-      // Verify connection configuration asynchronously on startup (non-blocking)
-      this.transporter.verify((error) => {
-        if (error) {
-          console.error("❌ Email service configuration failed:", error.message);
-        } else {
-          console.log("📧 Email service configured successfully");
-        }
-      });
+      this.resend = new Resend(resendApiKey);
+      console.log("📧 Resend Email Service initialized successfully");
     } catch (error: any) {
-      console.error("❌ Email service initialization failed:", error.message);
+      console.error("❌ Resend Email Service initialization failed:", error.message);
     }
   }
 
@@ -66,10 +37,10 @@ export class EmailService {
 
     const expiresInMinutes = process.env.OTP_EXPIRY_MINUTES || "10";
 
-    // In development, if SMTP not configured, log email to console
-    if (this.useMock || !this.transporter) {
+    // In development, if Resend is not configured, log email to console
+    if (this.useMock || !this.resend) {
       if (process.env.NODE_ENV !== "development") {
-        throw new Error("SMTP transporter is not configured in production");
+        throw new Error("Resend transporter is not configured in production");
       }
       console.log(`
 📧 ========== EMAIL SIMULATION ==========
@@ -88,11 +59,11 @@ If you didn't request this, please ignore this email.
 
     try {
       const fromName = process.env.EMAIL_FROM_NAME || "KonnectNow";
-      const fromAddress = process.env.EMAIL_FROM_ADDRESS || "no-reply@konnectnow.com";
+      const fromAddress = process.env.EMAIL_FROM_ADDRESS || "onboarding@resend.dev";
       const otpSpaced = otp.split("").join(" ");
 
-      await this.transporter.sendMail({
-        from: `"${fromName}" <${fromAddress}>`,
+      const response = await this.resend.emails.send({
+        from: `${fromName} <${fromAddress}>`,
         to: email,
         subject: "Verify your KonnectNow account",
         text: `KonnectNow\n\nVerify your email address\n\nUse the verification code below to complete your registration:\n\n${otpSpaced}\n\nThis code expires in ${expiresInMinutes} minutes.\n\nIf you did not request this code, you can ignore this email.\n\nKonnectNow Team`,
@@ -156,9 +127,13 @@ If you didn't request this, please ignore this email.
 </body>
 </html>`,
       });
+
+      if (response.error) {
+        throw response.error;
+      }
     } catch (error: any) {
-      console.error(`❌ Error sending email to ${email}:`, error.message);
-      throw new Error("SMTP delivery failed");
+      console.error(`❌ Error sending email to ${email}:`, error.message || error);
+      throw new Error("Email delivery failed");
     }
   }
 
