@@ -606,6 +606,29 @@ export class ProfilePage implements OnInit {
     });
   }
 
+  // Disconnect the Instagram account link
+  disconnectInstagram() {
+    this.loadingController
+      .create({
+        message: 'Disconnecting Instagram...',
+      })
+      .then((loading) => {
+        loading.present();
+        this.instagramService.disconnect().subscribe({
+          next: () => {
+            loading.dismiss();
+            this.showToast('Instagram account disconnected successfully.', 'success');
+            this.loadProfileData();
+          },
+          error: (error: any) => {
+            loading.dismiss();
+            console.error('Failed to disconnect Instagram:', error);
+            this.showToast('Failed to disconnect Instagram account.', 'danger');
+          },
+        });
+      });
+  }
+
   // Request backend manual synchronization of followers count and media feed
   syncInstagram() {
     this.loadingController

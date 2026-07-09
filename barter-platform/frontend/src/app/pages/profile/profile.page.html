@@ -201,15 +201,26 @@
                       </div>
                     </div>
 
-                    <!-- Sync Button -->
-                    <ion-button
-                      fill="outline"
-                      size="small"
-                      (click)="syncInstagram()"
-                      class="instagram-sync-btn"
-                    >
-                      Sync Feed
-                    </ion-button>
+                    <!-- Actions -->
+                    <div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-end;">
+                      <ion-button
+                        fill="outline"
+                        size="small"
+                        (click)="syncInstagram()"
+                        class="instagram-sync-btn"
+                      >
+                        Sync Feed
+                      </ion-button>
+                      <ion-button
+                        fill="clear"
+                        size="small"
+                        color="danger"
+                        (click)="disconnectInstagram()"
+                        style="--padding-start: 4px; --padding-end: 4px; font-size: 0.8rem; margin: 0;"
+                      >
+                        Disconnect
+                      </ion-button>
+                    </div>
                   </div>
                 </div>
                 }
