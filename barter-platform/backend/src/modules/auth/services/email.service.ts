@@ -38,6 +38,9 @@ export class EmailService {
           user,
           pass,
         },
+        connectionTimeout: 10000, // 10 seconds connection timeout
+        greetingTimeout: 10000,   // 10 seconds greeting timeout
+        socketTimeout: 15000,     // 15 seconds socket inactivity timeout
       });
 
       // Verify connection configuration asynchronously on startup (non-blocking)
@@ -65,6 +68,9 @@ export class EmailService {
 
     // In development, if SMTP not configured, log email to console
     if (this.useMock || !this.transporter) {
+      if (process.env.NODE_ENV !== "development") {
+        throw new Error("SMTP transporter is not configured in production");
+      }
       console.log(`
 📧 ========== EMAIL SIMULATION ==========
 To: ${email}
