@@ -1,12 +1,36 @@
-// Import workspace layout rules
-@import "../campaigns/campaigns.page.scss";
-
-.workspace-page-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 16px 8px;
+// ─── App Layout ────────────────────────────────────────────────────────
+.app-layout-container {
+  display: flex;
+  min-height: 100vh;
+  width: 100vw;
+  background-color: var(--ion-color-light);
 }
 
+.main-content-viewport {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+ion-content {
+  --background: var(--ion-color-light);
+}
+
+// ─── Page Container ────────────────────────────────────────────────────
+.workspace-page-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 16px 16px;
+
+  @media (min-width: 992px) {
+    padding: 24px 24px;
+  }
+}
+
+// ─── Header Banner ─────────────────────────────────────────────────────
 .workspace-header-banner {
   background: linear-gradient(135deg, rgba(var(--ion-color-primary-rgb), 0.05) 0%, rgba(var(--ion-color-secondary-rgb), 0.05) 100%);
   border: 1px solid var(--app-border-color);
@@ -14,25 +38,25 @@
   padding: 24px;
   margin-bottom: 24px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+}
 
-  .header-text {
-    h2 {
-      font-size: 1.6rem;
-      font-weight: 800;
-      color: var(--ion-color-dark);
-      margin: 0 0 6px 0;
-      letter-spacing: -0.5px;
-    }
-
-    p {
-      font-size: 0.95rem;
-      color: var(--ion-color-medium-shade);
-      margin: 0;
-      line-height: 1.4;
-    }
+.workspace-header-banner .header-text {
+  h2 {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--ion-color-dark);
+    margin: 0 0 6px 0;
+    letter-spacing: -0.5px;
+  }
+  p {
+    font-size: 0.95rem;
+    color: var(--ion-color-medium-shade);
+    margin: 0;
+    line-height: 1.4;
   }
 }
 
+// ─── Empty State ───────────────────────────────────────────────────────
 .empty-workspace-container {
   background: #ffffff;
   border: 1px dashed var(--app-border-color);
@@ -76,146 +100,1430 @@
   }
 }
 
-.deliverables-list-grid {
+// ─── Overview Stats Row ────────────────────────────────────────────────
+.overview-stats-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 28px;
+
+  @media (min-width: 500px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+.stat-card {
+  background: var(--app-bg-card);
+  border: 1px solid var(--app-border-color);
+  border-radius: 12px;
+  padding: 16px 12px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+  }
+}
+
+.stat-value {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--ion-color-dark);
+  line-height: 1.2;
+}
+
+.stat-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--ion-color-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.stat-card.stat-info .stat-value { color: var(--ion-color-primary); }
+.stat-card.stat-warning .stat-value { color: #f59e0b; }
+.stat-card.stat-success .stat-value { color: var(--ion-color-success); }
+
+// ─── Collaborations Section ────────────────────────────────────────────
+.collaborations-section-header {
+  margin-bottom: 16px;
+
+  h3 {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--ion-color-dark);
+    margin: 0;
+  }
+}
+
+// ─── Overview Campaign Cards Grid ──────────────────────────────────────
+.overview-campaigns-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 20px;
-  
-  @media (min-width: 768px) {
+  gap: 16px;
+
+  @media (min-width: 700px) {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  @media (min-width: 1024px) {
+  @media (min-width: 1000px) {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 
-.global-deliverable-card {
-  background: #ffffff;
+.overview-campaign-card {
+  background: var(--app-bg-card);
   border: 1px solid var(--app-border-color);
-  border-radius: 12px;
-  overflow: hidden;
+  border-radius: 14px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  cursor: pointer;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-  height: 320px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+  gap: 14px;
+  transition: transform 0.2s, box-shadow 0.2s;
 
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+  }
+}
+
+.ov-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ov-brand-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ov-brand-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--ion-color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.ov-brand-initial {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #ffffff;
+}
+
+.ov-brand-text {
+  h4 {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--ion-color-dark);
+    margin: 0 0 1px 0;
+  }
+  span {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--ion-color-medium);
+  }
+}
+
+.ov-card-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ion-color-dark);
+  margin: 0;
+  line-height: 1.4;
+}
+
+// ─── Overview Progress List ────────────────────────────────────────────
+.ov-progress-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 12px;
+  background: var(--ion-color-light-tint);
+  border-radius: 10px;
+}
+
+.ov-progress-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  text-align: center;
+}
+
+.ov-progress-count {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--ion-color-dark);
+
+  &.ov-neutral { color: #f59e0b; }
+  &.ov-info { color: var(--ion-color-primary); }
+  &.ov-warning { color: var(--ion-color-danger); }
+  &.ov-success { color: var(--ion-color-success); }
+}
+
+.ov-progress-lbl {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--ion-color-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+}
+
+// ─── Overview Card Footer ──────────────────────────────────────────────
+.ov-card-footer {
+  margin-top: auto;
+  padding-top: 4px;
+}
+
+.ov-manage-btn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--ion-color-primary);
+  color: #ffffff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  ion-icon {
+    font-size: 1rem;
+  }
+}
+
+// ─── Loading Skeletons ────────────────────────────────────────────────
+@keyframes skeleton-shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: calc(400px + 100%) 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--app-border-color) 25%, var(--ion-color-light-tint) 50%, var(--app-border-color) 75%);
+  background-size: 400px 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+.skeleton-stat {
+  height: 80px;
+}
+
+.skeleton-card {
+  height: 240px;
+  border-radius: 14px;
+}
+
+.skeleton-filter {
+  height: 32px;
+  width: 80px;
+  display: inline-block;
+}
+
+.skeleton-deliverable {
+  height: 280px;
+  border-radius: 12px;
+}
+
+.skeleton-stats-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 28px;
+
+  @media (min-width: 500px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+.skeleton-filters-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.skeleton-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.loading-state-container {
+  display: flex;
+  flex-direction: column;
+  padding: 20px 0;
+}
+
+// ========================================================================
+// CAMPAIGN MODE LAYOUT
+// ========================================================================
+
+.ws-campaign-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 20px 0 16px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--app-border-color);
+}
+
+.ws-campaign-header-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  flex: 1;
+}
+
+.ws-back-btn {
+  background: var(--app-bg-card);
+  border: 1px solid var(--app-border-color);
+  padding: 8px;
+  cursor: pointer;
+  color: var(--ion-color-medium);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+
+  &:hover {
+    background: var(--ion-color-light-tint);
+    color: var(--ion-color-primary);
     border-color: var(--ion-color-primary);
   }
 
-  .card-media-preview {
-    height: 160px;
-    background: #000000;
-    position: relative;
-    overflow: hidden;
+  ion-icon {
+    font-size: 1.3rem;
+  }
+}
+
+.ws-breadcrumb {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--ion-color-primary);
+  margin-bottom: 2px;
+  display: block;
+}
+
+.ws-title {
+  font-family: var(--font-family-headings);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--ion-color-dark);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.ws-meta {
+  font-size: 0.85rem;
+  color: var(--ion-color-medium);
+  font-weight: 500;
+  margin-top: 2px;
+  display: block;
+}
+
+.ws-meta-sep {
+  margin: 0 6px;
+  opacity: 0.5;
+}
+
+// ─── Two-Column Campaign Layout ────────────────────────────────────────
+.ws-campaign-layout {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+
+  @media (max-width: 900px) {
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
+// ─── Left: Campaign Brief ──────────────────────────────────────────────
+.ws-brief {
+  background: var(--app-bg-card);
+  border: 1px solid var(--app-border-color);
+  border-radius: 12px;
+  overflow: hidden;
+
+  @media (min-width: 901px) {
+    width: 280px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 24px;
+    align-self: flex-start;
+  }
+
+  @media (max-width: 900px) {
+    width: 100%;
+  }
+}
+
+.ws-brief-section {
+  padding: 20px 20px 12px;
+}
+
+.ws-brief-heading {
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--ion-color-medium);
+  margin: 0 0 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--app-border-color);
+}
+
+.ws-brief-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: var(--ion-color-medium);
+  margin-bottom: 6px;
+  display: block;
+}
+
+.ws-brief-value {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--ion-color-dark);
+}
+
+.ws-brief-platform {
+  margin-bottom: 16px;
+}
+
+.ws-brief-block {
+  margin-bottom: 16px;
+}
+
+.ws-brief-list {
+  margin: 6px 0 0;
+  padding-left: 14px;
+  font-size: 0.8rem;
+  color: var(--ion-color-medium-shade);
+  line-height: 1.5;
+
+  li {
+    margin-bottom: 4px;
+    &:last-child { margin-bottom: 0; }
+  }
+}
+
+.ws-brief-progress {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--app-border-color);
+}
+
+.ws-progress-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.ws-progress-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+
+.ws-progress-count {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--ion-color-dark);
+  min-width: 24px;
+
+  &.neutral { color: #f59e0b; }
+  &.info { color: var(--ion-color-primary); }
+  &.warning { color: var(--ion-color-danger); }
+  &.success { color: var(--ion-color-success); }
+  &.danger { color: var(--ion-color-danger); }
+}
+
+.ws-progress-lbl {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--ion-color-medium);
+}
+
+.ws-back-to-list-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 1px solid var(--app-border-color);
+  padding: 8px 16px;
+  margin: 0 20px 16px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ion-color-primary);
+  border-radius: 8px;
+  transition: all 0.2s;
+
+  &:hover {
+    background: rgba(255, 122, 0, 0.05);
+    border-color: var(--ion-color-primary);
+  }
+
+  ion-icon {
+    font-size: 1.1rem;
+  }
+}
+
+// ─── Right: Content Area ──────────────────────────────────────────────
+.ws-content-area {
+  flex: 1;
+  min-width: 0;
+}
+
+.ws-content-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  gap: 12px;
+}
+
+.ws-content-title {
+  font-family: var(--font-family-headings);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--ion-color-dark);
+  margin: 0;
+}
+
+.ws-create-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--ion-color-primary);
+  color: #ffffff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+
+  &:hover {
+    opacity: 0.9;
+    box-shadow: 0 4px 12px rgba(255, 122, 0, 0.25);
+  }
+
+  ion-icon {
+    font-size: 1.1rem;
+  }
+}
+
+.ws-create-btn-primary {
+  margin-top: 8px;
+}
+
+@media (max-width: 700px) {
+  .ws-create-label {
+    display: inline;
+  }
+  .ws-create-btn {
+    padding: 10px 18px;
+    font-size: 0.9rem;
+  }
+}
+
+// ─── States ────────────────────────────────────────────────────────────
+.ws-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+  gap: 12px;
+  background: var(--app-bg-card);
+  border: 1px solid var(--app-border-color);
+  border-radius: 12px;
+}
+
+.ws-state-icon {
+  font-size: 2.5rem;
+  color: var(--ion-color-medium);
+  opacity: 0.6;
+}
+
+.ws-state-text {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ion-color-medium);
+  margin: 0;
+}
+
+.ws-state-hint {
+  font-size: 0.82rem;
+  color: var(--ion-color-medium-shade);
+  margin: 0;
+  max-width: 320px;
+  line-height: 1.5;
+}
+
+.ws-state-filtered {
+  padding: 24px;
+  margin-top: 12px;
+}
+
+.ws-state-error {
+  .ws-state-icon {
+    color: var(--ion-color-danger);
+    opacity: 0.7;
+  }
+}
+
+.ws-retry-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 1px solid var(--app-border-color);
+  padding: 7px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ion-color-primary);
+  transition: all 0.2s;
+
+  &:hover {
+    border-color: var(--ion-color-primary);
+    background: rgba(255, 122, 0, 0.04);
+  }
+
+  ion-icon {
+    font-size: 1rem;
+  }
+}
+
+// ─── Status Filters ────────────────────────────────────────────────────
+.ws-filters {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+
+  @media (max-width: 700px) {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+.ws-filter-btn {
+  background: var(--app-bg-card);
+  border: 1px solid var(--app-border-color);
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--ion-color-medium);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+
+  &:hover {
+    border-color: var(--ion-color-primary);
+    color: var(--ion-color-dark);
+  }
+
+  &.active {
+    background: var(--ion-color-primary);
+    border-color: var(--ion-color-primary);
+    color: #ffffff;
+  }
+}
+
+// ─── Deliverable Cards ─────────────────────────────────────────────────
+.ws-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.ws-card {
+  background: var(--app-bg-card);
+  border: 1px solid var(--app-border-color);
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    border-color: var(--ion-color-primary);
+  }
+}
+
+.ws-card-media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  background: #000000;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ws-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+
+  &.ws-img-broken {
+    display: none;
+  }
+}
+
+.ws-card-media-badge {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #ffffff;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+
+  ion-icon {
+    font-size: 0.85rem;
+  }
+}
+
+.ws-card-media-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: var(--ion-color-medium);
+  padding: 20px;
+  text-align: center;
+
+  ion-icon {
+    font-size: 2rem;
+    opacity: 0.5;
+  }
+
+  span {
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+}
+
+.ws-card-body {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ws-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.ws-card-caption {
+  font-size: 0.8rem;
+  color: var(--ion-color-dark);
+  margin: 0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.ws-card-date {
+  font-size: 0.7rem;
+  color: var(--ion-color-medium);
+}
+
+// ─── Status Badge ──────────────────────────────────────────────────────
+.ws-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 5px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  white-space: nowrap;
+
+  ion-icon {
+    font-size: 0.82rem;
+  }
+
+  &.draft {
+    background: rgba(245, 158, 11, 0.1);
+    color: #b45309;
+  }
+  &.submitted {
+    background: rgba(59, 130, 246, 0.1);
+    color: #2563eb;
+  }
+  &.changes_requested {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+  }
+  &.approved {
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
+  }
+  &.publishing {
+    background: rgba(139, 92, 246, 0.1);
+    color: #7c3aed;
+  }
+  &.published {
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
+  }
+  &.failed {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+  }
+  &.not_started {
+    background: rgba(148, 163, 184, 0.1);
+    color: #64748b;
+  }
+}
+
+.ws-revision-pill {
+  font-size: 0.65rem;
+  font-weight: 700;
+  background: var(--ion-color-light-shade);
+  color: var(--ion-color-medium-shade);
+  padding: 1px 5px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+// ─── Status Card (Detail View) ─────────────────────────────────────────
+.ws-status-card {
+  border-left: 4px solid var(--ion-color-medium);
+  background: var(--app-bg-card);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+
+  &.draft { border-left-color: #f59e0b; }
+  &.submitted { border-left-color: var(--ion-color-primary); }
+  &.changes_requested { border-left-color: var(--ion-color-danger); }
+  &.approved { border-left-color: var(--ion-color-success); }
+  &.publishing { border-left-color: #7c3aed; }
+  &.published { border-left-color: var(--ion-color-success); }
+  &.failed { border-left-color: var(--ion-color-danger); }
+}
+
+.ws-status-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.ws-status-card-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--ion-color-dark);
+}
+
+.ws-status-desc {
+  font-size: 0.85rem;
+  color: var(--ion-color-medium-shade);
+  margin: 0;
+  line-height: 1.45;
+}
+
+// ─── Feedback / Error Cards ────────────────────────────────────────────
+.ws-feedback-card {
+  background: rgba(239, 68, 68, 0.03);
+  border: 1px solid rgba(239, 68, 68, 0.12);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+}
+
+.ws-feedback-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--ion-color-danger);
+  margin-bottom: 8px;
+
+  ion-icon {
+    font-size: 1.1rem;
+  }
+}
+
+.ws-feedback-text {
+  font-size: 0.85rem;
+  color: var(--ion-color-danger-shade);
+  margin: 0;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.ws-error-card {
+  background: rgba(239, 68, 68, 0.03);
+  border: 1px solid rgba(239, 68, 68, 0.12);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+}
+
+.ws-error-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--ion-color-danger);
+  margin-bottom: 8px;
+
+  ion-icon {
+    font-size: 1.1rem;
+  }
+}
+
+.ws-error-detail {
+  font-size: 0.82rem;
+  color: var(--ion-color-danger-shade);
+  margin: 0 0 8px;
+  font-family: monospace;
+  background: var(--app-bg-tint);
+  padding: 8px;
+  border-radius: 4px;
+  line-height: 1.4;
+}
+
+.ws-error-hint {
+  font-size: 0.78rem;
+  color: var(--ion-color-medium);
+  margin: 0;
+  line-height: 1.5;
+}
+
+// ─── Form (Detail View) ────────────────────────────────────────────────
+.ws-form {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ws-form-group {
+  margin-bottom: 16px;
+}
+
+.ws-form-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--ion-color-dark);
+  display: block;
+  margin-bottom: 8px;
+}
+
+.ws-form-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+
+  .ws-form-label {
+    margin-bottom: 0;
+  }
+}
+
+.ws-ai-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ion-color-primary);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background 0.2s;
+
+  &:hover {
+    background: rgba(255, 122, 0, 0.06);
+  }
+
+  ion-icon {
+    font-size: 0.95rem;
+  }
+}
+
+.ws-upload-zone {
+  border: 2px dashed var(--app-border-color);
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--app-bg-card);
+
+  &:hover {
+    border-color: var(--ion-color-primary);
+    background: rgba(255, 122, 0, 0.02);
+  }
+}
+
+.ws-upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+
+  p {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--ion-color-dark);
+    margin: 0;
+  }
+
+  span {
+    font-size: 0.75rem;
+    color: var(--ion-color-medium);
+  }
+}
+
+.ws-upload-icon {
+  font-size: 2rem;
+  color: var(--ion-color-medium);
+}
+
+.ws-media-preview {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  max-height: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000000;
+  width: 100%;
+}
+
+.ws-media-el {
+  max-width: 100%;
+  max-height: 260px;
+  object-fit: contain;
+}
+
+.ws-media-replace {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.6);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 6px;
+  text-align: center;
+}
+
+.ws-media-type-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.ws-type-pill {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 14px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ion-color-medium-shade);
+  background: var(--app-bg-card);
+  border: 1px solid var(--app-border-color);
+  cursor: pointer;
+  transition: all 0.2s;
+
+  ion-icon {
+    font-size: 1.05rem;
+  }
+
+  &.active {
+    background: var(--ion-color-primary);
+    border-color: var(--ion-color-primary);
+    color: #ffffff;
+  }
+}
+
+.ws-textarea {
+  --background: var(--app-bg-card);
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --padding-top: 10px;
+  --padding-bottom: 10px;
+  border: 1px solid var(--app-border-color);
+  border-radius: 8px;
+  font-size: 0.88rem;
+  color: var(--ion-color-dark);
+}
+
+.ws-char-count {
+  display: block;
+  text-align: right;
+  font-size: 0.7rem;
+  color: var(--ion-color-medium);
+  margin-top: 4px;
+}
+
+.ws-form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+
+  ion-button {
+    flex: 1;
+    margin: 0;
+  }
+}
+
+.ws-btn-outline {
+  --border-color: var(--app-border-color);
+  --color: var(--ion-color-dark);
+  --border-radius: 10px;
+  font-weight: 700;
+  height: 44px;
+}
+
+.ws-btn-primary {
+  --background: var(--ion-color-primary);
+  --color: #ffffff;
+  --border-radius: 10px;
+  font-weight: 700;
+  height: 44px;
+}
+
+.ws-btn-sm {
+  height: 38px;
+  font-size: 0.82rem;
+}
+
+// ─── Readonly View (Detail) ────────────────────────────────────────────
+.ws-readonly {
+  display: flex;
+  flex-direction: column;
+}
+
+.ws-media-readonly {
+  border-radius: 12px;
+  overflow: hidden;
+  max-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000000;
+  border: 1px solid var(--app-border-color);
+  width: 100%;
+
+  .ws-media-el {
+    max-width: 100%;
+    max-height: 300px;
+    object-fit: contain;
+  }
+}
+
+.ws-caption-readonly {
+  background: var(--app-bg-card);
+  border: 1px solid var(--app-border-color);
+  border-radius: 8px;
+  padding: 14px 16px;
+
+  p {
+    font-size: 0.88rem;
+    color: var(--ion-color-dark);
+    margin: 0;
+    line-height: 1.5;
+    white-space: pre-wrap;
+  }
+}
+
+// ─── Instagram Action Card ─────────────────────────────────────────────
+.ws-action-card {
+  background: var(--app-bg-card);
+  border: 1px solid var(--app-border-color);
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 4px;
+  text-align: center;
+}
+
+.ws-action-success {
+  .ws-action-hint {
+    color: var(--ion-color-success);
+    font-weight: 700;
+  }
+}
+
+.ws-action-hint {
+  font-size: 0.85rem;
+  color: var(--ion-color-medium-shade);
+  margin: 0 0 14px;
+  line-height: 1.4;
+}
+
+.ws-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+
+.ws-btn-instagram {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #E1306C;
+  color: #ffffff;
+  border: none;
+  padding: 0 20px;
+  height: 42px;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(225, 48, 108, 0.2);
+  transition: opacity 0.2s;
+
+  &:hover:not(:disabled) {
+    opacity: 0.9;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  ion-icon {
+    font-size: 1.15rem;
+  }
+}
+
+.ws-link-instagram {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #E1306C;
+  color: #ffffff;
+  text-decoration: none;
+  padding: 0 16px;
+  height: 38px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  box-shadow: 0 4px 10px rgba(225, 48, 108, 0.2);
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  ion-icon {
+    font-size: 1rem;
+  }
+}
+
+// ========================================================================
+// AI CAPTION MODAL STYLES
+// ========================================================================
+
+.ai-caption-modal {
+  --background: var(--app-bg-card);
+  --border-color: var(--app-border-color);
+  --border-radius: 16px;
+
+  --width: 90%;
+  --max-width: 500px;
+  --height: auto;
+  --max-height: 90%;
+  --box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
+.ai-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--app-border-color);
+
+  h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--ion-color-dark);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .ai-icon {
+    color: var(--ion-color-primary);
+  }
+
+  .close-modal-btn {
+    background: none;
+    border: none;
+    color: var(--ion-color-medium);
+    font-size: 1.75rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-bottom: 1px solid var(--app-border-color);
+  }
+}
 
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
+.ai-modal-content {
+  padding: 20px;
+}
 
-    .video-preview-placeholder {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: var(--ion-color-medium);
-      background: var(--ion-color-light);
-      width: 100%;
-      height: 100%;
+.custom-input-group {
+  margin-bottom: 16px;
+  width: 100%;
+}
 
-      .play-icon {
-        font-size: 3rem;
-        margin-bottom: 6px;
-        opacity: 0.8;
-      }
+.custom-input-label {
+  display: block;
+  font-family: var(--font-family-headings);
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--ion-color-step-700);
+  margin-bottom: 6px;
+}
 
-      span {
-        font-size: 0.85rem;
-        font-weight: 600;
-      }
-    }
+.custom-input-item {
+  --background: var(--app-bg-input);
+  border-radius: 12px;
+  border: 1px solid var(--app-border-color);
+  margin-bottom: 0;
+  --padding-start: 14px;
+  --inner-padding-end: 14px;
+  transition: border-color 0.2s ease;
+
+  &:focus-within {
+    border-color: var(--ion-color-primary);
   }
 
-  .card-details-box {
-    flex: 1;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    min-width: 0;
-
-    .campaign-brand-header {
-      margin-bottom: 8px;
-
-      .campaign-title {
-        font-size: 0.95rem;
-        font-weight: 700;
-        color: var(--ion-color-dark);
-        margin: 0 0 2px 0;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      .brand-name {
-        font-size: 0.76rem;
-        font-weight: 600;
-        color: var(--ion-color-medium);
-      }
-    }
-
-    .card-status-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-
-      .revision-label {
-        font-size: 0.72rem;
-        font-weight: 700;
-        background: var(--ion-color-light-shade);
-        color: var(--ion-color-medium-shade);
-        padding: 2px 6px;
-        border-radius: 4px;
-      }
-
-      .state-badge {
-        font-size: 0.74rem;
-        padding: 4px 8px;
-        text-transform: capitalize;
-      }
-    }
-
-    .caption-preview {
-      font-size: 0.825rem;
-      color: var(--ion-color-medium-shade);
-      margin: 0;
-      line-height: 1.4;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      margin-bottom: 12px;
-    }
-
-    .card-date {
-      font-size: 0.7rem;
-      color: var(--ion-color-medium);
-      margin-top: auto;
-      border-top: 1px solid var(--app-border-color);
-      padding-top: 8px;
-      font-weight: 500;
-    }
+  ion-input, ion-textarea {
+    --padding-top: 10px;
+    --padding-bottom: 10px;
+    font-weight: 500;
+    font-size: 0.92rem;
+    color: var(--ion-color-dark);
   }
+}
+
+.text-area-item {
+  align-items: flex-start;
+  ion-textarea {
+    min-height: 80px;
+  }
+}
+
+.validation-error {
+  margin-top: 4px;
+  small {
+    font-weight: 500;
+    font-size: 0.78rem;
+  }
+}
+
+.form-select {
+  --placeholder-color: var(--ion-color-medium);
+  --placeholder-opacity: 0.8;
+}
+
+.responsive-col-left {
+  padding-right: 0px;
+  @media (min-width: 768px) {
+    padding-right: 8px;
+  }
+}
+
+.responsive-col-right {
+  padding-left: 0px;
+  @media (min-width: 768px) {
+    padding-left: 8px;
+  }
+}
+
+.generate-submit-btn {
+  --border-radius: 8px;
+  font-weight: 600;
 }

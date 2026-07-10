@@ -35,8 +35,7 @@ import {
   ToastController,
   LoadingController
 } from '@ionic/angular/standalone';
-import { FormsModule, FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { AiService } from 'src/app/services/ai.service';
+import { FormsModule } from '@angular/forms';
 import { addIcons } from 'ionicons';
 import {
   logoInstagram,
@@ -72,7 +71,11 @@ import {
   closeOutline,
   alertCircleOutline,
   refreshOutline,
-  copyOutline
+  copyOutline,
+  createOutline,
+  checkmarkDoneOutline,
+  syncOutline,
+  chatbubbleOutline
 } from 'ionicons/icons';
 
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
@@ -103,17 +106,9 @@ import { HeaderComponent } from '../../shared/components/header/header.component
     IonSelect,
     IonSelectOption,
     IonModal,
-    IonItem,
-    IonInput,
     IonTextarea,
     IonSpinner,
     IonBadge,
-    IonToggle,
-    IonText,
-    IonGrid,
-    IonRow,
-    IonCol,
-    ReactiveFormsModule,
     SidebarComponent,
     HeaderComponent
   ]
@@ -122,10 +117,6 @@ export class CampaignsPage implements OnInit {
   currentUser: any;
   campaigns: ICampaign[] = [];
   isSidebarOpen = false;
-
-  isAiModalOpen = false;
-  isGenerating = false;
-  aiForm!: FormGroup;
 
   toggleSidebar() {
     this.isSidebarOpen = !this.isSidebarOpen;
@@ -154,9 +145,7 @@ export class CampaignsPage implements OnInit {
     private router: Router,
     private cdr: ChangeDetectorRef,
     private toastController: ToastController,
-    private loadingController: LoadingController,
-    private fb: FormBuilder,
-    private aiService: AiService
+    private loadingController: LoadingController
   ) {
     addIcons({
       logoInstagram,
@@ -192,25 +181,17 @@ export class CampaignsPage implements OnInit {
       closeOutline,
       alertCircleOutline,
       refreshOutline,
-      copyOutline
+      copyOutline,
+      createOutline,
+      checkmarkDoneOutline,
+      syncOutline,
+      chatbubbleOutline
     });
   }
 
   ngOnInit() {
     this.currentUser = this.storage.getUser();
     this.loadCampaigns();
-    this.initForm();
-  }
-
-  initForm() {
-    this.aiForm = this.fb.group({
-      description: ['', [Validators.required]],
-      tone: ['Casual', [Validators.required]],
-      length: ['Medium', [Validators.required]],
-      platform: ['Instagram', [Validators.required]],
-      includeEmojis: [true],
-      includeHashtags: [true],
-    });
   }
 
   ionViewWillEnter() {
@@ -454,19 +435,6 @@ export class CampaignsPage implements OnInit {
     this.router.navigate(['/profile']);
   }
 
-  // ================= CONTENT WORKSPACE STATE =================
-  isContentModalOpen = false;
-  selectedCampaignForContent: any = null;
-  submissions: any[] = [];
-  activeSubmission: any = null;
-  isCreatingNew = false;
-  submissionCaption = '';
-  submissionMediaType: 'IMAGE' | 'VIDEO' = 'IMAGE';
-  submissionFile: File | null = null;
-  submissionFilePreview: string | null = null;
-  isSubmittingContent = false;
-  isPublishingToInstagram = false;
-
   // ================= CONTENT REVIEW STATE =================
   isReviewModalOpen = false;
   selectedCampaignForReview: any = null;
@@ -476,229 +444,8 @@ export class CampaignsPage implements OnInit {
   brandReviewFeedback = '';
   isReviewingContent = false;
 
-  // Open the Influencer Content Workspace
   openContentWorkspace(campaign: any) {
-    this.selectedCampaignForContent = campaign;
-    this.isContentModalOpen = true;
-    this.submissions = [];
-    this.activeSubmission = null;
-    this.isCreatingNew = false;
-    this.resetFormFields();
-    this.cdr.markForCheck();
-    this.loadSubmissions(campaign.id);
-  }
-
-  closeContentWorkspace() {
-    this.isContentModalOpen = false;
-    this.cdr.markForCheck();
-  }
-
-  loadSubmissions(campaignId: string) {
-    this.campaignService.getSubmissions(campaignId).subscribe({
-      next: (response: any) => {
-        this.submissions = response.success ? response.data.submissions : [];
-        this.cdr.markForCheck();
-      },
-      error: (error: any) => {
-        console.error('Failed to load submissions:', error);
-        this.cdr.markForCheck();
-      }
-    });
-  }
-
-  resetFormFields() {
-    this.submissionCaption = '';
-    this.submissionMediaType = 'IMAGE';
-    this.submissionFile = null;
-    this.submissionFilePreview = null;
-  }
-
-  startNewSubmission() {
-    this.isCreatingNew = true;
-    this.activeSubmission = null;
-    this.resetFormFields();
-    this.cdr.markForCheck();
-  }
-
-  selectSubmission(sub: any) {
-    this.activeSubmission = sub;
-    this.isCreatingNew = false;
-    this.submissionCaption = sub.caption || '';
-    this.submissionMediaType = sub.mediaType || 'IMAGE';
-    this.submissionFilePreview = this.getAvatarUrl(sub.mediaUrl);
-    this.submissionFile = null;
-    this.cdr.markForCheck();
-  }
-
-  backToList() {
-    this.activeSubmission = null;
-    this.isCreatingNew = false;
-    this.resetFormFields();
-    if (this.selectedCampaignForContent) {
-      this.loadSubmissions(this.selectedCampaignForContent.id);
-    }
-  }
-
-  onSubmissionFileSelected(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      this.submissionFile = file;
-      this.submissionFilePreview = URL.createObjectURL(file);
-      this.cdr.markForCheck();
-    }
-  }
-
-  async saveSubmissionDraft() {
-    if (!this.selectedCampaignForContent) return;
-
-    if (!this.activeSubmission && !this.submissionFile) {
-      this.showToast('Please upload an image or video file for your deliverable', 'danger');
-      return;
-    }
-
-    this.isSubmittingContent = true;
-    this.cdr.markForCheck();
-
-    const campaignId = this.selectedCampaignForContent.id;
-
-    if (this.activeSubmission) {
-      // Update existing draft/revision
-      this.campaignService.updateSubmission(
-        campaignId,
-        this.activeSubmission.id,
-        this.submissionFile || undefined,
-        this.submissionMediaType,
-        this.submissionCaption
-      ).subscribe({
-        next: (response: any) => {
-          this.isSubmittingContent = false;
-          if (response.success && response.data?.submission) {
-            this.activeSubmission = response.data.submission;
-            this.submissionFilePreview = this.getAvatarUrl(this.activeSubmission.mediaUrl);
-            this.submissionFile = null;
-            this.showToast('Deliverable draft saved successfully!', 'success');
-          }
-          this.cdr.markForCheck();
-        },
-        error: (error: any) => {
-          this.isSubmittingContent = false;
-          console.error('Failed to save draft:', error);
-          this.showToast(error?.error?.message || 'Failed to save deliverable draft', 'danger');
-          this.cdr.markForCheck();
-        }
-      });
-    } else {
-      // Create new draft
-      this.campaignService.createSubmission(
-        campaignId,
-        this.submissionFile!,
-        this.submissionMediaType,
-        this.submissionCaption
-      ).subscribe({
-        next: (response: any) => {
-          this.isSubmittingContent = false;
-          if (response.success && response.data?.submission) {
-            this.activeSubmission = response.data.submission;
-            this.submissionFilePreview = this.getAvatarUrl(this.activeSubmission.mediaUrl);
-            this.submissionFile = null;
-            this.isCreatingNew = false;
-            this.showToast('Deliverable draft created successfully!', 'success');
-            this.loadSubmissions(campaignId);
-          }
-          this.cdr.markForCheck();
-        },
-        error: (error: any) => {
-          this.isSubmittingContent = false;
-          console.error('Failed to create draft:', error);
-          this.showToast(error?.error?.message || 'Failed to save deliverable draft', 'danger');
-          this.cdr.markForCheck();
-        }
-      });
-    }
-  }
-
-  submitDeliverable() {
-    if (!this.selectedCampaignForContent || !this.activeSubmission) return;
-
-    this.isSubmittingContent = true;
-    this.cdr.markForCheck();
-
-    this.campaignService.submitContent(
-      this.selectedCampaignForContent.id,
-      this.activeSubmission.id
-    ).subscribe({
-      next: (response: any) => {
-        this.isSubmittingContent = false;
-        if (response.success && response.data?.submission) {
-          this.activeSubmission = response.data.submission;
-          this.showToast('Deliverable submitted successfully to brand for review!', 'success');
-        }
-        this.cdr.markForCheck();
-      },
-      error: (error: any) => {
-        this.isSubmittingContent = false;
-        console.error('Failed to submit content:', error);
-        this.showToast(error?.error?.message || 'Failed to submit content', 'danger');
-        this.cdr.markForCheck();
-      }
-    });
-  }
-
-  publishDeliverableToInstagram() {
-    if (!this.selectedCampaignForContent || !this.activeSubmission) return;
-
-    this.isPublishingToInstagram = true;
-    this.cdr.markForCheck();
-
-    this.campaignService.publishToInstagram(
-      this.selectedCampaignForContent.id,
-      this.activeSubmission.id
-    ).subscribe({
-      next: (response: any) => {
-        this.isPublishingToInstagram = false;
-        if (response.success && response.data?.submission) {
-          this.activeSubmission = response.data.submission;
-          this.showToast('Successfully published approved deliverable directly to Instagram!', 'success');
-        }
-        this.cdr.markForCheck();
-      },
-      error: (error: any) => {
-        this.isPublishingToInstagram = false;
-        console.error('Failed to publish to Instagram:', error);
-        if (error?.error?.data?.submission) {
-          this.activeSubmission = error.error.data.submission;
-        }
-        this.showToast(error?.error?.message || 'Instagram publishing failed. Please check access token.', 'danger');
-        this.cdr.markForCheck();
-      }
-    });
-  }
-
-  addDeliverableToPortfolio() {
-    if (!this.selectedCampaignForContent || !this.activeSubmission) return;
-
-    this.loadingController.create({
-      message: 'Adding to your portfolio showcase...'
-    }).then((loading) => {
-      loading.present();
-
-      this.campaignService.addSubmissionToPortfolio(
-        this.selectedCampaignForContent.id,
-        this.activeSubmission.id
-      ).subscribe({
-        next: (response: any) => {
-          loading.dismiss();
-          this.showToast('Successfully added campaign deliverable to your portfolio!', 'success');
-          this.cdr.markForCheck();
-        },
-        error: (error: any) => {
-          loading.dismiss();
-          console.error('Failed to add to portfolio:', error);
-          this.showToast(error?.error?.message || 'Failed to add deliverable to portfolio', 'danger');
-          this.cdr.markForCheck();
-        }
-      });
-    });
+    this.router.navigate(['/content-workspace'], { queryParams: { campaignId: campaign.id } });
   }
 
   // Open the Brand Content Review workspace
@@ -789,56 +536,5 @@ export class CampaignsPage implements OnInit {
       buttons: ['OK'],
     });
     await toast.present();
-  }
-
-  openAiModal() {
-    this.aiForm.reset({
-      description: '',
-      tone: 'Casual',
-      length: 'Medium',
-      platform: 'Instagram',
-      includeEmojis: true,
-      includeHashtags: true,
-    });
-    this.isAiModalOpen = true;
-    this.cdr.markForCheck();
-  }
-
-  closeAiModal() {
-    this.isAiModalOpen = false;
-    this.cdr.markForCheck();
-  }
-
-  generateAiCaption() {
-    if (this.aiForm.invalid) {
-      this.aiForm.markAllAsTouched();
-      return;
-    }
-
-    this.isGenerating = true;
-    this.cdr.markForCheck();
-
-    this.aiService.generateCaption(this.aiForm.value).subscribe({
-      next: (response) => {
-        this.isGenerating = false;
-        if (response && response.success && response.data?.caption) {
-          this.submissionCaption = response.data.caption;
-          this.showToast('Caption generated successfully!', 'success');
-          this.closeAiModal();
-        } else {
-          this.showToast('Failed to generate caption. Please try again.', 'danger');
-        }
-        this.cdr.markForCheck();
-      },
-      error: (error) => {
-        this.isGenerating = false;
-        console.error('Caption generation failed:', error);
-        this.showToast(
-          error.error?.error?.message || error.message || 'Failed to generate caption',
-          'danger'
-        );
-        this.cdr.markForCheck();
-      },
-    });
   }
 }
