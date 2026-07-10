@@ -1,7 +1,7 @@
-import mongoose from 'mongoose';
-import { Campaign } from '@modules/campaign/models/campaign.model';
-import { ContentSubmission } from '@modules/campaign/models/content-submission.model';
-import { Profile } from '@modules/profile/models/profile.model';
+import mongoose from "mongoose";
+import { Campaign } from "@modules/campaign/models/campaign.model";
+import { ContentSubmission } from "@modules/campaign/models/content-submission.model";
+import { Profile } from "@modules/profile/models/profile.model";
 
 export interface InfluencerAnalyticsRaw {
   // Application stats
@@ -48,22 +48,24 @@ export interface BrandAnalyticsRaw {
 export class AnalyticsRepository {
   // ─── Influencer Analytics ────────────────────────────────────────────────────
 
-  async getInfluencerAnalytics(userId: string): Promise<InfluencerAnalyticsRaw> {
+  async getInfluencerAnalytics(
+    userId: string,
+  ): Promise<InfluencerAnalyticsRaw> {
     const userObjectId = new mongoose.Types.ObjectId(userId);
 
     // 1. Application counts via Campaign aggregation
     const applicationAgg = await Campaign.aggregate([
       {
         $match: {
-          'applicants.influencerId': userObjectId,
+          "applicants.influencerId": userObjectId,
         },
       },
       {
-        $unwind: '$applicants',
+        $unwind: "$applicants",
       },
       {
         $match: {
-          'applicants.influencerId': userObjectId,
+          "applicants.influencerId": userObjectId,
         },
       },
       {
@@ -71,13 +73,17 @@ export class AnalyticsRepository {
           _id: null,
           total: { $sum: 1 },
           approved: {
-            $sum: { $cond: [{ $eq: ['$applicants.status', 'APPROVED'] }, 1, 0] },
+            $sum: {
+              $cond: [{ $eq: ["$applicants.status", "APPROVED"] }, 1, 0],
+            },
           },
           rejected: {
-            $sum: { $cond: [{ $eq: ['$applicants.status', 'REJECTED'] }, 1, 0] },
+            $sum: {
+              $cond: [{ $eq: ["$applicants.status", "REJECTED"] }, 1, 0],
+            },
           },
           pending: {
-            $sum: { $cond: [{ $eq: ['$applicants.status', 'PENDING'] }, 1, 0] },
+            $sum: { $cond: [{ $eq: ["$applicants.status", "PENDING"] }, 1, 0] },
           },
         },
       },
@@ -87,18 +93,18 @@ export class AnalyticsRepository {
     const activeCampaignsAgg = await Campaign.aggregate([
       {
         $match: {
-          status: 'ACTIVE',
-          'applicants.influencerId': userObjectId,
+          status: "ACTIVE",
+          "applicants.influencerId": userObjectId,
         },
       },
-      { $unwind: '$applicants' },
+      { $unwind: "$applicants" },
       {
         $match: {
-          'applicants.influencerId': userObjectId,
-          'applicants.status': 'APPROVED',
+          "applicants.influencerId": userObjectId,
+          "applicants.status": "APPROVED",
         },
       },
-      { $count: 'count' },
+      { $count: "count" },
     ]);
 
     // 3. Deliverable stats via ContentSubmission aggregation
@@ -106,7 +112,7 @@ export class AnalyticsRepository {
       { $match: { influencerId: userObjectId } },
       {
         $group: {
-          _id: '$status',
+          _id: "$status",
           count: { $sum: 1 },
         },
       },
@@ -114,7 +120,7 @@ export class AnalyticsRepository {
 
     // 4. Instagram profile stats
     const profile = await Profile.findOne({ userId: userObjectId }).select(
-      'instagram stats',
+      "instagram stats",
     );
 
     // ─── Compute derived metrics ────────────────────────────────────────────
@@ -141,8 +147,8 @@ export class AnalyticsRepository {
       totalDeliverables += item.count;
     }
 
-    const published = deliverablesByStatus['PUBLISHED'] || 0;
-    const failed = deliverablesByStatus['FAILED'] || 0;
+    const published = deliverablesByStatus["PUBLISHED"] || 0;
+    const failed = deliverablesByStatus["FAILED"] || 0;
     const publishDenominator = published + failed;
     const publishingSuccessRate =
       publishDenominator > 0
@@ -180,8 +186,8 @@ export class AnalyticsRepository {
         $group: {
           _id: null,
           total: { $sum: 1 },
-          active: { $sum: { $cond: [{ $eq: ['$status', 'ACTIVE'] }, 1, 0] } },
-          past: { $sum: { $cond: [{ $eq: ['$status', 'PAST'] }, 1, 0] } },
+          active: { $sum: { $cond: [{ $eq: ["$status", "ACTIVE"] }, 1, 0] } },
+          past: { $sum: { $cond: [{ $eq: ["$status", "PAST"] }, 1, 0] } },
         },
       },
     ]);
@@ -189,19 +195,23 @@ export class AnalyticsRepository {
     // 2. Applications received across all brand campaigns
     const applicationsAgg = await Campaign.aggregate([
       { $match: { brandId: brandObjectId } },
-      { $unwind: { path: '$applicants', preserveNullAndEmpty: false } },
+      { $unwind: { path: "$applicants", preserveNullAndEmptyArrays: false } },
       {
         $group: {
           _id: null,
           total: { $sum: 1 },
           pending: {
-            $sum: { $cond: [{ $eq: ['$applicants.status', 'PENDING'] }, 1, 0] },
+            $sum: { $cond: [{ $eq: ["$applicants.status", "PENDING"] }, 1, 0] },
           },
           approved: {
-            $sum: { $cond: [{ $eq: ['$applicants.status', 'APPROVED'] }, 1, 0] },
+            $sum: {
+              $cond: [{ $eq: ["$applicants.status", "APPROVED"] }, 1, 0],
+            },
           },
           rejected: {
-            $sum: { $cond: [{ $eq: ['$applicants.status', 'REJECTED'] }, 1, 0] },
+            $sum: {
+              $cond: [{ $eq: ["$applicants.status", "REJECTED"] }, 1, 0],
+            },
           },
         },
       },
@@ -212,7 +222,7 @@ export class AnalyticsRepository {
       { $match: { brandId: brandObjectId } },
       {
         $group: {
-          _id: '$status',
+          _id: "$status",
           count: { $sum: 1 },
         },
       },
@@ -223,27 +233,31 @@ export class AnalyticsRepository {
       {
         $match: {
           brandId: brandObjectId,
-          status: 'APPROVED',
+          status: "APPROVED",
           submittedAt: { $exists: true, $ne: null },
           approvedAt: { $exists: true, $ne: null },
         },
       },
       {
         $project: {
-          turnaroundMs: { $subtract: ['$approvedAt', '$submittedAt'] },
+          turnaroundMs: { $subtract: ["$approvedAt", "$submittedAt"] },
         },
       },
       {
         $group: {
           _id: null,
-          avgMs: { $avg: '$turnaroundMs' },
+          avgMs: { $avg: "$turnaroundMs" },
         },
       },
     ]);
 
     // ─── Compute derived metrics ────────────────────────────────────────────
 
-    const campaignStats = campaignCountAgg[0] || { total: 0, active: 0, past: 0 };
+    const campaignStats = campaignCountAgg[0] || {
+      total: 0,
+      active: 0,
+      past: 0,
+    };
     const appStats = applicationsAgg[0] || {
       total: 0,
       pending: 0,
