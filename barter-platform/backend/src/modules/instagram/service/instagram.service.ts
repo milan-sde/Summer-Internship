@@ -369,43 +369,43 @@ export class InstagramService {
     const containerId = containerData.id;
     console.log(`[Instagram Service] Media container created successfully. ID: ${containerId}`);
 
-    // 3. Step 2: For Video, poll container status until FINISHED
-    if (mediaType === "VIDEO") {
-      console.log(`[Instagram Service] Polling status for video container: ${containerId}...`);
-      let isFinished = false;
-      let retries = 0;
-      const maxRetries = 30; // 30 retries * 5000ms = 150 seconds
+    // 3. Step 2: Poll container status until FINISHED
+    console.log(`[Instagram Service] Polling status for media container: ${containerId}...`);
+    let isFinished = false;
+    let retries = 0;
+    const maxRetries = 30; // 30 retries * 5000ms = 150 seconds
 
-      while (!isFinished && retries < maxRetries) {
+    while (!isFinished && retries < maxRetries) {
+      if (retries > 0) {
         await new Promise((resolve) => setTimeout(resolve, 5000));
-        retries++;
+      }
+      retries++;
 
-        const statusResponse = await fetch(
-          `https://graph.instagram.com/${apiVersion}/${containerId}?fields=status_code,status&access_token=${token}`
+      const statusResponse = await fetch(
+        `https://graph.instagram.com/${apiVersion}/${containerId}?fields=status_code,status&access_token=${token}`
+      );
+      const statusData = (await statusResponse.json()) as any;
+
+      if (!statusResponse.ok || statusData.error) {
+        throw new ValidationError(
+          statusData.error?.message || "Failed to check media container processing status"
         );
-        const statusData = (await statusResponse.json()) as any;
-
-        if (!statusResponse.ok || statusData.error) {
-          throw new ValidationError(
-            statusData.error?.message || "Failed to check video container processing status"
-          );
-        }
-
-        const statusCode = statusData.status_code;
-        console.log(`[Instagram Service] Video container status (Attempt ${retries}/${maxRetries}): ${statusCode}`);
-
-        if (statusCode === "FINISHED") {
-          isFinished = true;
-        } else if (statusCode === "ERROR" || statusCode === "EXPIRED") {
-          throw new ValidationError(
-            statusData.error?.message || `Video processing failed with state: ${statusCode}`
-          );
-        }
       }
 
-      if (!isFinished) {
-        throw new ValidationError("Video processing timed out on Instagram servers. Please try again.");
+      const statusCode = statusData.status_code;
+      console.log(`[Instagram Service] Media container status (Attempt ${retries}/${maxRetries}): ${statusCode}`);
+
+      if (statusCode === "FINISHED") {
+        isFinished = true;
+      } else if (statusCode === "ERROR" || statusCode === "EXPIRED") {
+        throw new ValidationError(
+          statusData.error?.message || `Media processing failed with state: ${statusCode}`
+        );
       }
+    }
+
+    if (!isFinished) {
+      throw new ValidationError("Media processing timed out on Instagram servers. Please try again.");
     }
 
     // 4. Step 3: Publish the media container

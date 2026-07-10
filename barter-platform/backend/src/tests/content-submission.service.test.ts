@@ -130,6 +130,12 @@ describe("ContentSubmissionService Workflow Tests", () => {
           json: async () => ({ id: "mock_media_id" }),
         } as Response);
       }
+      if (urlString.includes("fields=status_code")) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({ status_code: "FINISHED" }),
+        } as Response);
+      }
       if (urlString.includes("fields=permalink")) {
         return Promise.resolve({
           ok: true,
