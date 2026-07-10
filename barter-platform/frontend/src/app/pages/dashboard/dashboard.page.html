@@ -28,67 +28,7 @@
           </ion-card-content>
         </ion-card>
 
-        <!-- Visual Actions Grid -->
-        <ion-grid class="ion-no-padding actions-grid">
-          <ion-row>
-            <!-- Campaigns Card -->
-            <ion-col
-              size="12"
-              [sizeMd]="user?.role === 'INFLUENCER' ? 4 : 6"
-              class="action-col"
-            >
-              <div class="dashboard-action-card" (click)="exploreCollaborations()">
-                <div class="action-card-header">
-                  <div class="icon-wrapper">
-                    <ion-icon name="people-outline"></ion-icon>
-                  </div>
-                  <h3>
-                    {{ user?.role === 'BRAND' ? 'Manage Campaigns' : 'Explore Campaigns' }}
-                  </h3>
-                </div>
-                <p>
-                  {{ user?.role === 'BRAND' ? 'Create, monitor, and manage your active brand campaigns' : 'Discover and apply to top brand campaigns' }}
-                </p>
-              </div>
-            </ion-col>
 
-            <!-- Profile Card -->
-            <ion-col
-              size="12"
-              [sizeMd]="user?.role === 'INFLUENCER' ? 4 : 6"
-              class="action-col"
-            >
-              <div class="dashboard-action-card" (click)="viewProfile()">
-                <div class="action-card-header">
-                  <div class="icon-wrapper">
-                    <ion-icon name="person-outline"></ion-icon>
-                  </div>
-                  <h3>My Profile</h3>
-                </div>
-                <p>
-                  View and edit your specialized profile information and metrics
-                </p>
-              </div>
-            </ion-col>
-
-            <!-- My Portfolio Card (Influencer Only) -->
-            @if (user?.role === 'INFLUENCER') {
-            <ion-col size="12" size-md="4" class="action-col">
-              <div class="dashboard-action-card" (click)="viewPortfolio()">
-                <div class="action-card-header">
-                  <div class="icon-wrapper">
-                    <ion-icon name="folder-open-outline"></ion-icon>
-                  </div>
-                  <h3>My Portfolio</h3>
-                </div>
-                <p>
-                  Upload and manage your custom portfolio image and video showcase catalog
-                </p>
-              </div>
-            </ion-col>
-            }
-          </ion-row>
-        </ion-grid>
 
         <!-- Analytics Section -->
         <div class="analytics-section">

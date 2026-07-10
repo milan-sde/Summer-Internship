@@ -163,88 +163,96 @@
       <!-- ================= CAMPAIGN MODE ================= -->
       @if (!isOverview) {
         <div class="workspace-page-container">
-          <!-- Campaign Header -->
-          <div class="ws-campaign-header">
-            <button class="ws-back-btn" (click)="goBackToOverview()">
+          <!-- Page Header Row -->
+          <div class="page-header-row">
+            <button class="back-btn" (click)="goBackToOverview()">
               <ion-icon name="arrow-back-outline"></ion-icon>
             </button>
-            <div class="ws-campaign-header-info">
-              <div>
-                <span class="ws-breadcrumb">Content Workspace</span>
-                <h2 class="ws-title">{{ campaign?.title || 'Campaign' }}</h2>
-                @if (campaign) {
-                  <span class="ws-meta">
-                    {{ campaign.brandName }}
-                    @if (campaign.platform) {
-                      <span class="ws-meta-sep">•</span>
-                      {{ campaign.platform }}
-                    }
-                  </span>
-                }
-              </div>
+            <div class="page-header-info">
+              <span class="breadcrumb">Content Workspace</span>
+              <h2 class="page-title">{{ campaign?.title || 'Campaign' }}</h2>
+              @if (campaign) {
+                <span class="page-meta">
+                  {{ campaign.brandName }}
+                  @if (campaign.platform) {
+                    <span class="meta-sep">•</span>
+                    {{ campaign.platform }}
+                  }
+                </span>
+              }
             </div>
+            @if (!activeSubmission && !isCreatingNew) {
+              <button class="primary-action-btn" (click)="startNewSubmission()">
+                <ion-icon name="add-outline"></ion-icon>
+                <span>Create New Post</span>
+              </button>
+            }
           </div>
 
           <!-- ===== LIST VIEW ===== -->
           @if (!activeSubmission && !isCreatingNew) {
-            <div class="ws-campaign-layout">
+            <div class="workspace-grid">
               <!-- Left: Campaign Brief -->
-              <aside class="ws-brief">
-                <div class="ws-brief-section">
-                  <h4 class="ws-brief-heading">Campaign Brief</h4>
-                  <div class="ws-brief-platform">
-                    <span class="ws-brief-label">Platform</span>
-                    <span class="ws-brief-value">{{ campaign?.platform || 'N/A' }}</span>
+              <aside class="brief-card">
+                <div class="brief-toggle-header" (click)="toggleBrief()">
+                  <div class="brief-header-info">
+                    <h4 class="brief-heading">Campaign Brief</h4>
+                    @if (campaign) {
+                      <span class="brief-header-summary">{{ campaign.brandName }} • {{ campaign.platform }}</span>
+                    }
                   </div>
-                  <div class="ws-brief-block">
-                    <span class="ws-brief-label">Deliverable Requirements</span>
-                    <ul class="ws-brief-list">
+                  <button class="brief-toggle-btn" type="button">
+                    <ion-icon [name]="briefExpanded ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+                  </button>
+                </div>
+                <div class="brief-body" [class.collapsed]="!briefExpanded">
+                  @if (campaign) {
+                    <div class="brief-info-row">
+                      <span class="brief-label">Platform</span>
+                      <span class="brief-value">{{ campaign.platform }}</span>
+                    </div>
+                  }
+                  <div class="brief-info-block">
+                    <span class="brief-label">Deliverable Requirements</span>
+                    <ul class="brief-list">
                       <li>High quality Image or Video (Reel) suitable for social publishing.</li>
                       <li>Write a captivating Instagram caption for the post.</li>
                       <li>Content must be approved by the brand before it can be published.</li>
                     </ul>
                   </div>
-                  <div class="ws-brief-progress">
-                    <span class="ws-brief-label">Content Progress</span>
-                    <div class="ws-progress-list">
-                      <div class="ws-progress-item">
-                        <span class="ws-progress-count">{{ submissions.length }}</span>
-                        <span class="ws-progress-lbl">Total</span>
-                      </div>
-                      <div class="ws-progress-item">
-                        <span class="ws-progress-count neutral">{{ getStatusCount('DRAFT') }}</span>
-                        <span class="ws-progress-lbl">Draft</span>
-                      </div>
-                      <div class="ws-progress-item">
-                        <span class="ws-progress-count info">{{ getStatusCount('SUBMITTED') }}</span>
-                        <span class="ws-progress-lbl">In Review</span>
-                      </div>
-                      <div class="ws-progress-item">
-                        <span class="ws-progress-count warning">{{ getStatusCount('CHANGES_REQUESTED') }}</span>
-                        <span class="ws-progress-lbl">Changes</span>
-                      </div>
-                      <div class="ws-progress-item">
-                        <span class="ws-progress-count success">{{ getStatusCount('APPROVED') + getStatusCount('PUBLISHED') }}</span>
-                        <span class="ws-progress-lbl">Approved</span>
-                      </div>
-                      <div class="ws-progress-item">
-                        <span class="ws-progress-count danger">{{ getStatusCount('FAILED') }}</span>
-                        <span class="ws-progress-lbl">Failed</span>
-                      </div>
-                    </div>
+                </div>
+                <div class="brief-divider"></div>
+                <h4 class="brief-heading">Content Progress</h4>
+                <div class="progress-grid">
+                  <div class="progress-item">
+                    <span class="progress-count">{{ submissions.length }}</span>
+                    <span class="progress-lbl">Total</span>
+                  </div>
+                  <div class="progress-item">
+                    <span class="progress-count neutral">{{ getStatusCount('DRAFT') }}</span>
+                    <span class="progress-lbl">Draft</span>
+                  </div>
+                  <div class="progress-item">
+                    <span class="progress-count info">{{ getStatusCount('SUBMITTED') }}</span>
+                    <span class="progress-lbl">In Review</span>
+                  </div>
+                  <div class="progress-item">
+                    <span class="progress-count warning">{{ getStatusCount('CHANGES_REQUESTED') }}</span>
+                    <span class="progress-lbl">Changes</span>
+                  </div>
+                  <div class="progress-item">
+                    <span class="progress-count success">{{ getStatusCount('APPROVED') + getStatusCount('PUBLISHED') }}</span>
+                    <span class="progress-lbl">Approved</span>
+                  </div>
+                  <div class="progress-item">
+                    <span class="progress-count danger">{{ getStatusCount('FAILED') }}</span>
+                    <span class="progress-lbl">Failed</span>
                   </div>
                 </div>
               </aside>
 
               <!-- Right: Content Area -->
-              <main class="ws-content-area">
-                <div class="ws-content-header">
-                  <h3 class="ws-content-title">Your Content</h3>
-                  <button class="ws-create-btn" (click)="startNewSubmission()">
-                    <ion-icon name="add-outline"></ion-icon>
-                    <span class="ws-create-label">Create New Post</span>
-                  </button>
-                </div>
+              <main class="content-area">
 
                 <!-- Loading State -->
                 @if (submissionsLoading) {
@@ -278,7 +286,7 @@
                     <ion-icon name="document-text-outline" class="ws-state-icon"></ion-icon>
                     <p class="ws-state-text">No content created yet.</p>
                     <p class="ws-state-hint">Create your first post for this collaboration and submit it to the brand for review.</p>
-                    <button class="ws-create-btn ws-create-btn-primary" (click)="startNewSubmission()">
+                    <button class="primary-action-btn" (click)="startNewSubmission()">
                       <ion-icon name="add-outline"></ion-icon> Create First Post
                     </button>
                   </div>
@@ -286,30 +294,33 @@
 
                 <!-- Status Filters + Grid -->
                 @if (!submissionsLoading && !submissionsError && submissions.length > 0) {
-                  <div class="ws-filters">
-                    <button class="ws-filter-btn" [class.active]="selectedStatusFilter === 'all'" (click)="setStatusFilter('all')">All</button>
-                    <button class="ws-filter-btn" [class.active]="selectedStatusFilter === 'DRAFT'" (click)="setStatusFilter('DRAFT')">Draft</button>
-                    <button class="ws-filter-btn" [class.active]="selectedStatusFilter === 'SUBMITTED'" (click)="setStatusFilter('SUBMITTED')">In Review</button>
-                    <button class="ws-filter-btn" [class.active]="selectedStatusFilter === 'CHANGES_REQUESTED'" (click)="setStatusFilter('CHANGES_REQUESTED')">Changes Req.</button>
-                    <button class="ws-filter-btn" [class.active]="selectedStatusFilter === 'APPROVED'" (click)="setStatusFilter('APPROVED')">Approved</button>
-                    <button class="ws-filter-btn" [class.active]="selectedStatusFilter === 'PUBLISHED'" (click)="setStatusFilter('PUBLISHED')">Published</button>
-                    <button class="ws-filter-btn" [class.active]="selectedStatusFilter === 'FAILED'" (click)="setStatusFilter('FAILED')">Failed</button>
+                  <h3 class="content-section-heading">Your Content</h3>
+                  <div class="filters-wrapper">
+                  <div class="filters-bar">
+                    <button class="filter-chip" [class.active]="selectedStatusFilter === 'all'" (click)="setStatusFilter('all')">All</button>
+                    <button class="filter-chip" [class.active]="selectedStatusFilter === 'DRAFT'" (click)="setStatusFilter('DRAFT')">Draft</button>
+                    <button class="filter-chip" [class.active]="selectedStatusFilter === 'SUBMITTED'" (click)="setStatusFilter('SUBMITTED')">In Review</button>
+                    <button class="filter-chip" [class.active]="selectedStatusFilter === 'CHANGES_REQUESTED'" (click)="setStatusFilter('CHANGES_REQUESTED')">Changes Req.</button>
+                    <button class="filter-chip" [class.active]="selectedStatusFilter === 'APPROVED'" (click)="setStatusFilter('APPROVED')">Approved</button>
+                    <button class="filter-chip" [class.active]="selectedStatusFilter === 'PUBLISHED'" (click)="setStatusFilter('PUBLISHED')">Published</button>
+                    <button class="filter-chip" [class.active]="selectedStatusFilter === 'FAILED'" (click)="setStatusFilter('FAILED')">Failed</button>
+                  </div>
                   </div>
 
-                  <div class="ws-card-grid">
+                  <div class="deliverable-grid">
                     @for (sub of getFilteredSubmissions(); track sub.id) {
-                      <div class="ws-card" (click)="selectSubmission(sub)">
-                        <div class="ws-card-media">
+                      <div class="deliverable-card" (click)="selectSubmission(sub)">
+                        <div class="del-card-media">
                           @if (sub.mediaUrl) {
                             @if (sub.mediaType === 'VIDEO') {
                               <img
                                 [src]="getAvatarUrl(sub.mediaUrl)"
                                 alt="Video preview"
-                                class="ws-card-img"
+                                class="del-card-img"
                                 (error)="sub._mediaError = true"
-                                [class.ws-img-broken]="sub._mediaError"
+                                [class.del-img-broken]="sub._mediaError"
                               />
-                              <span class="ws-card-media-badge">
+                              <span class="del-card-media-badge">
                                 <ion-icon name="play-circle-outline"></ion-icon>
                                 Reel
                               </span>
@@ -317,21 +328,21 @@
                               <img
                                 [src]="getAvatarUrl(sub.mediaUrl)"
                                 alt="Image preview"
-                                class="ws-card-img"
+                                class="del-card-img"
                                 (error)="sub._mediaError = true"
-                                [class.ws-img-broken]="sub._mediaError"
+                                [class.del-img-broken]="sub._mediaError"
                               />
                             }
                           }
                           @if (!sub.mediaUrl || sub._mediaError) {
-                            <div class="ws-card-media-fallback">
+                            <div class="del-card-media-fallback">
                               <ion-icon name="image-outline"></ion-icon>
                               <span>Media unavailable</span>
                             </div>
                           }
                         </div>
-                        <div class="ws-card-body">
-                          <div class="ws-card-top">
+                        <div class="del-card-body">
+                          <div class="del-card-top">
                             <span class="ws-status-badge" [class]="sub.status | lowercase">
                               @if (sub.status === 'DRAFT') {
                                 <ion-icon name="create-outline"></ion-icon>
@@ -354,8 +365,8 @@
                               <span class="ws-revision-pill">Rev {{ sub.revisionNumber }}</span>
                             }
                           </div>
-                          <p class="ws-card-caption">{{ sub.caption || '(No caption)' }}</p>
-                          <span class="ws-card-date">{{ sub.createdAt | date:'MMM d, h:mm a' }}</span>
+                          <p class="del-card-caption">{{ sub.caption || '(No caption)' }}</p>
+                          <span class="del-card-date">{{ sub.createdAt | date:'MMM d, h:mm a' }}</span>
                         </div>
                       </div>
                     }
@@ -373,32 +384,44 @@
 
           <!-- ===== DETAIL / FORM VIEW ===== -->
           @if (activeSubmission || isCreatingNew) {
-            <div class="ws-campaign-layout">
+            <div class="workspace-grid">
               <!-- Left: Campaign Brief -->
-              <aside class="ws-brief">
-                <div class="ws-brief-section">
-                  <h4 class="ws-brief-heading">Campaign Brief</h4>
-                  <div class="ws-brief-platform">
-                    <span class="ws-brief-label">Platform</span>
-                    <span class="ws-brief-value">{{ campaign?.platform || 'N/A' }}</span>
+              <aside class="brief-card">
+                <div class="brief-toggle-header" (click)="toggleBrief()">
+                  <div class="brief-header-info">
+                    <h4 class="brief-heading">Campaign Brief</h4>
+                    @if (campaign) {
+                      <span class="brief-header-summary">{{ campaign.brandName }} • {{ campaign.platform }}</span>
+                    }
                   </div>
-                  <div class="ws-brief-block">
-                    <span class="ws-brief-label">Requirements</span>
-                    <ul class="ws-brief-list">
+                  <button class="brief-toggle-btn" type="button">
+                    <ion-icon [name]="briefExpanded ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+                  </button>
+                </div>
+                <div class="brief-body" [class.collapsed]="!briefExpanded">
+                  @if (campaign) {
+                    <div class="brief-info-row">
+                      <span class="brief-label">Platform</span>
+                      <span class="brief-value">{{ campaign.platform }}</span>
+                    </div>
+                  }
+                  <div class="brief-info-block">
+                    <span class="brief-label">Requirements</span>
+                    <ul class="brief-list">
                       <li>High quality Image or Video (Reel) suitable for social publishing.</li>
                       <li>Write a captivating Instagram caption for the post.</li>
                       <li>Content must be approved by the brand before it can be published.</li>
                     </ul>
                   </div>
                 </div>
-                <button class="ws-back-to-list-btn" (click)="backToList()">
+                <button class="back-to-list-btn" (click)="backToList()">
                   <ion-icon name="arrow-back-outline"></ion-icon>
                   Back to all content
                 </button>
               </aside>
 
               <!-- Right: Detail Content -->
-              <main class="ws-content-area">
+              <main class="content-area">
                 <!-- Workflow State Banner -->
                 <div class="ws-status-card" [class]="(activeSubmission?.status || 'NOT_STARTED') | lowercase">
                   <div class="ws-status-card-header">

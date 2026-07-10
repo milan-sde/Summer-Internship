@@ -55,7 +55,9 @@ import {
   syncOutline,
   checkmarkDoneOutline,
   chatbubbleOutline,
-  addOutline
+  addOutline,
+  chevronUpOutline,
+  chevronDownOutline
 } from 'ionicons/icons';
 import { Subscription, forkJoin } from 'rxjs';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
@@ -119,6 +121,7 @@ export class ContentWorkspacePage implements OnInit, OnDestroy {
   submissionsLoading = true;
   submissionsError = false;
   selectedStatusFilter = 'all';
+  briefExpanded = true;
 
   // Detail / form view state
   activeSubmission: any = null;
@@ -176,7 +179,9 @@ export class ContentWorkspacePage implements OnInit, OnDestroy {
       syncOutline,
       checkmarkDoneOutline,
       chatbubbleOutline,
-      addOutline
+      addOutline,
+      chevronUpOutline,
+      chevronDownOutline
     });
   }
 
@@ -600,6 +605,11 @@ export class ContentWorkspacePage implements OnInit, OnDestroy {
 
   setStatusFilter(filter: string) {
     this.selectedStatusFilter = filter;
+    this.cdr.markForCheck();
+  }
+
+  toggleBrief() {
+    this.briefExpanded = !this.briefExpanded;
     this.cdr.markForCheck();
   }
 

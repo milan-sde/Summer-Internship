@@ -3,7 +3,7 @@
   <div class="sidebar-header">
     <div class="logo-container">
       <div class="logo-dot"></div>
-      <span class="logo-text">Konnect</span>
+      <span class="logo-text">Creator Link</span>
     </div>
     <!-- Close button for mobile drawer -->
     <button class="mobile-close-btn" (click)="onLinkClick()">
@@ -15,7 +15,7 @@
   <nav class="sidebar-nav">
     <ul class="nav-list">
       <li *ngFor="let item of menuItems">
-        <a 
+        <a
           *ngIf="shouldShowItem(item)"
           [routerLink]="item.route"
           class="nav-link"

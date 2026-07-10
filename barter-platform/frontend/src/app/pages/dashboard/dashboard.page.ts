@@ -20,9 +20,6 @@ import {
   IonCardTitle,
   IonCardSubtitle,
   IonCardContent,
-  IonGrid,
-  IonRow,
-  IonCol,
   IonList,
   IonItem,
   IonLabel,
@@ -35,10 +32,7 @@ import { addIcons } from 'ionicons';
 import {
   logOutOutline,
   checkmarkCircle,
-  peopleOutline,
-  personOutline,
   barChartOutline,
-  folderOpenOutline,
   eyeOutline,
   documentTextOutline,
   checkmarkDoneOutline,
@@ -83,9 +77,6 @@ import { HeaderComponent } from '../../shared/components/header/header.component
     IonCardTitle,
     IonCardSubtitle,
     IonCardContent,
-    IonGrid,
-    IonRow,
-    IonCol,
     IonList,
     IonItem,
     IonLabel,
@@ -121,10 +112,7 @@ export class DashboardPage implements OnInit {
     addIcons({
       logOutOutline,
       checkmarkCircle,
-      peopleOutline,
-      personOutline,
       barChartOutline,
-      folderOpenOutline,
       eyeOutline,
       documentTextOutline,
       checkmarkDoneOutline,
@@ -256,18 +244,6 @@ export class DashboardPage implements OnInit {
       this.loadAnalytics();
       event.target.complete();
     });
-  }
-
-  exploreCollaborations() {
-    this.router.navigate(['/campaigns']);
-  }
-
-  viewProfile() {
-    this.router.navigate(['/profile']);
-  }
-
-  viewPortfolio() {
-    this.router.navigate(['/portfolio']);
   }
 
   // Process user logout API request and clear local session storage via subscribe
