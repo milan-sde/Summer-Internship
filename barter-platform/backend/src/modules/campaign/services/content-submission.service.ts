@@ -1,11 +1,13 @@
 import { ContentSubmissionRepository } from "../repositories/content-submission.repository";
 import { CampaignRepository } from "../repositories/campaign.repository";
 import { ProfileRepository } from "@modules/profile/repositories/profile.repository";
+import { Profile } from "@modules/profile/models/profile.model";
 import { UserRepository } from "@modules/users/repositories/user.repository";
 import { InstagramService } from "@modules/instagram/service/instagram.service";
 import { PortfolioMedia } from "@modules/portfolio/models/portfolio-media.model";
 import { ValidationError, NotFoundError, ConflictError } from "@shared/errors/app-error";
 import { ContentSubmission, IContentSubmission } from "../models/content-submission.model";
+import { NotificationService } from "@modules/notification/services/notification.service";
 import mongoose from "mongoose";
 import fs from "fs";
 import path from "path";
@@ -16,6 +18,7 @@ export class ContentSubmissionService {
   private profileRepository: ProfileRepository;
   private userRepository: UserRepository;
   private instagramService: InstagramService;
+  private notificationService: NotificationService;
 
   constructor() {
     this.submissionRepository = new ContentSubmissionRepository();
@@ -23,6 +26,7 @@ export class ContentSubmissionService {
     this.profileRepository = new ProfileRepository();
     this.userRepository = new UserRepository();
     this.instagramService = new InstagramService();
+    this.notificationService = new NotificationService();
   }
 
   // Create a new content submission as DRAFT (Influencers only)
@@ -123,6 +127,26 @@ export class ContentSubmissionService {
       throw new NotFoundError("Content submission");
     }
 
+    // Notify the brand that a deliverable was submitted for review (non-blocking)
+    // submission.brandId is Profile._id — use Profile.findById to get brand's User._id
+    void (async () => {
+      const campaign = await this.campaignRepository.findById(submission.campaignId.toString());
+      const brandProfile = await Profile.findById(submission.brandId);
+      const influencerProfile = await this.profileRepository.findByUserId(submission.influencerId.toString());
+      if (brandProfile && campaign) {
+        void this.notificationService.notifyDeliverableSubmitted({
+          brandUserId: brandProfile.userId.toString(),
+          influencerUserId: submission.influencerId.toString(),
+          campaignId: campaign._id.toString(),
+          campaignTitle: campaign.title,
+          submissionId: submissionId,
+          influencerName: influencerProfile?.fullName || 'An influencer',
+        });
+      }
+    })().catch((err) => {
+      console.error('[ContentSubmissionService] Notification error (submit):', err);
+    });
+
     return updated;
   }
 
@@ -173,6 +197,30 @@ export class ContentSubmissionService {
     if (!updated) {
       throw new NotFoundError("Content submission");
     }
+
+    // Notify the influencer of the brand's review decision (non-blocking)
+    void (async () => {
+      if (status === 'APPROVED') {
+        void this.notificationService.notifyDeliverableApproved({
+          influencerUserId: submission.influencerId.toString(),
+          brandUserId: brandUserId,
+          campaignId: campaign._id.toString(),
+          campaignTitle: campaign.title,
+          submissionId: submissionId,
+        });
+      } else if (status === 'CHANGES_REQUESTED') {
+        void this.notificationService.notifyDeliverableChangesRequested({
+          influencerUserId: submission.influencerId.toString(),
+          brandUserId: brandUserId,
+          campaignId: campaign._id.toString(),
+          campaignTitle: campaign.title,
+          submissionId: submissionId,
+          feedback: feedback || 'Changes requested by brand',
+        });
+      }
+    })().catch((err) => {
+      console.error('[ContentSubmissionService] Notification error (review):', err);
+    });
 
     return updated;
   }
@@ -240,12 +288,28 @@ export class ContentSubmissionService {
         instagramPermalink: publishResult.instagramPermalink,
         publishedAt: new Date(),
       });
+
+      // Notify influencer that content was successfully published (non-blocking)
+      void this.notificationService.notifyContentPublished({
+        influencerUserId: influencerId,
+        campaignId: campaign._id.toString(),
+        campaignTitle: campaign.title,
+        submissionId: submissionId,
+      });
     } catch (err: any) {
       console.error("Instagram Direct Publishing error:", err);
       // 4. On failure, transition status to FAILED and record error message
       updatedSubmission = await this.submissionRepository.update(submissionId, {
         status: "FAILED",
         publishingError: err.message || "Unknown error occurred during Instagram publishing",
+      });
+
+      // Notify influencer that publishing failed (non-blocking)
+      void this.notificationService.notifyContentPublishFailed({
+        influencerUserId: influencerId,
+        campaignId: campaign._id.toString(),
+        campaignTitle: campaign.title,
+        submissionId: submissionId,
       });
     }
 

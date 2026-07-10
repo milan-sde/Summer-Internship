@@ -4,17 +4,21 @@ import { UserRepository } from '@modules/users/repositories/user.repository';
 import { ValidationError, NotFoundError, ConflictError } from '@shared/errors/app-error';
 import { CreateCampaignDto, CampaignResponseDto, CreateCampaignDtoSchema } from '../dto/campaign.dto';
 import { ICampaign } from '../models/campaign.model';
+import { Profile } from '@modules/profile/models/profile.model';
+import { NotificationService } from '@modules/notification/services/notification.service';
 import mongoose from 'mongoose';
 
 export class CampaignService {
   private campaignRepository: CampaignRepository;
   private profileRepository: ProfileRepository;
   private userRepository: UserRepository;
+  private notificationService: NotificationService;
 
   constructor() {
     this.campaignRepository = new CampaignRepository();
     this.profileRepository = new ProfileRepository();
     this.userRepository = new UserRepository();
+    this.notificationService = new NotificationService();
   }
 
   async createCampaign(userId: string, data: CreateCampaignDto): Promise<CampaignResponseDto> {
@@ -102,6 +106,23 @@ export class CampaignService {
     if (!updatedCampaign) {
       throw new ConflictError('Failed to apply. You might have already applied or slots are filled.');
     }
+
+    // Notify the brand that a new application was received (non-blocking)
+    // campaign.brandId is Profile._id — look up by profile _id to get brand's User._id via .userId
+    const influencerProfile = await this.profileRepository.findByUserId(userId);
+    void Profile.findById(campaign.brandId).then((brandProfile) => {
+      if (brandProfile) {
+        void this.notificationService.notifyApplicationReceived({
+          brandUserId: brandProfile.userId.toString(),
+          influencerUserId: userId,
+          campaignId: campaignId,
+          campaignTitle: campaign.title,
+          influencerName: influencerProfile?.fullName || 'An influencer',
+        });
+      }
+    }).catch((err) => {
+      console.error('[CampaignService] Notification lookup error:', err);
+    });
 
     return this.toResponseDto(updatedCampaign);
   }
@@ -216,6 +237,28 @@ export class CampaignService {
     }
 
     await campaign.save();
+
+    // Notify the influencer of their application status change (non-blocking)
+    // influencerId here is their User._id; brandUserId is also a User._id
+    void Promise.resolve().then(async () => {
+      if (status === 'APPROVED') {
+        void this.notificationService.notifyApplicationAccepted({
+          influencerUserId: influencerId,
+          brandUserId: brandUserId,
+          campaignId: campaignId,
+          campaignTitle: campaign.title,
+        });
+      } else if (status === 'REJECTED') {
+        void this.notificationService.notifyApplicationRejected({
+          influencerUserId: influencerId,
+          brandUserId: brandUserId,
+          campaignId: campaignId,
+          campaignTitle: campaign.title,
+        });
+      }
+    }).catch((err) => {
+      console.error('[CampaignService] Notification send error:', err);
+    });
 
     const populated = await this.populateCampaignApplicants([campaign]);
     return populated[0];

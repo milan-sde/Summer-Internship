@@ -17,6 +17,8 @@ import instagramRoutes from "@modules/instagram/routes/instagram.routes";
 import influencerRoutes from "@modules/profile/routes/influencer.routes";
 import aiRoutes from "@modules/ai/routes/ai.routes";
 import { requireOnboarding } from "@shared/middlewares/onboarding.guard";
+import notificationRoutes from "@modules/notification/routes/notification.routes";
+import analyticsRoutes from "@modules/analytics/routes/analytics.routes";
 
 //load environment variables:
 dotenv.config();
@@ -101,6 +103,12 @@ app.use("/api/influencers", influencerRoutes);
 
 // AI routes:
 app.use("/api/ai", aiRoutes);
+
+// Notification routes:
+app.use("/api/notifications", notificationRoutes);
+
+// Analytics routes:
+app.use("/api/analytics", analyticsRoutes);
 
 app.get(
   "/api/dashboard",
