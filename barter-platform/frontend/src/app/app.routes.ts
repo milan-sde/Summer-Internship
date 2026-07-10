@@ -57,6 +57,14 @@ export const routes: Routes = [
     canActivate: [AuthGuard, OnboardingGuard],
   },
   {
+    path: 'content-workspace',
+    loadComponent: () =>
+      import('./pages/content-workspace/content-workspace.page').then(
+        (m) => m.ContentWorkspacePage,
+      ),
+    canActivate: [AuthGuard, OnboardingGuard],
+  },
+  {
     path: 'instagram-catalogue',
     loadComponent: () =>
       import('./pages/instagram-catalogue/instagram-catalogue.page').then(

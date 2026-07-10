@@ -227,4 +227,12 @@ export class CampaignService {
       { withCredentials: true }
     );
   }
+
+  // Get all submissions belonging to the authenticated influencer (Global Workspace)
+  getMySubmissions(): Observable<any> {
+    return this.http.get(
+      `${this.apiUrl}/campaigns/submissions/my`,
+      { withCredentials: true }
+    );
+  }
 }

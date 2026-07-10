@@ -5,7 +5,7 @@ import { UserRepository } from "@modules/users/repositories/user.repository";
 import { InstagramService } from "@modules/instagram/service/instagram.service";
 import { PortfolioMedia } from "@modules/portfolio/models/portfolio-media.model";
 import { ValidationError, NotFoundError, ConflictError } from "@shared/errors/app-error";
-import { IContentSubmission } from "../models/content-submission.model";
+import { ContentSubmission, IContentSubmission } from "../models/content-submission.model";
 import mongoose from "mongoose";
 import fs from "fs";
 import path from "path";
@@ -47,15 +47,6 @@ export class ContentSubmissionService {
       throw new ValidationError("Only influencers accepted into this campaign can upload content");
     }
 
-    // Verify duplicate submission
-    const existing = await this.submissionRepository.findOne({
-      campaignId: new mongoose.Types.ObjectId(campaignId),
-      influencerId: new mongoose.Types.ObjectId(influencerId),
-    });
-
-    if (existing) {
-      throw new ConflictError("A submission already exists for this campaign. Please update the existing submission.");
-    }
 
     return await this.submissionRepository.create({
       campaignId: campaign._id as mongoose.Types.ObjectId,
@@ -291,22 +282,20 @@ export class ContentSubmissionService {
         campaignId: new mongoose.Types.ObjectId(campaignId),
       });
     } else {
-      // Influencer: only return their own submission
-      const submission = await this.submissionRepository.findOne({
+      // Influencer: return all their own submissions for this campaign
+      return await this.submissionRepository.findMany({
         campaignId: new mongoose.Types.ObjectId(campaignId),
         influencerId: new mongoose.Types.ObjectId(userId),
       });
-
-      return submission ? [submission] : [];
     }
   }
 
-  // Get submission for specific influencer/campaign collaboration
-  async getSubmissionByInfluencer(
+  // Get submissions list for specific influencer/campaign collaboration
+  async getSubmissionsByInfluencer(
     campaignId: string,
     influencerId: string,
     userId: string
-  ): Promise<IContentSubmission | null> {
+  ): Promise<IContentSubmission[]> {
     const user = await this.userRepository.findById(userId);
     if (!user) {
       throw new NotFoundError("User");
@@ -314,7 +303,7 @@ export class ContentSubmissionService {
     const role = user.role;
 
     if (role === "INFLUENCER" && userId !== influencerId) {
-      throw new ValidationError("You can only access your own content submission");
+      throw new ValidationError("You can only access your own content submissions");
     }
 
     if (role === "BRAND") {
@@ -328,7 +317,7 @@ export class ContentSubmissionService {
       }
     }
 
-    return await this.submissionRepository.findOne({
+    return await this.submissionRepository.findMany({
       campaignId: new mongoose.Types.ObjectId(campaignId),
       influencerId: new mongoose.Types.ObjectId(influencerId),
     });
@@ -395,6 +384,15 @@ export class ContentSubmissionService {
     });
 
     return await portfolioItem.save();
+  }
+
+  // Get all submissions belonging to the influencer across all campaigns (Global Workspace)
+  async getMySubmissions(influencerId: string): Promise<IContentSubmission[]> {
+    return await ContentSubmission.find({
+      influencerId: new mongoose.Types.ObjectId(influencerId),
+    })
+      .populate("campaignId", "title brandName brandLogo platform")
+      .sort({ createdAt: -1 });
   }
 }
 

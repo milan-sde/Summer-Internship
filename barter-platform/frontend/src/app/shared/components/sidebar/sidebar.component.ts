@@ -12,7 +12,8 @@ import {
   folderOpenOutline,
   logoInstagram,
   logOutOutline,
-  closeOutline
+  closeOutline,
+  documentTextOutline
 } from 'ionicons/icons';
 import { filter } from 'rxjs/operators';
 
@@ -49,6 +50,12 @@ export class SidebarComponent implements OnInit {
       icon: 'people-outline'
     },
     {
+      label: 'Content Workspace',
+      route: '/content-workspace',
+      icon: 'document-text-outline',
+      roles: ['INFLUENCER']
+    },
+    {
       label: 'My Profile',
       route: '/profile',
       icon: 'person-outline'
@@ -80,7 +87,8 @@ export class SidebarComponent implements OnInit {
       folderOpenOutline,
       logoInstagram,
       logOutOutline,
-      closeOutline
+      closeOutline,
+      documentTextOutline
     });
 
     // Track route changes to highlight the active menu item

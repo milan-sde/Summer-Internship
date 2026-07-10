@@ -457,7 +457,9 @@ export class CampaignsPage implements OnInit {
   // ================= CONTENT WORKSPACE STATE =================
   isContentModalOpen = false;
   selectedCampaignForContent: any = null;
-  currentSubmission: any = null;
+  submissions: any[] = [];
+  activeSubmission: any = null;
+  isCreatingNew = false;
   submissionCaption = '';
   submissionMediaType: 'IMAGE' | 'VIDEO' = 'IMAGE';
   submissionFile: File | null = null;
@@ -469,41 +471,72 @@ export class CampaignsPage implements OnInit {
   isReviewModalOpen = false;
   selectedCampaignForReview: any = null;
   selectedApplicantForReview: any = null;
-  reviewSubmissionData: any = null;
+  reviewSubmissions: any[] = [];
+  selectedReviewSubmission: any = null;
   brandReviewFeedback = '';
   isReviewingContent = false;
 
-  // Open the Influencer Content Submission workspace
+  // Open the Influencer Content Workspace
   openContentWorkspace(campaign: any) {
     this.selectedCampaignForContent = campaign;
     this.isContentModalOpen = true;
-    this.currentSubmission = null;
-    this.submissionCaption = '';
-    this.submissionMediaType = 'IMAGE';
-    this.submissionFile = null;
-    this.submissionFilePreview = null;
+    this.submissions = [];
+    this.activeSubmission = null;
+    this.isCreatingNew = false;
+    this.resetFormFields();
     this.cdr.markForCheck();
-
-    this.campaignService.getSubmissionByInfluencer(campaign.id, this.currentUser.id).subscribe({
-      next: (response: any) => {
-        if (response.success && response.data?.submission) {
-          this.currentSubmission = response.data.submission;
-          this.submissionCaption = this.currentSubmission.caption || '';
-          this.submissionMediaType = this.currentSubmission.mediaType || 'IMAGE';
-          this.submissionFilePreview = this.getAvatarUrl(this.currentSubmission.mediaUrl);
-        }
-        this.cdr.markForCheck();
-      },
-      error: (error: any) => {
-        console.error('Failed to load submission details:', error);
-        this.cdr.markForCheck();
-      }
-    });
+    this.loadSubmissions(campaign.id);
   }
 
   closeContentWorkspace() {
     this.isContentModalOpen = false;
     this.cdr.markForCheck();
+  }
+
+  loadSubmissions(campaignId: string) {
+    this.campaignService.getSubmissions(campaignId).subscribe({
+      next: (response: any) => {
+        this.submissions = response.success ? response.data.submissions : [];
+        this.cdr.markForCheck();
+      },
+      error: (error: any) => {
+        console.error('Failed to load submissions:', error);
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  resetFormFields() {
+    this.submissionCaption = '';
+    this.submissionMediaType = 'IMAGE';
+    this.submissionFile = null;
+    this.submissionFilePreview = null;
+  }
+
+  startNewSubmission() {
+    this.isCreatingNew = true;
+    this.activeSubmission = null;
+    this.resetFormFields();
+    this.cdr.markForCheck();
+  }
+
+  selectSubmission(sub: any) {
+    this.activeSubmission = sub;
+    this.isCreatingNew = false;
+    this.submissionCaption = sub.caption || '';
+    this.submissionMediaType = sub.mediaType || 'IMAGE';
+    this.submissionFilePreview = this.getAvatarUrl(sub.mediaUrl);
+    this.submissionFile = null;
+    this.cdr.markForCheck();
+  }
+
+  backToList() {
+    this.activeSubmission = null;
+    this.isCreatingNew = false;
+    this.resetFormFields();
+    if (this.selectedCampaignForContent) {
+      this.loadSubmissions(this.selectedCampaignForContent.id);
+    }
   }
 
   onSubmissionFileSelected(event: any) {
@@ -518,7 +551,7 @@ export class CampaignsPage implements OnInit {
   async saveSubmissionDraft() {
     if (!this.selectedCampaignForContent) return;
 
-    if (!this.currentSubmission && !this.submissionFile) {
+    if (!this.activeSubmission && !this.submissionFile) {
       this.showToast('Please upload an image or video file for your deliverable', 'danger');
       return;
     }
@@ -528,11 +561,11 @@ export class CampaignsPage implements OnInit {
 
     const campaignId = this.selectedCampaignForContent.id;
 
-    if (this.currentSubmission) {
+    if (this.activeSubmission) {
       // Update existing draft/revision
       this.campaignService.updateSubmission(
         campaignId,
-        this.currentSubmission.id,
+        this.activeSubmission.id,
         this.submissionFile || undefined,
         this.submissionMediaType,
         this.submissionCaption
@@ -540,8 +573,8 @@ export class CampaignsPage implements OnInit {
         next: (response: any) => {
           this.isSubmittingContent = false;
           if (response.success && response.data?.submission) {
-            this.currentSubmission = response.data.submission;
-            this.submissionFilePreview = this.getAvatarUrl(this.currentSubmission.mediaUrl);
+            this.activeSubmission = response.data.submission;
+            this.submissionFilePreview = this.getAvatarUrl(this.activeSubmission.mediaUrl);
             this.submissionFile = null;
             this.showToast('Deliverable draft saved successfully!', 'success');
           }
@@ -565,10 +598,12 @@ export class CampaignsPage implements OnInit {
         next: (response: any) => {
           this.isSubmittingContent = false;
           if (response.success && response.data?.submission) {
-            this.currentSubmission = response.data.submission;
-            this.submissionFilePreview = this.getAvatarUrl(this.currentSubmission.mediaUrl);
+            this.activeSubmission = response.data.submission;
+            this.submissionFilePreview = this.getAvatarUrl(this.activeSubmission.mediaUrl);
             this.submissionFile = null;
+            this.isCreatingNew = false;
             this.showToast('Deliverable draft created successfully!', 'success');
+            this.loadSubmissions(campaignId);
           }
           this.cdr.markForCheck();
         },
@@ -583,19 +618,19 @@ export class CampaignsPage implements OnInit {
   }
 
   submitDeliverable() {
-    if (!this.selectedCampaignForContent || !this.currentSubmission) return;
+    if (!this.selectedCampaignForContent || !this.activeSubmission) return;
 
     this.isSubmittingContent = true;
     this.cdr.markForCheck();
 
     this.campaignService.submitContent(
       this.selectedCampaignForContent.id,
-      this.currentSubmission.id
+      this.activeSubmission.id
     ).subscribe({
       next: (response: any) => {
         this.isSubmittingContent = false;
         if (response.success && response.data?.submission) {
-          this.currentSubmission = response.data.submission;
+          this.activeSubmission = response.data.submission;
           this.showToast('Deliverable submitted successfully to brand for review!', 'success');
         }
         this.cdr.markForCheck();
@@ -610,19 +645,19 @@ export class CampaignsPage implements OnInit {
   }
 
   publishDeliverableToInstagram() {
-    if (!this.selectedCampaignForContent || !this.currentSubmission) return;
+    if (!this.selectedCampaignForContent || !this.activeSubmission) return;
 
     this.isPublishingToInstagram = true;
     this.cdr.markForCheck();
 
     this.campaignService.publishToInstagram(
       this.selectedCampaignForContent.id,
-      this.currentSubmission.id
+      this.activeSubmission.id
     ).subscribe({
       next: (response: any) => {
         this.isPublishingToInstagram = false;
         if (response.success && response.data?.submission) {
-          this.currentSubmission = response.data.submission;
+          this.activeSubmission = response.data.submission;
           this.showToast('Successfully published approved deliverable directly to Instagram!', 'success');
         }
         this.cdr.markForCheck();
@@ -631,7 +666,7 @@ export class CampaignsPage implements OnInit {
         this.isPublishingToInstagram = false;
         console.error('Failed to publish to Instagram:', error);
         if (error?.error?.data?.submission) {
-          this.currentSubmission = error.error.data.submission;
+          this.activeSubmission = error.error.data.submission;
         }
         this.showToast(error?.error?.message || 'Instagram publishing failed. Please check access token.', 'danger');
         this.cdr.markForCheck();
@@ -640,7 +675,7 @@ export class CampaignsPage implements OnInit {
   }
 
   addDeliverableToPortfolio() {
-    if (!this.selectedCampaignForContent || !this.currentSubmission) return;
+    if (!this.selectedCampaignForContent || !this.activeSubmission) return;
 
     this.loadingController.create({
       message: 'Adding to your portfolio showcase...'
@@ -649,7 +684,7 @@ export class CampaignsPage implements OnInit {
 
       this.campaignService.addSubmissionToPortfolio(
         this.selectedCampaignForContent.id,
-        this.currentSubmission.id
+        this.activeSubmission.id
       ).subscribe({
         next: (response: any) => {
           loading.dismiss();
@@ -671,14 +706,18 @@ export class CampaignsPage implements OnInit {
     this.selectedCampaignForReview = campaign;
     this.selectedApplicantForReview = applicant;
     this.isReviewModalOpen = true;
-    this.reviewSubmissionData = null;
+    this.reviewSubmissions = [];
+    this.selectedReviewSubmission = null;
     this.brandReviewFeedback = '';
     this.cdr.markForCheck();
 
     this.campaignService.getSubmissionByInfluencer(campaign.id, applicant.influencerId).subscribe({
       next: (response: any) => {
-        if (response.success && response.data?.submission) {
-          this.reviewSubmissionData = response.data.submission;
+        if (response.success && response.data?.submissions) {
+          this.reviewSubmissions = response.data.submissions;
+          if (this.reviewSubmissions.length > 0) {
+            this.selectReviewSubmission(this.reviewSubmissions[0]);
+          }
         }
         this.cdr.markForCheck();
       },
@@ -694,8 +733,14 @@ export class CampaignsPage implements OnInit {
     this.cdr.markForCheck();
   }
 
+  selectReviewSubmission(sub: any) {
+    this.selectedReviewSubmission = sub;
+    this.brandReviewFeedback = sub.brandFeedback || '';
+    this.cdr.markForCheck();
+  }
+
   reviewDeliverable(status: 'APPROVED' | 'CHANGES_REQUESTED') {
-    if (!this.selectedCampaignForReview || !this.reviewSubmissionData) return;
+    if (!this.selectedCampaignForReview || !this.selectedReviewSubmission) return;
 
     if (status === 'CHANGES_REQUESTED' && (!this.brandReviewFeedback || !this.brandReviewFeedback.trim())) {
       this.showToast('Please provide feedback explaining the changes required', 'danger');
@@ -707,14 +752,19 @@ export class CampaignsPage implements OnInit {
 
     this.campaignService.reviewContent(
       this.selectedCampaignForReview.id,
-      this.reviewSubmissionData.id,
+      this.selectedReviewSubmission.id,
       status,
       this.brandReviewFeedback
     ).subscribe({
       next: (response: any) => {
         this.isReviewingContent = false;
         if (response.success && response.data?.submission) {
-          this.reviewSubmissionData = response.data.submission;
+          const updated = response.data.submission;
+          this.selectedReviewSubmission = updated;
+          const idx = this.reviewSubmissions.findIndex(s => s.id === updated.id);
+          if (idx > -1) {
+            this.reviewSubmissions[idx] = updated;
+          }
           const msg = status === 'APPROVED' ? 'Deliverable approved successfully!' : 'Changes requested successfully';
           this.showToast(msg, 'success');
         }

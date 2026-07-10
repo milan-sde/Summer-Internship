@@ -132,8 +132,8 @@ const contentSubmissionSchema = new Schema<IContentSubmission>(
   }
 );
 
-// One content submission workflow active per influencer per campaign
-contentSubmissionSchema.index({ campaignId: 1, influencerId: 1 }, { unique: true });
+// Support multiple deliverables per influencer per campaign
+contentSubmissionSchema.index({ campaignId: 1, influencerId: 1 }, { unique: false });
 
 export const ContentSubmission = mongoose.model<IContentSubmission>(
   "ContentSubmission",

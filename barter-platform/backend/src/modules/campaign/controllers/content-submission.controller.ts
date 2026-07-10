@@ -151,13 +151,13 @@ export const getSubmissionsByCampaign = asyncHandler(async (req: Request, res: R
   });
 });
 
-// Get submission details for a specific influencer collaboration
-export const getSubmissionByInfluencer = asyncHandler(async (req: Request, res: Response) => {
+// Get submissions list for a specific influencer collaboration
+export const getSubmissionsByInfluencer = asyncHandler(async (req: Request, res: Response) => {
   const userId = req.user!.userId;
   const campaignId = req.params.campaignId as string;
   const influencerId = req.params.influencerId as string;
 
-  const submission = await contentSubmissionService.getSubmissionByInfluencer(
+  const submissions = await contentSubmissionService.getSubmissionsByInfluencer(
     campaignId,
     influencerId,
     userId
@@ -165,7 +165,19 @@ export const getSubmissionByInfluencer = asyncHandler(async (req: Request, res: 
 
   res.status(200).json({
     success: true,
-    data: { submission },
+    data: { submissions },
+  });
+});
+
+// Get all submissions belonging to the authenticated influencer (Global Workspace)
+export const getMySubmissions = asyncHandler(async (req: Request, res: Response) => {
+  const influencerId = req.user!.userId;
+
+  const submissions = await contentSubmissionService.getMySubmissions(influencerId);
+
+  res.status(200).json({
+    success: true,
+    data: { submissions },
   });
 });
 

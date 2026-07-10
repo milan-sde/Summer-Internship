@@ -1,0 +1,321 @@
+<div class="app-layout-container">
+  <!-- Sidebar Navigation -->
+  <app-sidebar [isOpen]="isSidebarOpen" (closeSidebar)="isSidebarOpen = false"></app-sidebar>
+
+  <div class="main-content-viewport">
+    <!-- Header component with Hamburger button to open mobile sidebar -->
+    <app-header (menuToggle)="toggleSidebar()"></app-header>
+
+    <ion-content class="ion-padding" scroll-y="true">
+      <!-- Pull-to-refresh control -->
+      <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+        <ion-refresher-content></ion-refresher-content>
+      </ion-refresher>
+
+      <div class="workspace-page-container">
+        <!-- Banner Header Section -->
+        <div class="workspace-header-banner">
+          <div class="header-text">
+            <h2>Content Workspace</h2>
+            <p>Track, manage, and publish all your campaign deliverables in one place</p>
+          </div>
+        </div>
+
+        <!-- Loading Spinner -->
+        @if (isLoading) {
+          <div class="loading-state-container text-center ion-padding" style="margin-top: 40px;">
+            <ion-spinner name="crescent" color="primary" size="large"></ion-spinner>
+            <p style="color: var(--ion-color-medium); margin-top: 12px; font-weight: 500;">Loading your deliverables...</p>
+          </div>
+        }
+
+        <!-- Empty State -->
+        @if (!isLoading && submissions.length === 0) {
+          <div class="empty-workspace-container text-center ion-padding">
+            <div class="empty-icon-wrapper">
+              <ion-icon name="document-text-outline"></ion-icon>
+            </div>
+            <h3>No deliverables found</h3>
+            <p>You haven't uploaded any deliverables yet. Apply and get approved for campaigns to start creating content!</p>
+            <ion-button (click)="navigateToCampaigns()" class="browse-campaigns-btn" style="margin-top: 18px;">
+              Browse Campaigns
+            </ion-button>
+          </div>
+        }
+
+        <!-- Deliverables List Grid -->
+        @if (!isLoading && submissions.length > 0) {
+          <div class="deliverables-grid-container">
+            <div class="deliverables-list-grid">
+              <div *ngFor="let sub of submissions" class="global-deliverable-card" (click)="openSubmissionDetail(sub)">
+                <div class="card-media-preview">
+                  @if (sub.mediaType === 'VIDEO') {
+                    <div class="video-preview-placeholder">
+                      <ion-icon name="play-circle-outline" class="play-icon"></ion-icon>
+                      <span>Video / Reel</span>
+                    </div>
+                  } @else {
+                    <img [src]="getAvatarUrl(sub.mediaUrl)" alt="Deliverable Preview" />
+                  }
+                </div>
+                <div class="card-details-box">
+                  <div class="campaign-brand-header">
+                    <h4 class="campaign-title">{{ sub.campaignId?.title || 'Campaign Deliverable' }}</h4>
+                    <span class="brand-name">By {{ sub.campaignId?.brandName || 'Acme' }} • {{ sub.campaignId?.platform }}</span>
+                  </div>
+                  <div class="card-status-row">
+                    <span class="revision-label" *ngIf="sub.revisionNumber > 1">Revision {{ sub.revisionNumber }}</span>
+                    <ion-badge class="state-badge" [class]="sub.status | lowercase">
+                      {{ sub.status }}
+                    </ion-badge>
+                  </div>
+                  <p class="caption-preview">{{ sub.caption || '(No caption provided)' }}</p>
+                  <span class="card-date">Created: {{ sub.createdAt | date:'medium' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </ion-content>
+  </div>
+</div>
+
+<!-- ================= DELIVERABLE DETAIL MODAL ================= -->
+<ion-modal [isOpen]="isDetailModalOpen" (didDismiss)="closeDetailModal()" class="custom-premium-modal">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar color="primary">
+        <ion-title>Deliverable Details</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="closeDetailModal()">
+            <ion-icon name="close-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="ion-padding modal-viewport-content" scroll-y="true">
+      <div class="workspace-details-container" style="padding-top: 10px;">
+        <!-- Campaign details -->
+        <div class="campaign-info-header-card">
+          <h3>{{ activeSubmission?.campaignId?.title || 'Campaign Deliverable' }}</h3>
+          <p class="brand-subtext">By {{ activeSubmission?.campaignId?.brandName }} • Platform: {{ activeSubmission?.campaignId?.platform }}</p>
+        </div>
+
+        <!-- Workflow State Banner -->
+        <div class="status-banner-card" [class]="(activeSubmission?.status || 'NOT_STARTED') | lowercase">
+          <div class="status-banner-header">
+            <span class="status-label">Status:</span>
+            <ion-badge class="state-badge" [class]="(activeSubmission?.status || 'NOT_STARTED') | lowercase">
+              {{ activeSubmission?.status || 'NOT_STARTED' }}
+            </ion-badge>
+            @if (activeSubmission?.revisionNumber > 1) {
+              <span class="revision-number-pill">Revision {{ activeSubmission.revisionNumber }}</span>
+            }
+          </div>
+          
+          <p class="status-desc-text">
+            @if (activeSubmission?.status === 'DRAFT') {
+              Your content is saved as a draft. Click <strong>Submit for Review</strong> to send it to the brand.
+            } @else if (activeSubmission?.status === 'SUBMITTED') {
+              Content submitted! Waiting for the brand to review and approve your submission.
+            } @else if (activeSubmission?.status === 'CHANGES_REQUESTED') {
+              The brand reviewed your content and requested changes. Check feedback below, edit, and resubmit.
+            } @else if (activeSubmission?.status === 'APPROVED') {
+              🎉 Congratulations! Your content has been approved. You are ready to publish it to Instagram.
+            } @else if (activeSubmission?.status === 'PUBLISHING') {
+              <ion-spinner name="crescent" size="small"></ion-spinner> Publishing to your Instagram profile...
+            } @else if (activeSubmission?.status === 'PUBLISHED') {
+              ✅ Successfully published to Instagram! View the live post below.
+            } @else if (activeSubmission?.status === 'FAILED') {
+              ⚠️ Direct publishing failed. Check error details below, ensure your Instagram Creator/Business account is connected, and retry.
+            }
+          </p>
+        </div>
+
+        <!-- Brand Feedback Box -->
+        @if (activeSubmission?.status === 'CHANGES_REQUESTED' && activeSubmission?.brandFeedback) {
+        <div class="brand-feedback-container">
+          <h4>💬 Brand Feedback:</h4>
+          <blockquote>"{{ activeSubmission.brandFeedback }}"</blockquote>
+        </div>
+        }
+
+        <!-- Publishing Error Box -->
+        @if (activeSubmission?.status === 'FAILED' && activeSubmission?.publishingError) {
+        <div class="publishing-error-container">
+          <h4>
+            <ion-icon name="alert-circle-outline" color="danger"></ion-icon>
+            Publishing Error:
+          </h4>
+          <p class="error-msg-text">{{ activeSubmission.publishingError }}</p>
+        </div>
+        }
+
+        <!-- Form fields if DRAFT or CHANGES_REQUESTED -->
+        @if (activeSubmission?.status === 'DRAFT' || activeSubmission?.status === 'CHANGES_REQUESTED') {
+          <div class="submission-form-container">
+            <!-- Media Upload Area -->
+            <div class="form-field-group">
+              <label class="field-label">Deliverable File (Image/Video):</label>
+              <div class="upload-dropzone-box" (click)="fileInput.click()">
+                @if (submissionFilePreview) {
+                  <div class="media-preview-container">
+                    @if (submissionMediaType === 'VIDEO') {
+                      <video [src]="submissionFilePreview" controls class="media-preview-element"></video>
+                    } @else {
+                      <img [src]="submissionFilePreview" class="media-preview-element" alt="Content Preview" />
+                    }
+                    <div class="upload-overlay-hint">Click to replace file</div>
+                  </div>
+                } @else {
+                  <div class="upload-placeholder-content">
+                    <ion-icon name="cloud-upload-outline" class="upload-icon"></ion-icon>
+                    <p>Click here to select and upload deliverable</p>
+                  </div>
+                }
+                <input
+                  #fileInput
+                  type="file"
+                  style="display: none"
+                  (change)="onSubmissionFileSelected($event)"
+                  accept="image/*,video/*"
+                />
+              </div>
+            </div>
+
+            <!-- Media Type Toggle -->
+            <div class="form-field-group">
+              <label class="field-label">Media Type:</label>
+              <div class="media-type-pill-selector">
+                <span
+                  [class.active]="submissionMediaType === 'IMAGE'"
+                  (click)="submissionMediaType = 'IMAGE'"
+                  class="selector-pill"
+                >
+                  <ion-icon name="image-outline"></ion-icon> Image
+                </span>
+                <span
+                  [class.active]="submissionMediaType === 'VIDEO'"
+                  (click)="submissionMediaType = 'VIDEO'"
+                  class="selector-pill"
+                >
+                  <ion-icon name="videocam-outline"></ion-icon> Video / Reel
+                </span>
+              </div>
+            </div>
+
+            <!-- Caption Textarea -->
+            <div class="form-field-group">
+              <label class="field-label">Instagram Caption:</label>
+              <div class="caption-input-wrapper">
+                <ion-textarea
+                  [(ngModel)]="submissionCaption"
+                  placeholder="Enter your Instagram caption here..."
+                  [rows]="4"
+                  class="custom-textarea"
+                ></ion-textarea>
+              </div>
+            </div>
+
+            <!-- Action buttons for editor -->
+            <div class="modal-footer-actions" style="display: flex; gap: 12px; margin-top: 16px;">
+              <ion-button
+                expand="block"
+                fill="outline"
+                (click)="saveSubmissionDraft()"
+                [disabled]="isSubmittingContent"
+                class="save-draft-btn"
+                style="flex: 1; margin: 0;"
+              >
+                @if (isSubmittingContent) {
+                  <ion-spinner name="crescent" size="small"></ion-spinner> Saving...
+                } @else {
+                  Save Draft
+                }
+              </ion-button>
+
+              <ion-button
+                expand="block"
+                (click)="submitDeliverable()"
+                [disabled]="isSubmittingContent"
+                class="submit-review-btn"
+                style="flex: 1; margin: 0;"
+              >
+                Submit for Review
+              </ion-button>
+            </div>
+          </div>
+        } @else {
+          <!-- Read-only View of Submission Content -->
+          <div class="readonly-content-container">
+            <div class="form-field-group">
+              <label class="field-label">Deliverable Preview:</label>
+              <div class="readonly-media-preview-box">
+                @if (activeSubmission?.mediaType === 'VIDEO') {
+                  <video [src]="submissionFilePreview" controls class="media-preview-element"></video>
+                } @else {
+                  <img [src]="submissionFilePreview" class="media-preview-element" alt="Deliverable Preview" />
+                }
+              </div>
+            </div>
+
+            <div class="form-field-group">
+              <label class="field-label">Instagram Caption:</label>
+              <div class="readonly-caption-box">
+                <p class="caption-display-text">{{ activeSubmission?.caption || '(No caption provided)' }}</p>
+              </div>
+            </div>
+
+            <!-- Instagram Actions (APPROVED / PUBLISHED / FAILED) -->
+            <div class="instagram-actions-card">
+              @if (activeSubmission?.status === 'APPROVED' || activeSubmission?.status === 'FAILED') {
+                <div class="publishing-box" style="text-align: center;">
+                  <p class="ready-hint-text" style="font-size: 0.85rem; color: var(--ion-color-medium); margin-bottom: 12px;">Your content is approved by the brand and ready to publish directly.</p>
+                  <ion-button
+                    expand="block"
+                    color="success"
+                    (click)="publishDeliverableToInstagram()"
+                    [disabled]="isPublishingToInstagram"
+                    class="publish-instagram-btn"
+                    style="margin: 0;"
+                  >
+                    @if (isPublishingToInstagram) {
+                      <ion-spinner name="crescent" size="small" slot="start"></ion-spinner> Publishing to Instagram...
+                    } @else {
+                      <ion-icon name="logo-instagram" slot="start"></ion-icon>
+                      Publish to Instagram
+                    }
+                  </ion-button>
+                </div>
+              }
+
+              @if (activeSubmission?.status === 'PUBLISHED') {
+                <div class="published-success-box text-center" style="text-align: center;">
+                  <p style="color: var(--ion-color-success); font-weight: 700; margin-bottom: 14px;">🎉 Your post is live on Instagram!</p>
+                  <div class="success-actions-row" style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                    <a [href]="activeSubmission.instagramPermalink" target="_blank" class="instagram-link-button" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #E1306C; color: white; text-decoration: none; padding: 0 16px; height: 38px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; box-shadow: 0 4px 10px rgba(225, 48, 108, 0.2);">
+                      <ion-icon name="open-outline" slot="start"></ion-icon>
+                      View on Instagram
+                    </a>
+                    <ion-button
+                      fill="outline"
+                      color="primary"
+                      (click)="addDeliverableToPortfolio()"
+                      class="add-portfolio-btn"
+                      style="margin: 0; height: 38px;"
+                    >
+                      <ion-icon name="copy-outline" slot="start"></ion-icon>
+                      Add to Portfolio
+                    </ion-button>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>

@@ -18,7 +18,8 @@ import {
   reviewContent,
   publishToInstagram,
   getSubmissionsByCampaign,
-  getSubmissionByInfluencer,
+  getSubmissionsByInfluencer,
+  getMySubmissions,
   addSubmissionToPortfolio
 } from '../controllers/content-submission.controller';
 
@@ -39,6 +40,7 @@ router.use(authenticate);
 router.get('/', validateQuery(GetCampaignsQuerySchema), getCampaigns);
 router.get('/applied', getAppliedCampaigns);
 router.get('/my-campaigns', getMyCampaigns);
+router.get('/submissions/my', requireRole('INFLUENCER'), getMySubmissions);
 
 // Application route
 router.post('/:id/apply', applyToCampaign);
@@ -51,7 +53,7 @@ router.post('/', validate(CreateCampaignDtoSchema), createCampaign);
 
 // Campaign Content Submissions Routes
 router.get('/:campaignId/submissions', getSubmissionsByCampaign);
-router.get('/:campaignId/submissions/influencer/:influencerId', getSubmissionByInfluencer);
+router.get('/:campaignId/submissions/influencer/:influencerId', getSubmissionsByInfluencer);
 router.post('/:campaignId/submissions', requireRole('INFLUENCER'), submissionUploader.single('file'), createDraft);
 router.put('/:campaignId/submissions/:submissionId', requireRole('INFLUENCER'), submissionUploader.single('file'), updateDraft);
 router.post('/:campaignId/submissions/:submissionId/submit', requireRole('INFLUENCER'), submitContent);

@@ -35,6 +35,24 @@ class DatabaseConnection {
       console.log("✅ MongoDB connected successfully");
       console.log(`📦 Database: ${mongoose.connection.name}`);
 
+      // Drop the obsolete unique index on contentsubmissions if it exists
+      try {
+        const db = mongoose.connection.db;
+        if (db) {
+          const collections = await db.listCollections({ name: "contentsubmissions" }).toArray();
+          if (collections.length > 0) {
+            const indexes = await db.collection("contentsubmissions").indexes();
+            const uniqueIndexExists = indexes.some(idx => idx.name === "campaignId_1_influencerId_1");
+            if (uniqueIndexExists) {
+              await db.collection("contentsubmissions").dropIndex("campaignId_1_influencerId_1");
+              console.log("✅ Successfully dropped unique index campaignId_1_influencerId_1 from contentsubmissions collection");
+            }
+          }
+        }
+      } catch (err) {
+        console.error("⚠️ Failed to drop unique index on contentsubmissions:", err);
+      }
+
       // Monitor connection events
       mongoose.connection.on("error", (error) => {
         console.error("MongoDB connection error:", error);
