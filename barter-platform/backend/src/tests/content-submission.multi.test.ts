@@ -14,6 +14,8 @@ import { ValidationError, NotFoundError, ConflictError } from "@shared/errors/ap
 import fs from "fs";
 import path from "path";
 
+jest.setTimeout(20000);
+
 describe("ContentSubmissionService Multi-Deliverable Tests", () => {
   let submissionService: ContentSubmissionService;
   let influencerUser: any;

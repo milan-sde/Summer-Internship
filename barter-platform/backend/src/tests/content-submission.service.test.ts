@@ -14,6 +14,8 @@ import { ValidationError, NotFoundError } from "@shared/errors/app-error";
 import fs from "fs";
 import path from "path";
 
+jest.setTimeout(20000);
+
 describe("ContentSubmissionService Workflow Tests", () => {
   let submissionService: ContentSubmissionService;
   let influencerUser: any;

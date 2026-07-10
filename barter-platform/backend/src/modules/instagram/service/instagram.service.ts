@@ -330,7 +330,7 @@ export class InstagramService {
     // 1. Swapping local server URLs for a public fallback when running locally
     let publicMediaUrl = mediaUrl;
     if (mediaUrl.includes("localhost") || mediaUrl.includes("127.0.0.1") || !mediaUrl.startsWith("http")) {
-      const hostUrl = process.env.BACKEND_URL || "http://localhost:3000";
+      const hostUrl = process.env.BACKEND_URL || process.env.RENDER_EXTERNAL_URL || "http://localhost:3000";
       const fullUrl = mediaUrl.startsWith("/") ? `${hostUrl}${mediaUrl}` : mediaUrl;
       
       if (fullUrl.includes("localhost") || fullUrl.includes("127.0.0.1")) {

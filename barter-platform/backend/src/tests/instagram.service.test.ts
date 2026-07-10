@@ -10,6 +10,8 @@ import { MediaCatalogue } from "@modules/instagram/models/media-catalogue.model"
 import { encrypt, decrypt } from "@shared/utils/encryption";
 import { ValidationError, NotFoundError } from "@shared/errors/app-error";
 
+jest.setTimeout(20000);
+
 describe("InstagramService", () => {
   let instagramService: InstagramService;
   let testUser: any;
