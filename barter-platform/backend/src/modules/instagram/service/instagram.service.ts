@@ -347,7 +347,7 @@ export class InstagramService {
 
     // 2. Step 1: Create media container
     console.log(`[Instagram Service] Creating media container for ${mediaType}...`);
-    let containerUrl = `https://graph.facebook.com/${apiVersion}/${instagramId}/media?caption=${encodeURIComponent(
+    let containerUrl = `https://graph.instagram.com/${apiVersion}/${instagramId}/media?caption=${encodeURIComponent(
       caption
     )}&access_token=${token}`;
 
@@ -381,7 +381,7 @@ export class InstagramService {
         retries++;
 
         const statusResponse = await fetch(
-          `https://graph.facebook.com/${apiVersion}/${containerId}?fields=status_code,status&access_token=${token}`
+          `https://graph.instagram.com/${apiVersion}/${containerId}?fields=status_code,status&access_token=${token}`
         );
         const statusData = (await statusResponse.json()) as any;
 
@@ -410,7 +410,7 @@ export class InstagramService {
 
     // 4. Step 3: Publish the media container
     console.log(`[Instagram Service] Publishing media container: ${containerId}...`);
-    const publishUrl = `https://graph.facebook.com/${apiVersion}/${instagramId}/media_publish?creation_id=${containerId}&access_token=${token}`;
+    const publishUrl = `https://graph.instagram.com/${apiVersion}/${instagramId}/media_publish?creation_id=${containerId}&access_token=${token}`;
     const publishResponse = await fetch(publishUrl, { method: "POST" });
     const publishData = (await publishResponse.json()) as any;
 
@@ -426,7 +426,7 @@ export class InstagramService {
     // 5. Step 4: Fetch permalink and timestamp
     console.log(`[Instagram Service] Fetching permalink for media ID: ${mediaId}...`);
     const mediaDetailResponse = await fetch(
-      `https://graph.facebook.com/${apiVersion}/${mediaId}?fields=permalink,timestamp&access_token=${token}`
+      `https://graph.instagram.com/${apiVersion}/${mediaId}?fields=permalink,timestamp&access_token=${token}`
     );
     const mediaDetailData = (await mediaDetailResponse.json()) as any;
 

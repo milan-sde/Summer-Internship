@@ -53,7 +53,7 @@ app.use(cookieParser());
 app.use(requestLogger);
 
 //health checkpoint:
-app.get("/health", (req: Request, res: Response) => {
+app.get("/", (req: Request, res: Response) => {
   res.status(200).json({
     status: "ok",
     timeStamp: new Date().toISOString(),
