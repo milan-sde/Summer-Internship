@@ -90,27 +90,263 @@
           </ion-row>
         </ion-grid>
 
-        <!-- Stats Table Card -->
-        <!-- <div class="stats-card">
-          <div class="stats-card-header">
-            <ion-icon name="bar-chart-outline"></ion-icon>
-            <h3>Quick Stats</h3>
+        <!-- Analytics Section -->
+        <div class="analytics-section">
+          <div class="section-header">
+            <ion-icon name="stats-chart-outline" class="section-icon"></ion-icon>
+            <h3>Your Analytics</h3>
           </div>
-          <ion-list lines="none" class="stats-list">
-            <ion-item class="stats-item">
-              <ion-label>Profile Views</ion-label>
-              <ion-badge slot="end" color="primary">0</ion-badge>
-            </ion-item>
-            <ion-item class="stats-item">
-              <ion-label>Collaboration Requests</ion-label>
-              <ion-badge slot="end" color="success">0</ion-badge>
-            </ion-item>
-            <ion-item class="stats-item">
-              <ion-label>Active Collaborations</ion-label>
-              <ion-badge slot="end" color="warning">0</ion-badge>
-            </ion-item>
-          </ion-list>
-        </div> -->
+
+          <!-- Loading State -->
+          @if (analyticsLoading) {
+            <div class="analytics-loading">
+              <ion-spinner color="primary"></ion-spinner>
+              <span>Loading analytics...</span>
+            </div>
+          }
+
+          <!-- Error State -->
+          @if (analyticsError) {
+            <div class="analytics-error">
+              <ion-icon name="alert-circle-outline"></ion-icon>
+              <p>Unable to load analytics.</p>
+              <button class="retry-btn" (click)="loadAnalytics()">
+                <ion-icon name="refresh-outline"></ion-icon>
+                Retry
+              </button>
+            </div>
+          }
+
+          <!-- Influencer Analytics -->
+          @if (!analyticsLoading && !analyticsError && influencerAnalytics) {
+            <div class="analytics-grid">
+              <!-- Application Stats -->
+              <div class="analytics-card">
+                <div class="analytics-card-header">
+                  <ion-icon name="document-text-outline"></ion-icon>
+                  <h4>Applications</h4>
+                </div>
+                <div class="analytics-metrics">
+                  <div class="metric-item">
+                    <span class="metric-value">{{ influencerAnalytics.totalApplications }}</span>
+                    <span class="metric-label">Total</span>
+                  </div>
+                  <div class="metric-item accent">
+                    <span class="metric-value">{{ influencerAnalytics.acceptedApplications }}</span>
+                    <span class="metric-label">Accepted</span>
+                  </div>
+                  <div class="metric-item danger">
+                    <span class="metric-value">{{ influencerAnalytics.rejectedApplications }}</span>
+                    <span class="metric-label">Rejected</span>
+                  </div>
+                  <div class="metric-item muted">
+                    <span class="metric-value">{{ influencerAnalytics.pendingApplications }}</span>
+                    <span class="metric-label">Pending</span>
+                  </div>
+                </div>
+                @if (influencerAnalytics.totalApplications > 0) {
+                  <div class="metric-bar-section">
+                    <div class="metric-bar-label">
+                      <span>Acceptance Rate</span>
+                      <span class="metric-bar-value">{{ influencerAnalytics.acceptanceRate }}%</span>
+                    </div>
+                    <div class="metric-bar-track">
+                      <div
+                        class="metric-bar-fill accent"
+                        [style.width.%]="influencerAnalytics.acceptanceRate"
+                      ></div>
+                    </div>
+                  </div>
+                }
+              </div>
+
+              <!-- Active Campaigns -->
+              <div class="analytics-card">
+                <div class="analytics-card-header">
+                  <ion-icon name="flash-outline"></ion-icon>
+                  <h4>Active Campaigns</h4>
+                </div>
+                <div class="analytics-metrics single">
+                  <div class="metric-item large">
+                    <span class="metric-value">{{ influencerAnalytics.activeCampaigns }}</span>
+                    <span class="metric-label">Active Collaborations</span>
+                  </div>
+                </div>
+                @if (influencerAnalytics.totalDeliverables > 0) {
+                  <div class="metric-bar-section">
+                    <div class="metric-bar-label">
+                      <span>Publishing Success</span>
+                      <span class="metric-bar-value">{{ influencerAnalytics.publishingSuccessRate }}%</span>
+                    </div>
+                    <div class="metric-bar-track">
+                      <div
+                        class="metric-bar-fill success"
+                        [style.width.%]="influencerAnalytics.publishingSuccessRate"
+                      ></div>
+                    </div>
+                  </div>
+                }
+              </div>
+
+              <!-- Content Pipeline -->
+              <div class="analytics-card full-width">
+                <div class="analytics-card-header">
+                  <ion-icon name="cloud-upload-outline"></ion-icon>
+                  <h4>Content Pipeline</h4>
+                </div>
+                <div class="pipeline-grid">
+                  <div class="pipeline-item">
+                    <span class="pipeline-value">{{ influencerAnalytics.totalDeliverables }}</span>
+                    <span class="pipeline-label">Total Deliverables</span>
+                  </div>
+                  <div class="pipeline-item pending">
+                    <span class="pipeline-value">{{ influencerInReviewDeliverables }}</span>
+                    <span class="pipeline-label">In Review</span>
+                  </div>
+                  <div class="pipeline-item success">
+                    <span class="pipeline-value">{{ influencerApprovedDeliverables }}</span>
+                    <span class="pipeline-label">Approved</span>
+                  </div>
+                  <div class="pipeline-item accent">
+                    <span class="pipeline-value">{{ influencerPublishedDeliverables }}</span>
+                    <span class="pipeline-label">Published</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Instagram Stats -->
+              <div class="analytics-card full-width">
+                <div class="analytics-card-header">
+                  <ion-icon name="eye-outline"></ion-icon>
+                  <h4>Instagram</h4>
+                </div>
+                <div class="pipeline-grid">
+                  <div class="pipeline-item">
+                    <span class="pipeline-value">{{ influencerAnalytics.instagramFollowers }}</span>
+                    <span class="pipeline-label">Followers</span>
+                  </div>
+                  <div class="pipeline-item">
+                    <span class="pipeline-value">{{ influencerAnalytics.instagramMediaCount }}</span>
+                    <span class="pipeline-label">Media Posts</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Brand Analytics -->
+          @if (!analyticsLoading && !analyticsError && brandAnalytics) {
+            <div class="analytics-grid">
+              <!-- Campaign Stats -->
+              <div class="analytics-card">
+                <div class="analytics-card-header">
+                  <ion-icon name="megaphone-outline"></ion-icon>
+                  <h4>Campaigns</h4>
+                </div>
+                <div class="analytics-metrics">
+                  <div class="metric-item">
+                    <span class="metric-value">{{ brandAnalytics.totalCampaigns }}</span>
+                    <span class="metric-label">Total</span>
+                  </div>
+                  <div class="metric-item accent">
+                    <span class="metric-value">{{ brandAnalytics.activeCampaigns }}</span>
+                    <span class="metric-label">Active</span>
+                  </div>
+                  <div class="metric-item muted">
+                    <span class="metric-value">{{ brandAnalytics.pastCampaigns }}</span>
+                    <span class="metric-label">Past</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Application Stats -->
+              <div class="analytics-card">
+                <div class="analytics-card-header">
+                  <ion-icon name="people-outline"></ion-icon>
+                  <h4>Applications</h4>
+                </div>
+                <div class="analytics-metrics">
+                  <div class="metric-item">
+                    <span class="metric-value">{{ brandAnalytics.totalApplicationsReceived }}</span>
+                    <span class="metric-label">Total</span>
+                  </div>
+                  <div class="metric-item muted">
+                    <span class="metric-value">{{ brandAnalytics.pendingApplications }}</span>
+                    <span class="metric-label">Pending</span>
+                  </div>
+                  <div class="metric-item success">
+                    <span class="metric-value">{{ brandAnalytics.acceptedInfluencers }}</span>
+                    <span class="metric-label">Accepted</span>
+                  </div>
+                  <div class="metric-item danger">
+                    <span class="metric-value">{{ brandAnalytics.rejectedApplications }}</span>
+                    <span class="metric-label">Rejected</span>
+                  </div>
+                </div>
+                @if (brandAnalytics.totalApplicationsReceived > 0) {
+                  <div class="metric-bar-section">
+                    <div class="metric-bar-label">
+                      <span>Acceptance Rate</span>
+                      <span class="metric-bar-value">{{ brandAnalytics.applicationAcceptanceRate }}%</span>
+                    </div>
+                    <div class="metric-bar-track">
+                      <div
+                        class="metric-bar-fill accent"
+                        [style.width.%]="brandAnalytics.applicationAcceptanceRate"
+                      ></div>
+                    </div>
+                  </div>
+                }
+              </div>
+
+              <!-- Deliverable Review -->
+              <div class="analytics-card full-width">
+                <div class="analytics-card-header">
+                  <ion-icon name="create-outline"></ion-icon>
+                  <h4>Deliverable Review</h4>
+                </div>
+                <div class="pipeline-grid">
+                  <div class="pipeline-item muted">
+                    <span class="pipeline-value">{{ brandAnalytics.totalDeliverables }}</span>
+                    <span class="pipeline-label">Total</span>
+                  </div>
+                  <div class="pipeline-item warning">
+                    <span class="pipeline-value">{{ brandPendingReviewDeliverables }}</span>
+                    <span class="pipeline-label">Awaiting Review</span>
+                  </div>
+                  <div class="pipeline-item success">
+                    <span class="pipeline-value">{{ brandApprovedDeliverables }}</span>
+                    <span class="pipeline-label">Approved</span>
+                  </div>
+                  <div class="pipeline-item danger">
+                    <span class="pipeline-value">{{ brandChangesRequestedDeliverables }}</span>
+                    <span class="pipeline-label">Changes Req.</span>
+                  </div>
+                  <div class="pipeline-item accent">
+                    <span class="pipeline-value">{{ brandPublishedDeliverables }}</span>
+                    <span class="pipeline-label">Published</span>
+                  </div>
+                </div>
+                @if (brandAnalytics.avgReviewTurnaroundHours != null) {
+                  <div class="metric-bar-section">
+                    <div class="metric-bar-label">
+                      <span>Avg Review Turnaround</span>
+                      <span class="metric-bar-value">{{ brandAnalytics.avgReviewTurnaroundHours }}h</span>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- Empty / New User State -->
+          @if (!analyticsLoading && !analyticsError && !influencerAnalytics && !brandAnalytics) {
+            <div class="analytics-empty">
+              <ion-icon name="bar-chart-outline"></ion-icon>
+              <p>Analytics will appear here once you start collaborating.</p>
+            </div>
+          }
+        </div>
       </div>
     </ion-content>
   </div>

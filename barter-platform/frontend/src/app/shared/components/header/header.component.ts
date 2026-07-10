@@ -1,7 +1,9 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { StorageService } from '../../../services/storage.service';
+import { NotificationService } from '../../../services/notification.service';
+import { NotificationPanelComponent } from '../notification-panel/notification-panel.component';
 import { IonIcon, IonButton } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { menuOutline, notificationsOutline, arrowBackOutline, sunnyOutline, moonOutline, desktopOutline } from 'ionicons/icons';
@@ -12,9 +14,9 @@ import { ThemeService } from '../../../services/theme.service';
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
   standalone: true,
-  imports: [CommonModule, RouterLink, IonIcon, IonButton]
+  imports: [CommonModule, RouterLink, IonIcon, IonButton, NotificationPanelComponent]
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent implements OnInit, OnDestroy {
   @Input() title = '';
   @Input() showBackButton = false;
   @Input() backRoute = '';
@@ -22,11 +24,14 @@ export class HeaderComponent implements OnInit {
   @Output() toggleSidebar = new EventEmitter<void>();
 
   user: any;
+  unreadCount = 0;
+  isNotificationPanelOpen = false;
 
   constructor(
     private storage: StorageService,
     private router: Router,
-    public themeService: ThemeService
+    public themeService: ThemeService,
+    public notificationService: NotificationService
   ) {
     addIcons({
       menuOutline,
@@ -40,6 +45,15 @@ export class HeaderComponent implements OnInit {
 
   ngOnInit() {
     this.user = this.storage.getUser();
+    this.notificationService.refreshUnreadCount();
+    this.notificationService.startPolling(30000);
+    this.notificationService.unreadCount$.subscribe(count => {
+      this.unreadCount = count;
+    });
+  }
+
+  ngOnDestroy() {
+    this.notificationService.stopPolling();
   }
 
   getCurrentThemeIcon(): string {
@@ -63,5 +77,17 @@ export class HeaderComponent implements OnInit {
 
   viewProfile() {
     this.router.navigate(['/profile']);
+  }
+
+  toggleNotificationPanel() {
+    this.isNotificationPanelOpen = !this.isNotificationPanelOpen;
+  }
+
+  closeNotificationPanel() {
+    this.isNotificationPanelOpen = false;
+  }
+
+  onUnreadCountChanged(count: number) {
+    this.unreadCount = count;
   }
 }

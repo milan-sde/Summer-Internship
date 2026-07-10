@@ -20,9 +20,11 @@
     </button>
 
     <!-- Notification Button -->
-    <button class="icon-btn">
+    <button class="icon-btn notification-btn" (click)="toggleNotificationPanel()">
       <ion-icon name="notifications-outline"></ion-icon>
-      <span class="notification-indicator"></span>
+      @if (unreadCount > 0) {
+        <span class="notification-badge">{{ unreadCount > 99 ? '99+' : unreadCount }}</span>
+      }
     </button>
 
     <!-- User Avatar Menu Button -->
@@ -32,4 +34,12 @@
       </div>
     </button>
   </div>
+
+  @if (isNotificationPanelOpen) {
+    <app-notification-panel
+      [isOpen]="isNotificationPanelOpen"
+      (closePanel)="closeNotificationPanel()"
+      (unreadCountChanged)="onUnreadCountChanged($event)"
+    ></app-notification-panel>
+  }
 </header>

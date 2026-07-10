@@ -4,6 +4,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { ProfileService } from '../../services/profile.service';
 import { StorageService } from '../../services/storage.service';
+import { AnalyticsService, InfluencerAnalytics, BrandAnalytics } from '../../services/analytics.service';
 import {
   IonHeader,
   IonToolbar,
@@ -26,6 +27,7 @@ import {
   IonItem,
   IonLabel,
   IonBadge,
+  IonSpinner,
   LoadingController,
   ToastController,
 } from '@ionic/angular/standalone';
@@ -37,6 +39,23 @@ import {
   personOutline,
   barChartOutline,
   folderOpenOutline,
+  eyeOutline,
+  documentTextOutline,
+  checkmarkDoneOutline,
+  hourglassOutline,
+  closeCircleOutline,
+  flashOutline,
+  refreshOutline,
+  alertCircleOutline,
+  ribbonOutline,
+  statsChartOutline,
+  megaphoneOutline,
+  timeOutline,
+  thumbsUpOutline,
+  createOutline,
+  cloudUploadOutline,
+  checkmarkOutline,
+  flagOutline,
 } from 'ionicons/icons';
 
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
@@ -71,6 +90,7 @@ import { HeaderComponent } from '../../shared/components/header/header.component
     IonItem,
     IonLabel,
     IonBadge,
+    IonSpinner,
     SidebarComponent,
     HeaderComponent
   ],
@@ -78,6 +98,11 @@ import { HeaderComponent } from '../../shared/components/header/header.component
 export class DashboardPage implements OnInit {
   user: any;
   isSidebarOpen = false;
+
+  analyticsLoading = false;
+  analyticsError = false;
+  influencerAnalytics: InfluencerAnalytics | null = null;
+  brandAnalytics: BrandAnalytics | null = null;
 
   toggleSidebar() {
     this.isSidebarOpen = !this.isSidebarOpen;
@@ -87,6 +112,7 @@ export class DashboardPage implements OnInit {
     private authService: AuthService,
     private profileService: ProfileService,
     private storage: StorageService,
+    private analyticsService: AnalyticsService,
     private router: Router,
     private route: ActivatedRoute,
     private loadingController: LoadingController,
@@ -99,6 +125,23 @@ export class DashboardPage implements OnInit {
       personOutline,
       barChartOutline,
       folderOpenOutline,
+      eyeOutline,
+      documentTextOutline,
+      checkmarkDoneOutline,
+      hourglassOutline,
+      closeCircleOutline,
+      flashOutline,
+      refreshOutline,
+      alertCircleOutline,
+      ribbonOutline,
+      statsChartOutline,
+      megaphoneOutline,
+      timeOutline,
+      thumbsUpOutline,
+      createOutline,
+      cloudUploadOutline,
+      checkmarkOutline,
+      flagOutline,
     });
   }
 
@@ -106,6 +149,68 @@ export class DashboardPage implements OnInit {
     this.user = this.storage.getUser();
     this.loadProfile();
     this.checkInstagramCallback();
+    this.loadAnalytics();
+  }
+
+  loadAnalytics() {
+    this.analyticsLoading = true;
+    this.analyticsError = false;
+    this.analyticsService.getOverview().subscribe({
+      next: (res) => {
+        if (res?.success && res?.data) {
+          if (res.data.role === 'INFLUENCER') {
+            this.influencerAnalytics = res.data.analytics as InfluencerAnalytics;
+            this.brandAnalytics = null;
+          } else {
+            this.brandAnalytics = res.data.analytics as BrandAnalytics;
+            this.influencerAnalytics = null;
+          }
+        }
+        this.analyticsLoading = false;
+      },
+      error: () => {
+        this.analyticsLoading = false;
+        this.analyticsError = true;
+      },
+    });
+  }
+
+  getDeliverableCount(status: string): number {
+    if (this.influencerAnalytics) {
+      return this.influencerAnalytics.deliverablesByStatus[status] || 0;
+    }
+    if (this.brandAnalytics) {
+      return this.brandAnalytics.deliverablesByStatus[status] || 0;
+    }
+    return 0;
+  }
+
+  get influencerInReviewDeliverables(): number {
+    return this.getDeliverableCount('SUBMITTED') + this.getDeliverableCount('CHANGES_REQUESTED');
+  }
+
+  get influencerApprovedDeliverables(): number {
+    return this.getDeliverableCount('APPROVED');
+  }
+
+  get influencerPublishedDeliverables(): number {
+    return this.getDeliverableCount('PUBLISHED');
+  }
+
+  get brandPendingReviewDeliverables(): number {
+    return this.getDeliverableCount('SUBMITTED');
+  }
+
+  get brandApprovedDeliverables(): number {
+    return this.getDeliverableCount('APPROVED');
+  }
+
+  get brandChangesRequestedDeliverables(): number {
+    return this.getDeliverableCount('CHANGES_REQUESTED');
+  }
+
+  get brandPublishedDeliverables(): number {
+    return this.getDeliverableCount('PUBLISHED');
   }
 
   // Monitor query parameters for successful Instagram OAuth callbacks
@@ -148,6 +253,7 @@ export class DashboardPage implements OnInit {
   // Reload profile on pull-to-refresh
   doRefresh(event: any) {
     this.loadProfile(() => {
+      this.loadAnalytics();
       event.target.complete();
     });
   }

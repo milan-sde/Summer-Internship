@@ -1,0 +1,53 @@
+<div class="notification-panel-overlay" (click)="closePanel.emit()"></div>
+<div class="notification-panel">
+  <div class="panel-header">
+    <h3>Notifications</h3>
+    @if (notifications.length > 0 && !loading) {
+      <button class="mark-all-btn" (click)="onMarkAllAsRead()">
+        <ion-icon name="checkmark-done-outline"></ion-icon>
+        Mark all read
+      </button>
+    }
+  </div>
+
+  <div class="panel-body">
+    @if (loading) {
+      <div class="state-container">
+        <ion-spinner color="primary"></ion-spinner>
+        <p class="state-text">Loading notifications...</p>
+      </div>
+    } @else if (error) {
+      <div class="state-container error-state">
+        <ion-icon name="alert-circle-outline" class="state-icon"></ion-icon>
+        <p class="state-text">Unable to load notifications.</p>
+        <button class="retry-btn" (click)="loadNotifications()">Retry</button>
+      </div>
+    } @else if (notifications.length === 0) {
+      <div class="state-container empty-state">
+        <ion-icon name="time-outline" class="state-icon"></ion-icon>
+        <p class="state-text">No notifications yet.</p>
+      </div>
+    } @else {
+      <div class="notifications-list">
+        @for (notification of notifications; track trackById($index, notification)) {
+          <div
+            class="notification-item"
+            [class.unread]="!notification.isRead"
+            (click)="onNotificationClick(notification)"
+          >
+            <div class="notification-content">
+              <div class="notification-title-row">
+                <span class="notification-title">{{ notification.title }}</span>
+                @if (!notification.isRead) {
+                  <span class="unread-dot"></span>
+                }
+              </div>
+              <p class="notification-message">{{ notification.message }}</p>
+              <span class="notification-time">{{ getRelativeTime(notification.createdAt) }}</span>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>
