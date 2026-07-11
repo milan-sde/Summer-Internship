@@ -13,7 +13,7 @@ import fs from "fs";
  *   const avatarUploader = createUploader('avatars', 'avatar');
  *   router.put('/avatar', avatarUploader.single('avatar'), controllerFunction);
  * 
- * @param folderName Subdirectory under src/static where files will be stored (e.g., 'avatars', 'portfolio', 'campaigns')
+ * @param folderName Subdirectory under backend/static where files will be stored (e.g., 'avatars', 'portfolio', 'campaigns')
  * @param filePrefix Text prefix used to generate unique filenames (e.g., 'avatar', 'portfolio', 'campaign')
  * @param maxFileSize Maximum allowed file size in bytes. Defaults to 5MB (5 * 1024 * 1024 bytes)
  * @returns A configured Multer middleware object
@@ -26,9 +26,9 @@ export const createUploader = (
 ) => {
   // 1. DETERMINE UPLOAD PATH
   // __dirname is the absolute path to this middleware folder.
-  // We navigate two levels up (../../) to get to 'src', and enter the 'static' directory.
+  // We navigate three levels up (../../../) to get to the backend root, and enter the 'static' directory.
   // Finally, we enter the specific folder (e.g., 'avatars').
-  const uploadDir = path.join(__dirname, "../../static", folderName);
+  const uploadDir = path.join(__dirname, "../../../static", folderName);
 
   // 2. CREATE FOLDER IF IT DOES NOT EXIST
   // fs.existsSync checks if the path exists on the disk.

@@ -62,12 +62,13 @@
                 class="grid-media-el"
                 muted
                 playsinline
+                (error)="$any($event.target).style.display = 'none'"
               ></video>
               <div class="media-type-icon-badge">
                 <ion-icon name="play-circle-outline"></ion-icon>
               </div>
               } @else {
-              <img [src]="getMediaUrl(item.mediaUrl)" alt="Instagram media" class="grid-media-el" />
+              <img [src]="getMediaUrl(item.mediaUrl)" alt="Instagram media" class="grid-media-el" (error)="$any($event.target).style.display = 'none'" />
               }
 
               <!-- Hover Overlay -->

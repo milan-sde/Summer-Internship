@@ -39,7 +39,7 @@ async function runMigration() {
   await mongoose.connect(mongoUri);
   console.log("Connected to MongoDB successfully!");
 
-  const staticBaseDir = path.join(__dirname, "../static");
+  const staticBaseDir = path.join(__dirname, "../../static");
   console.log(`Static base directory resolved to: ${staticBaseDir}`);
 
   // ================= 1. PROFILE AVATARS =================

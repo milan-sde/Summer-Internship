@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule, TitleCasePipe } from '@angular/common';
 import {
   FormBuilder,
@@ -27,6 +27,7 @@ import {
   IonCol,
 } from '@ionic/angular/standalone';
 import { ToastController, LoadingController } from '@ionic/angular/standalone';
+import { Subscription } from 'rxjs';
 import { addIcons } from 'ionicons';
 import {
   cameraOutline,
@@ -74,13 +75,15 @@ import { HeaderComponent } from '../../shared/components/header/header.component
     HeaderComponent
   ],
 })
-export class ProfilePage implements OnInit {
+export class ProfilePage implements OnInit, OnDestroy {
   profileForm!: FormGroup;
   isSubmitting = false;
   isLoading = true;
   currentUser: any;
   profileData: any;
   isSidebarOpen = false;
+
+  private querySub?: Subscription;
 
   toggleSidebar() {
     this.isSidebarOpen = !this.isSidebarOpen;
@@ -542,9 +545,13 @@ export class ProfilePage implements OnInit {
     }
   }
 
+  ngOnDestroy() {
+    this.querySub?.unsubscribe();
+  }
+
   // Check if routed back from Meta OAuth redirect and display toaster feedback
   checkInstagramCallback() {
-    this.route.queryParams.subscribe((params) => {
+    this.querySub = this.route.queryParams.subscribe((params) => {
       if (params['instagram'] === 'connected') {
         this.showToast('Instagram connected successfully!', 'success');
         this.router.navigate([], {

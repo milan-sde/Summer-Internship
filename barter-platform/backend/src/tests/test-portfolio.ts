@@ -18,7 +18,7 @@ const testPortfolioSystem = async () => {
   const portfolioService = new PortfolioService();
   
   // Define temporary files
-  const staticDir = path.join(__dirname, "../static/portfolio");
+  const staticDir = path.join(__dirname, "../../static/portfolio");
   const dummyImageName = `test-portfolio-image-${Date.now()}.jpg`;
   const dummyVideoName = `test-portfolio-video-${Date.now()}.mp4`;
   

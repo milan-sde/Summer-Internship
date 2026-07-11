@@ -122,6 +122,10 @@ export class CampaignsPage implements OnInit {
   isLoading = true;
   appliedCount = 0;
 
+  private appliedCache = new Set<string>();
+  private statusCache = new Map<string, string>();
+  private timeLabelCache = new Map<string, string>();
+
   // Active filters and segment
   activeSegment: 'discover' | 'applied' = 'discover';
   selectedCategory = 'All';
@@ -189,7 +193,6 @@ export class CampaignsPage implements OnInit {
 
   ngOnInit() {
     this.currentUser = this.storage.getUser();
-    this.loadCampaigns();
   }
 
   ionViewWillEnter() {
@@ -204,6 +207,7 @@ export class CampaignsPage implements OnInit {
       this.campaignService.getMyCampaigns().subscribe({
         next: (response: any) => {
           this.campaigns = response.success ? response.data.campaigns : [];
+          this.rebuildCaches();
           this.isLoading = false;
           this.cdr.markForCheck();
           if (callback) callback();
@@ -230,6 +234,7 @@ export class CampaignsPage implements OnInit {
               next: (discoverRes: any) => {
                 const rawCampaigns = discoverRes.success ? discoverRes.data.campaigns : [];
                 this.campaigns = this.applyClientSideFilters(rawCampaigns);
+                this.rebuildCaches();
                 this.isLoading = false;
                 this.cdr.markForCheck();
                 if (callback) callback();
@@ -243,6 +248,7 @@ export class CampaignsPage implements OnInit {
             });
           } else {
             this.campaigns = this.applyClientSideFilters(appliedCampaigns);
+            this.rebuildCaches();
             this.isLoading = false;
             this.cdr.markForCheck();
             if (callback) callback();
@@ -255,6 +261,27 @@ export class CampaignsPage implements OnInit {
           if (callback) callback();
         }
       });
+    }
+  }
+
+  private rebuildCaches() {
+    if (!this.currentUser) return;
+    const userId = this.currentUser.id;
+    this.appliedCache.clear();
+    this.statusCache.clear();
+    this.timeLabelCache.clear();
+
+    for (const campaign of this.campaigns) {
+      this.timeLabelCache.set(campaign.id, this.computeCampaignTimeLabel(campaign));
+
+      if (!campaign.applicants) continue;
+      const app = campaign.applicants.find(
+        (a: any) => (a && a.influencerId === userId) || (a === userId)
+      );
+      if (app) {
+        this.appliedCache.add(campaign.id);
+        this.statusCache.set(campaign.id, app === userId ? 'PENDING' : app.status);
+      }
     }
   }
 
@@ -317,23 +344,11 @@ export class CampaignsPage implements OnInit {
   }
 
   hasApplied(campaign: ICampaign): boolean {
-    if (!this.currentUser || !campaign.applicants) return false;
-    const userId = this.currentUser.id;
-    return campaign.applicants.some(
-      (app: any) => (app && app.influencerId === userId) || (app === userId)
-    );
+    return this.appliedCache.has(campaign.id);
   }
 
   getApplicationStatus(campaign: ICampaign): string {
-    if (!this.currentUser || !campaign.applicants) return '';
-    const userId = this.currentUser.id;
-    const app = campaign.applicants.find(
-      (a: any) => (a && a.influencerId === userId) || (a === userId)
-    );
-    if (app === userId) {
-      return 'PENDING';
-    }
-    return app ? app.status : '';
+    return this.statusCache.get(campaign.id) || '';
   }
 
   toggleApplicants(campaignId: string) {
@@ -382,7 +397,7 @@ export class CampaignsPage implements OnInit {
     return campaign.filledSlots / campaign.totalSlots;
   }
 
-  getCampaignTimeLabel(campaign: ICampaign): string {
+  private computeCampaignTimeLabel(campaign: ICampaign): string {
     if (!campaign.startDate || !campaign.endDate) {
       return `${campaign.daysLeft}d left`;
     }
@@ -407,6 +422,10 @@ export class CampaignsPage implements OnInit {
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
       return `${diffDays}d left`;
     }
+  }
+
+  getCampaignTimeLabel(campaign: ICampaign): string {
+    return this.timeLabelCache.get(campaign.id) || this.computeCampaignTimeLabel(campaign);
   }
 
   goToInfluencerProfile(influencerId: string) {

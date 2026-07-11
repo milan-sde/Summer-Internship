@@ -142,6 +142,14 @@ export class CampaignService {
     return campaigns.map(c => this.toResponseDto(c));
   }
 
+  async getCampaignById(campaignId: string): Promise<CampaignResponseDto> {
+    const campaign = await this.campaignRepository.findById(campaignId);
+    if (!campaign) {
+      throw new NotFoundError('Campaign');
+    }
+    return this.toResponseDto(campaign);
+  }
+
   async populateCampaignApplicants(campaigns: ICampaign[]): Promise<CampaignResponseDto[]> {
     const responseCampaigns: CampaignResponseDto[] = [];
     

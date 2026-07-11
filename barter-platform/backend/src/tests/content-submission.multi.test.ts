@@ -29,8 +29,8 @@ describe("ContentSubmissionService Multi-Deliverable Tests", () => {
     await connectDatabase();
     submissionService = new ContentSubmissionService();
 
-    const campaignDir = path.join(__dirname, "../static/campaigns");
-    const portfolioDir = path.join(__dirname, "../static/portfolio");
+    const campaignDir = path.join(__dirname, "../../static/campaigns");
+    const portfolioDir = path.join(__dirname, "../../static/portfolio");
     if (!fs.existsSync(campaignDir)) fs.mkdirSync(campaignDir, { recursive: true });
     if (!fs.existsSync(portfolioDir)) fs.mkdirSync(portfolioDir, { recursive: true });
   });
@@ -165,7 +165,7 @@ describe("ContentSubmissionService Multi-Deliverable Tests", () => {
   });
 
   const createMockFile = (filename: string): string => {
-    const filePath = path.join(__dirname, "../static/campaigns", filename);
+    const filePath = path.join(__dirname, "../../static/campaigns", filename);
     fs.writeFileSync(filePath, "dummy-binary-data");
     mockFilePaths.push(filePath);
     return `/static/campaigns/${filename}`;

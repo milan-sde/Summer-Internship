@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule, LowerCasePipe } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -44,6 +44,7 @@ import {
   flagOutline,
 } from 'ionicons/icons';
 
+import { Subscription } from 'rxjs';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { HeaderComponent } from '../../shared/components/header/header.component';
 
@@ -69,7 +70,7 @@ import { HeaderComponent } from '../../shared/components/header/header.component
     HeaderComponent
   ],
 })
-export class DashboardPage implements OnInit {
+export class DashboardPage implements OnInit, OnDestroy {
   user: any;
   isSidebarOpen = false;
 
@@ -77,6 +78,9 @@ export class DashboardPage implements OnInit {
   analyticsError = false;
   influencerAnalytics: InfluencerAnalytics | null = null;
   brandAnalytics: BrandAnalytics | null = null;
+
+  private userSub?: Subscription;
+  private querySub?: Subscription;
 
   toggleSidebar() {
     this.isSidebarOpen = !this.isSidebarOpen;
@@ -118,10 +122,15 @@ export class DashboardPage implements OnInit {
   }
 
   ngOnInit() {
-    this.appState.user$.subscribe((u: any) => this.user = u);
+    this.userSub = this.appState.user$.subscribe((u: any) => this.user = u);
     this.loadProfile();
     this.checkInstagramCallback();
     this.loadAnalytics();
+  }
+
+  ngOnDestroy() {
+    this.userSub?.unsubscribe();
+    this.querySub?.unsubscribe();
   }
 
   loadAnalytics() {
@@ -187,7 +196,7 @@ export class DashboardPage implements OnInit {
 
   // Monitor query parameters for successful Instagram OAuth callbacks
   checkInstagramCallback() {
-    this.route.queryParams.subscribe(params => {
+    this.querySub = this.route.queryParams.subscribe(params => {
       if (params['instagram'] === 'connected') {
         this.showToast('Instagram connected successfully!', 'success');
         this.router.navigate([], {

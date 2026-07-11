@@ -342,17 +342,18 @@ export class ContentSubmissionService {
       if (campaign.brandId.toString() !== brandProfile._id.toString()) {
         throw new ValidationError("You do not own this campaign");
       }
-
-      return await this.submissionRepository.findMany({
-        campaignId: new mongoose.Types.ObjectId(campaignId),
-      });
-    } else {
-      // Influencer: return all their own submissions for this campaign
-      return await this.submissionRepository.findMany({
-        campaignId: new mongoose.Types.ObjectId(campaignId),
-        influencerId: new mongoose.Types.ObjectId(userId),
-      });
     }
+
+    const filter: any = {
+      campaignId: new mongoose.Types.ObjectId(campaignId),
+    };
+    if (role === "INFLUENCER") {
+      filter.influencerId = new mongoose.Types.ObjectId(userId);
+    }
+
+    return await ContentSubmission.find(filter)
+      .populate("campaignId", "title brandName brandLogo platform")
+      .sort({ createdAt: -1 });
   }
 
   // Get submissions list for specific influencer/campaign collaboration

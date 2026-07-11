@@ -30,8 +30,8 @@ describe("ContentSubmissionService Workflow Tests", () => {
     submissionService = new ContentSubmissionService();
 
     // Ensure upload and portfolio directories exist on server for file copies
-    const campaignDir = path.join(__dirname, "../static/campaigns");
-    const portfolioDir = path.join(__dirname, "../static/portfolio");
+    const campaignDir = path.join(__dirname, "../../static/campaigns");
+    const portfolioDir = path.join(__dirname, "../../static/portfolio");
     if (!fs.existsSync(campaignDir)) fs.mkdirSync(campaignDir, { recursive: true });
     if (!fs.existsSync(portfolioDir)) fs.mkdirSync(portfolioDir, { recursive: true });
   });
@@ -170,7 +170,7 @@ describe("ContentSubmissionService Workflow Tests", () => {
 
   // Helper to create a dummy mock file for upload testing
   const createMockFile = (filename: string): string => {
-    const filePath = path.join(__dirname, "../static/campaigns", filename);
+    const filePath = path.join(__dirname, "../../static/campaigns", filename);
     fs.writeFileSync(filePath, "dummy-binary-data");
     mockFilePaths.push(filePath);
     return `/static/campaigns/${filename}`;
@@ -272,7 +272,7 @@ describe("ContentSubmissionService Workflow Tests", () => {
 
       // Verify physical file was copied to static/portfolio/
       const copiedFilename = portfolioItem.mediaUrl.replace("/static/portfolio/", "");
-      const copiedFilePath = path.join(__dirname, "../static/portfolio", copiedFilename);
+      const copiedFilePath = path.join(__dirname, "../../static/portfolio", copiedFilename);
       expect(fs.existsSync(copiedFilePath)).toBe(true);
       mockFilePaths.push(copiedFilePath); // mark for cleanup
     });

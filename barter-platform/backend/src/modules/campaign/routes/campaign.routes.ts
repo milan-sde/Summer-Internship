@@ -5,6 +5,7 @@ import { CreateCampaignDtoSchema, GetCampaignsQuerySchema } from '../dto/campaig
 import {
   createCampaign,
   getCampaigns,
+  getCampaign,
   applyToCampaign,
   getMyCampaigns,
   getAppliedCampaigns,
@@ -41,6 +42,7 @@ router.get('/', validateQuery(GetCampaignsQuerySchema), getCampaigns);
 router.get('/applied', getAppliedCampaigns);
 router.get('/my-campaigns', getMyCampaigns);
 router.get('/submissions/my', requireRole('INFLUENCER'), getMySubmissions);
+router.get('/:id', getCampaign);
 
 // Application route
 router.post('/:id/apply', applyToCampaign);

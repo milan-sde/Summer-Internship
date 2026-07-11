@@ -476,9 +476,9 @@
               <label class="field-label">Submitted Content Preview:</label>
               <div class="readonly-media-preview-box">
                 @if (selectedReviewSubmission.mediaType === 'VIDEO') {
-                  <video [src]="getAvatarUrl(selectedReviewSubmission.mediaUrl)" controls class="media-preview-element"></video>
+                  <video [src]="getAvatarUrl(selectedReviewSubmission.mediaUrl)" controls class="media-preview-element" (error)="$any($event.target).style.display = 'none'"></video>
                 } @else {
-                  <img [src]="getAvatarUrl(selectedReviewSubmission.mediaUrl)" class="media-preview-element" alt="Deliverable Preview" />
+                  <img [src]="getAvatarUrl(selectedReviewSubmission.mediaUrl)" class="media-preview-element" alt="Deliverable Preview" (error)="$any($event.target).style.display = 'none'" />
                 }
               </div>
             </div>

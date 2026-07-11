@@ -126,6 +126,7 @@
                   [src]="getMediaUrl(item.mediaUrl)"
                   class="media-showcase-el"
                   alt="Portfolio Showcase"
+                  (error)="$any($event.target).style.display = 'none'"
                 />
                 } @if (item.mediaType === 'video') {
                 <video
@@ -133,6 +134,7 @@
                   class="media-showcase-el"
                   muted
                   playsinline
+                  (error)="$any($event.target).style.display = 'none'"
                 ></video>
                 <div class="media-type-icon-badge">
                   <ion-icon name="play-circle-outline"></ion-icon>
@@ -183,6 +185,7 @@
                   class="media-showcase-el"
                   muted
                   playsinline
+                  (error)="$any($event.target).style.display = 'none'"
                 ></video>
                 <div class="media-type-icon-badge">
                   <ion-icon name="play-circle-outline"></ion-icon>
@@ -192,6 +195,7 @@
                   [src]="getMediaUrl(media.mediaUrl)"
                   class="media-showcase-el"
                   alt="Instagram Post"
+                  (error)="$any($event.target).style.display = 'none'"
                 />
                 }
 

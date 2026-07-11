@@ -69,7 +69,7 @@ export class PortfolioService {
       }
     } else if (mediaItem.mediaUrl.startsWith("/static/")) {
       const filename = mediaItem.mediaUrl.replace("/static/", "");
-      const absoluteFilePath = path.join(__dirname, "../../../static", filename);
+      const absoluteFilePath = path.join(__dirname, "../../../../static", filename);
       try {
         if (fs.existsSync(absoluteFilePath)) {
           await fs.promises.unlink(absoluteFilePath);

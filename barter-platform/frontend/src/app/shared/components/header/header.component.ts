@@ -29,6 +29,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   unreadCount = 0;
   isNotificationPanelOpen = false;
   private userSub?: Subscription;
+  private unreadSub?: Subscription;
 
   constructor(
     private appState: AppStateService,
@@ -50,7 +51,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.userSub = this.appState.user$.subscribe(u => this.user = u);
     this.notificationService.refreshUnreadCount();
     this.notificationService.startPolling(30000);
-    this.notificationService.unreadCount$.subscribe(count => {
+    this.unreadSub = this.notificationService.unreadCount$.subscribe(count => {
       this.unreadCount = count;
     });
   }
@@ -58,6 +59,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.notificationService.stopPolling();
     this.userSub?.unsubscribe();
+    this.unreadSub?.unsubscribe();
   }
 
   getCurrentThemeIcon(): string {

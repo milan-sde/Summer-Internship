@@ -54,10 +54,10 @@
             <div class="grid-card media-card" (click)="openDetail(item, 'catalog')" role="button" tabindex="0" (keydown.enter)="openDetail(item, 'catalog')" (keydown.space)="openDetail(item, 'catalog'); $event.preventDefault()">
               <div class="media-container">
                 @if (item.mediaType === 'image') {
-                <img [src]="getMediaUrl(item.mediaUrl)" alt="Portfolio Showcase" class="grid-media-el" />
+                <img [src]="getMediaUrl(item.mediaUrl)" alt="Portfolio Showcase" class="grid-media-el" (error)="$any($event.target).style.display = 'none'" />
                 }
                 @if (item.mediaType === 'video') {
-                <video [src]="getMediaUrl(item.mediaUrl)" class="grid-media-el" muted playsinline></video>
+                <video [src]="getMediaUrl(item.mediaUrl)" class="grid-media-el" muted playsinline (error)="$any($event.target).style.display = 'none'"></video>
                 <div class="media-type-icon-badge">
                   <ion-icon name="play-circle-outline"></ion-icon>
                 </div>
@@ -115,12 +115,13 @@
                   class="grid-media-el"
                   muted
                   playsinline
+                  (error)="$any($event.target).style.display = 'none'"
                 ></video>
                 <div class="media-type-icon-badge">
                   <ion-icon name="play-circle-outline"></ion-icon>
                 </div>
                 } @else {
-                <img [src]="getMediaUrl(item.mediaUrl)" alt="Instagram media" class="grid-media-el" />
+                <img [src]="getMediaUrl(item.mediaUrl)" alt="Instagram media" class="grid-media-el" (error)="$any($event.target).style.display = 'none'" />
                 }
 
                 <!-- Hover Overlay -->

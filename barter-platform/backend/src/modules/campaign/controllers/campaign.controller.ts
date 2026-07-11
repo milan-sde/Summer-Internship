@@ -4,6 +4,19 @@ import { asyncHandler } from '@shared/middlewares/async-handler';
 
 const campaignService = new CampaignService();
 
+// Get a single campaign by ID
+export const getCampaign = asyncHandler(
+  async (req: Request, res: Response) => {
+    const campaignId = req.params.id as string;
+    const campaign = await campaignService.getCampaignById(campaignId);
+
+    res.status(200).json({
+      success: true,
+      data: { campaign }
+    });
+  }
+);
+
 // Create a new campaign (Brands only)
 export const createCampaign = asyncHandler(
   async (req: Request, res: Response) => {

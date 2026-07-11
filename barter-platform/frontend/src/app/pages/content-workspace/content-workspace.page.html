@@ -193,63 +193,6 @@
           @if (!activeSubmission && !isCreatingNew) {
             <div class="workspace-grid">
               <!-- Left: Campaign Brief -->
-              <aside class="brief-card">
-                <div class="brief-toggle-header" (click)="toggleBrief()" role="button" tabindex="0" (keydown.enter)="toggleBrief()" (keydown.space)="toggleBrief(); $event.preventDefault()">
-                  <div class="brief-header-info">
-                    <h4 class="brief-heading">Campaign Brief</h4>
-                    @if (campaign) {
-                      <span class="brief-header-summary">{{ campaign.brandName }} • {{ campaign.platform }}</span>
-                    }
-                  </div>
-                  <button class="brief-toggle-btn" type="button">
-                    <ion-icon [name]="briefExpanded ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
-                  </button>
-                </div>
-                <div class="brief-body" [class.collapsed]="!briefExpanded">
-                  @if (campaign) {
-                    <div class="brief-info-row">
-                      <span class="brief-label">Platform</span>
-                      <span class="brief-value">{{ campaign.platform }}</span>
-                    </div>
-                  }
-                  <div class="brief-info-block">
-                    <span class="brief-label">Deliverable Requirements</span>
-                    <ul class="brief-list">
-                      <li>High quality Image or Video (Reel) suitable for social publishing.</li>
-                      <li>Write a captivating Instagram caption for the post.</li>
-                      <li>Content must be approved by the brand before it can be published.</li>
-                    </ul>
-                  </div>
-                </div>
-                <div class="brief-divider"></div>
-                <h4 class="brief-heading">Content Progress</h4>
-                <div class="progress-grid">
-                  <div class="progress-item">
-                    <span class="progress-count">{{ submissions.length }}</span>
-                    <span class="progress-lbl">Total</span>
-                  </div>
-                  <div class="progress-item">
-                    <span class="progress-count neutral">{{ getStatusCount('DRAFT') }}</span>
-                    <span class="progress-lbl">Draft</span>
-                  </div>
-                  <div class="progress-item">
-                    <span class="progress-count info">{{ getStatusCount('SUBMITTED') }}</span>
-                    <span class="progress-lbl">In Review</span>
-                  </div>
-                  <div class="progress-item">
-                    <span class="progress-count warning">{{ getStatusCount('CHANGES_REQUESTED') }}</span>
-                    <span class="progress-lbl">Changes</span>
-                  </div>
-                  <div class="progress-item">
-                    <span class="progress-count success">{{ getStatusCount('APPROVED') + getStatusCount('PUBLISHED') }}</span>
-                    <span class="progress-lbl">Approved</span>
-                  </div>
-                  <div class="progress-item">
-                    <span class="progress-count danger">{{ getStatusCount('FAILED') }}</span>
-                    <span class="progress-lbl">Failed</span>
-                  </div>
-                </div>
-              </aside>
 
               <!-- Right: Content Area -->
               <main class="content-area">
@@ -316,11 +259,9 @@
                               <video
                                 [src]="getAvatarUrl(sub.mediaUrl)"
                                 class="del-card-img"
-                                preload="none"
                                 muted
                                 playsinline
-                                (error)="sub._mediaError = true"
-                                [class.del-img-broken]="sub._mediaError"
+                                (error)="$any($event.target).style.display = 'none'"
                               ></video>
                               <span class="del-card-media-badge">
                                 <ion-icon name="play-circle-outline"></ion-icon>
@@ -331,16 +272,9 @@
                                 [src]="getAvatarUrl(sub.mediaUrl)"
                                 alt="Image preview"
                                 class="del-card-img"
-                                (error)="sub._mediaError = true"
-                                [class.del-img-broken]="sub._mediaError"
+                                (error)="$any($event.target).style.display = 'none'"
                               />
                             }
-                          }
-                          @if (!sub.mediaUrl || sub._mediaError) {
-                            <div class="del-card-media-fallback">
-                              <ion-icon name="image-outline"></ion-icon>
-                              <span>Media unavailable</span>
-                            </div>
                           }
                         </div>
                         <div class="del-card-body">
@@ -406,15 +340,59 @@
                       <span class="brief-label">Platform</span>
                       <span class="brief-value">{{ campaign.platform }}</span>
                     </div>
+                    <div class="brief-info-row">
+                      <span class="brief-label">Category</span>
+                      <span class="brief-value">{{ campaign.category }}</span>
+                    </div>
+                    <div class="brief-info-row">
+                      <span class="brief-label">Budget</span>
+                      <span class="brief-value">₹{{ campaign.budget | number }} per person</span>
+                    </div>
+                    @if (campaign.followersRequired) {
+                    <div class="brief-info-row">
+                      <span class="brief-label">Min. Reach</span>
+                      <span class="brief-value">{{ campaign.followersRequired }}</span>
+                    </div>
+                    }
+                    <div class="brief-info-row">
+                      <span class="brief-label">Slots</span>
+                      <span class="brief-value">{{ campaign.filledSlots }}/{{ campaign.totalSlots }} filled</span>
+                    </div>
+                    @if (campaign.description) {
+                    <div class="brief-info-block">
+                      <span class="brief-label">Description</span>
+                      <p class="brief-description">{{ campaign.description }}</p>
+                    </div>
+                    }
                   }
+                  <!-- Submission Stats -->
+                  @if (submissions.length > 0) {
                   <div class="brief-info-block">
-                    <span class="brief-label">Requirements</span>
-                    <ul class="brief-list">
-                      <li>High quality Image or Video (Reel) suitable for social publishing.</li>
-                      <li>Write a captivating Instagram caption for the post.</li>
-                      <li>Content must be approved by the brand before it can be published.</li>
-                    </ul>
+                    <span class="brief-label">Deliverable Progress</span>
+                    <div class="progress-grid">
+                      <div class="progress-item">
+                        <span class="progress-count">{{ submissions.length }}</span>
+                        <span class="progress-label">Total</span>
+                      </div>
+                      <div class="progress-item">
+                        <span class="progress-count neutral">{{ getStatusCount('DRAFT') }}</span>
+                        <span class="progress-label">Draft</span>
+                      </div>
+                      <div class="progress-item">
+                        <span class="progress-count info">{{ getStatusCount('SUBMITTED') }}</span>
+                        <span class="progress-label">Review</span>
+                      </div>
+                      <div class="progress-item">
+                        <span class="progress-count warning">{{ getStatusCount('CHANGES_REQUESTED') }}</span>
+                        <span class="progress-label">Changes</span>
+                      </div>
+                      <div class="progress-item">
+                        <span class="progress-count success">{{ getStatusCount('APPROVED') + getStatusCount('PUBLISHED') }}</span>
+                        <span class="progress-label">Done</span>
+                      </div>
+                    </div>
                   </div>
+                  }
                 </div>
                 <button class="back-to-list-btn" (click)="backToList()">
                   <ion-icon name="arrow-back-outline"></ion-icon>

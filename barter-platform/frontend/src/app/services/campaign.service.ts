@@ -99,6 +99,13 @@ export class CampaignService {
     );
   }
 
+  // Get a single campaign by ID
+  getCampaign(campaignId: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/campaigns/${campaignId}`, {
+      withCredentials: true,
+    });
+  }
+
   // Fetch campaigns created by the currently authenticated brand user via API
   getMyCampaigns(): Observable<any> {
     return this.http.get(`${this.apiUrl}/campaigns/my-campaigns`, {

@@ -11,7 +11,7 @@ import {
 const router = Router();
 
 // Configure the uploader for portfolio:
-// - Destination: src/static/portfolio
+// - Destination: backend/static/portfolio
 // - Filename prefix: portfolio
 // - Max size: 50MB (to comfortably support short video clips)
 // - Allowed types: images and videos

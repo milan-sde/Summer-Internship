@@ -175,10 +175,6 @@ export class InstagramCataloguePage implements OnInit {
 
   getMediaUrl = getMediaUrl;
 
-  getMediaPreview(item: InstagramMediaItem): string {
-    return this.getMediaUrl(item.thumbnailUrl || item.mediaUrl);
-  }
-
   async showToast(message: string, color: string = 'primary') {
     const toast = await this.toastController.create({
       message,

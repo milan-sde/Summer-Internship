@@ -366,20 +366,6 @@ export class PortfolioPage implements OnInit {
       });
   }
 
-  getInstagramMediaUrl(item: InstagramMediaItem): string {
-    const url = item.thumbnailUrl || item.mediaUrl;
-    if (!url) return '';
-    if (
-      url.startsWith('http://') ||
-      url.startsWith('https://') ||
-      url.startsWith('data:')
-    ) {
-      return url;
-    }
-    const backendBase = environment.apiUrl.replace('/api', '');
-    return `${backendBase}${url}`;
-  }
-
   getMediaUrl = getMediaUrl;
 
   // Toast feedback helper

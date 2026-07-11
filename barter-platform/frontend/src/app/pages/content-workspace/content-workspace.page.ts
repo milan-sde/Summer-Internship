@@ -313,17 +313,34 @@ export class ContentWorkspacePage implements OnInit, OnDestroy {
     this.selectedStatusFilter = 'all';
     this.cdr.markForCheck();
 
+    this.campaignService.getCampaign(this.campaignId).subscribe({
+      next: (campaignRes: any) => {
+        if (campaignRes.success && campaignRes.data?.campaign) {
+          this.campaign = campaignRes.data.campaign;
+        }
+        this.loadSubmissionsForCampaign();
+      },
+      error: () => {
+        this.loadSubmissionsForCampaign();
+      }
+    });
+  }
+
+  private loadSubmissionsForCampaign() {
+    if (!this.campaignId) return;
     this.campaignService.getSubmissions(this.campaignId).subscribe({
       next: (response: any) => {
         this.submissions = response.success ? response.data.submissions : [];
         this.submissionsLoading = false;
-        if (this.submissions.length > 0) {
-          this.campaign = this.submissions[0].campaignId;
+        if (!this.campaign && this.submissions.length > 0) {
+          const popCampaign = this.submissions[0].campaignId;
+          if (popCampaign && typeof popCampaign === 'object' && popCampaign.id) {
+            this.campaign = popCampaign;
+          }
         }
         this.cdr.markForCheck();
       },
-      error: (error: any) => {
-        console.error('Failed to load campaign submissions:', error);
+      error: () => {
         this.submissionsLoading = false;
         this.submissionsError = true;
         this.cdr.markForCheck();

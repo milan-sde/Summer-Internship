@@ -7,13 +7,13 @@
       <div class="detail-modal-content-wrapper">
         <div class="detail-media-panel">
           @if (isCatalogImage) {
-            <img [src]="getMediaUrl(selectedItem.mediaUrl)" alt="Portfolio Detail" />
+            <img [src]="getMediaUrl(selectedItem.mediaUrl)" alt="Portfolio Detail" (error)="$any($event.target).style.display = 'none'" />
           } @else if (isCatalogVideo) {
-            <video [src]="getMediaUrl(selectedItem.mediaUrl)" controls autoplay playsinline></video>
+            <video [src]="getMediaUrl(selectedItem.mediaUrl)" controls autoplay playsinline (error)="$any($event.target).style.display = 'none'"></video>
           } @else if (isInstagramVideo) {
-            <video [src]="getMediaUrl(selectedItem.mediaUrl)" [poster]="selectedItem.thumbnailUrl ? getMediaUrl(selectedItem.thumbnailUrl) : ''" controls autoplay playsinline></video>
+            <video [src]="getMediaUrl(selectedItem.mediaUrl)" [poster]="selectedItem.thumbnailUrl ? getMediaUrl(selectedItem.thumbnailUrl) : ''" controls autoplay playsinline (error)="$any($event.target).style.display = 'none'"></video>
           } @else {
-            <img [src]="getMediaUrl(selectedItem.mediaUrl)" alt="Media Detail" />
+            <img [src]="getMediaUrl(selectedItem.mediaUrl)" alt="Media Detail" (error)="$any($event.target).style.display = 'none'" />
           }
         </div>
 

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { StorageService } from './storage.service';
 import { environment } from 'src/environments/environment';
+import { bustMediaCache } from '../shared/utils/media.utils';
 
 export interface UserState {
   id: string;
@@ -65,6 +66,7 @@ export class AppStateService {
     if (updated.avatarUrl && updated.avatarUrl !== current.avatarUrl?.replace(/[?&]_cb=\d+/, '')) {
       avatarCacheBust++;
       updated.avatarUrl = resolveAvatarUrl(updated.avatarUrl);
+      bustMediaCache();
     }
     this.userSubject.next(updated);
     this.persist(updated);
