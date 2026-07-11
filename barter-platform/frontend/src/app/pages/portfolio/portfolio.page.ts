@@ -14,15 +14,8 @@ import {
   IonInput,
   IonTextarea,
   IonButton,
-  IonGrid,
-  IonRow,
-  IonCol,
-  IonText,
   IonModal,
-  IonSelect,
-  IonSelectOption,
-  IonToggle,
-  IonSpinner,
+  IonText,
   AlertController,
   ToastController,
   LoadingController,
@@ -35,8 +28,6 @@ import {
   imageOutline,
   videocamOutline,
   folderOpenOutline,
-  sparkles,
-  sparklesOutline,
   addOutline,
   closeOutline,
   eyeOutline,
@@ -50,7 +41,6 @@ import {
   PortfolioService,
   PortfolioItem,
 } from 'src/app/services/portfolio.service';
-import { AiService } from 'src/app/services/ai.service';
 import {
   InstagramService,
   InstagramMediaItem,
@@ -58,9 +48,12 @@ import {
 import { StorageService } from 'src/app/services/storage.service';
 import { ProfileService } from 'src/app/services/profile.service';
 import { environment } from 'src/environments/environment';
+import { getMediaUrl } from '../../shared/utils/media.utils';
 
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { HeaderComponent } from '../../shared/components/header/header.component';
+import { AiCaptionModalComponent } from '../../shared/components/ai-caption-modal/ai-caption-modal.component';
+import { InstagramDetailModalComponent } from '../../shared/components/instagram-detail-modal/instagram-detail-modal.component';
 
 @Component({
   selector: 'app-portfolio',
@@ -76,17 +69,12 @@ import { HeaderComponent } from '../../shared/components/header/header.component
     IonInput,
     IonTextarea,
     IonButton,
-    IonGrid,
-    IonRow,
-    IonCol,
-    IonText,
     IonModal,
-    IonSelect,
-    IonSelectOption,
-    IonToggle,
-    IonSpinner,
+    IonText,
     SidebarComponent,
-    HeaderComponent
+    HeaderComponent,
+    AiCaptionModalComponent,
+    InstagramDetailModalComponent,
   ],
 })
 export class PortfolioPage implements OnInit {
@@ -100,11 +88,6 @@ export class PortfolioPage implements OnInit {
   isLoading = true;
   isSidebarOpen = false;
 
-  isAiModalOpen = false;
-  isGenerating = false;
-  aiForm!: FormGroup;
-
-  // Instagram Shop style modals state
   isUploadModalOpen = false;
   isDetailModalOpen = false;
   selectedItem: any = null;
@@ -146,7 +129,6 @@ export class PortfolioPage implements OnInit {
     private toastController: ToastController,
     private loadingController: LoadingController,
     private router: Router,
-    private aiService: AiService,
   ) {
     addIcons({
       arrowBackOutline,
@@ -155,8 +137,6 @@ export class PortfolioPage implements OnInit {
       imageOutline,
       videocamOutline,
       folderOpenOutline,
-      sparkles,
-      sparklesOutline,
       addOutline,
       closeOutline,
       eyeOutline,
@@ -178,15 +158,6 @@ export class PortfolioPage implements OnInit {
     this.uploadForm = this.fb.group({
       caption: ['', [Validators.required, Validators.maxLength(500)]],
       category: ['', [Validators.required, Validators.maxLength(100)]],
-    });
-
-    this.aiForm = this.fb.group({
-      description: ['', [Validators.required]],
-      tone: ['Casual', [Validators.required]],
-      length: ['Medium', [Validators.required]],
-      platform: ['Instagram', [Validators.required]],
-      includeEmojis: [true],
-      includeHashtags: [true],
     });
   }
 
@@ -409,19 +380,7 @@ export class PortfolioPage implements OnInit {
     return `${backendBase}${url}`;
   }
 
-  // Help construct full URL for backend static assets
-  getMediaUrl(url: string): string {
-    if (!url) return '';
-    if (
-      url.startsWith('http://') ||
-      url.startsWith('https://') ||
-      url.startsWith('data:')
-    ) {
-      return url;
-    }
-    const backendBase = environment.apiUrl.replace('/api', '');
-    return `${backendBase}${url}`;
-  }
+  getMediaUrl = getMediaUrl;
 
   // Toast feedback helper
   async showToast(message: string, color: string = 'primary') {
@@ -435,50 +394,7 @@ export class PortfolioPage implements OnInit {
     await toast.present();
   }
 
-  openAiModal() {
-    this.aiForm.reset({
-      description: '',
-      tone: 'Casual',
-      length: 'Medium',
-      platform: 'Instagram',
-      includeEmojis: true,
-      includeHashtags: true,
-    });
-    this.isAiModalOpen = true;
-  }
-
-  closeAiModal() {
-    this.isAiModalOpen = false;
-  }
-
-  generateAiCaption() {
-    if (this.aiForm.invalid) {
-      this.aiForm.markAllAsTouched();
-      return;
-    }
-
-    this.isGenerating = true;
-    this.aiService.generateCaption(this.aiForm.value).subscribe({
-      next: (response) => {
-        this.isGenerating = false;
-        if (response && response.success && response.data?.caption) {
-          this.uploadForm.patchValue({
-            caption: response.data.caption,
-          });
-          this.showToast('Caption generated successfully!', 'success');
-          this.closeAiModal();
-        } else {
-          this.showToast('Failed to generate caption. Please try again.', 'danger');
-        }
-      },
-      error: (error) => {
-        this.isGenerating = false;
-        console.error('Caption generation failed:', error);
-        this.showToast(
-          error.error?.error?.message || error.message || 'Failed to generate caption',
-          'danger'
-        );
-      },
-    });
+  onCaptionGenerated(caption: string) {
+    this.uploadForm.patchValue({ caption });
   }
 }

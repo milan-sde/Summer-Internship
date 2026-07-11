@@ -2,6 +2,7 @@
 import { Request, Response } from "express";
 import { ProfileService } from "../services/profile.service";
 import { asyncHandler } from "@shared/middlewares/async-handler";
+import { cloudinaryService } from "@shared/services/cloudinary.service";
 // import { asyncHandler } from '@shared/middleware/async-handler';
 
 const profileService = new ProfileService();
@@ -129,17 +130,23 @@ export const uploadAvatar = asyncHandler(
       return;
     }
 
-    // Relative path to store in Mongoose / access via URL
-    const avatarUrlPath = `/static/avatars/${req.file.filename}`;
+    // Upload to Cloudinary and get HTTPS URL (falls back to local storage if Cloudinary fails)
+    const localUrl = `/static/avatars/${req.file.filename}`;
+    const { url: avatarUrl } = await cloudinaryService.uploadAndCleanup(
+      req.file.path,
+      req.file.mimetype.startsWith("video/") ? "brands" : "avatars",
+      req.file.mimetype,
+      localUrl
+    );
 
     // Update avatar URL in the database
-    await profileService.updateAvatar(userId, avatarUrlPath);
+    await profileService.updateAvatar(userId, avatarUrl);
 
     res.status(200).json({
       success: true,
       message: "Avatar uploaded successfully",
       data: {
-        avatar: avatarUrlPath,
+        avatar: avatarUrl,
       },
     });
   },

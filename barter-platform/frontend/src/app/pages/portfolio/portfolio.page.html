@@ -42,7 +42,7 @@
           @if (!isLoading) {
           <div class="instagram-shop-grid">
             <!-- First Card: Add New Item Trigger Card -->
-            <div class="grid-card add-new-trigger-card" (click)="openUploadModal()">
+            <div class="grid-card add-new-trigger-card" (click)="openUploadModal()" role="button" tabindex="0" (keydown.enter)="openUploadModal()" (keydown.space)="openUploadModal(); $event.preventDefault()">
               <div class="add-card-content">
                 <ion-icon name="add-outline" class="add-card-icon"></ion-icon>
                 <span class="add-card-label">Add Item</span>
@@ -51,7 +51,7 @@
 
             <!-- Items -->
             @for (item of portfolioItems; track item.id) {
-            <div class="grid-card media-card" (click)="openDetail(item, 'catalog')">
+            <div class="grid-card media-card" (click)="openDetail(item, 'catalog')" role="button" tabindex="0" (keydown.enter)="openDetail(item, 'catalog')" (keydown.space)="openDetail(item, 'catalog'); $event.preventDefault()">
               <div class="media-container">
                 @if (item.mediaType === 'image') {
                 <img [src]="getMediaUrl(item.mediaUrl)" alt="Portfolio Showcase" class="grid-media-el" />
@@ -105,7 +105,7 @@
             @for (item of instagramMedia; track item.mediaId) {
             <div 
               class="grid-card media-card" 
-              (click)="openDetail(item, 'instagram')"
+              (click)="openDetail(item, 'instagram')" role="button" tabindex="0" (keydown.enter)="openDetail(item, 'instagram')" (keydown.space)="openDetail(item, 'instagram'); $event.preventDefault()"
             >
               <div class="media-container">
                 @if (item.mediaType === 'VIDEO') {
@@ -151,7 +151,7 @@
               <ion-icon name="cloud-upload-outline" class="modal-header-icon"></ion-icon>
               Upload Portfolio Media
             </h3>
-            <button type="button" class="close-modal-x-btn" (click)="closeUploadModal()">&times;</button>
+            <button type="button" class="close-modal-x-btn" (click)="closeUploadModal()" aria-label="Close upload modal">&times;</button>
           </div>
 
           <div class="modal-custom-body">
@@ -169,6 +169,10 @@
                 class="file-picker-container"
                 (click)="!filePreview && fileInput.click()"
                 [class.has-preview]="filePreview"
+                role="button"
+                tabindex="0"
+                (keydown.enter)="!filePreview && fileInput.click()"
+                (keydown.space)="!filePreview && fileInput.click(); $event.preventDefault()"
               >
                 <!-- Default Selector Display -->
                 @if (!filePreview) {
@@ -187,6 +191,7 @@
                     type="button"
                     class="preview-close-btn"
                     (click)="clearSelectedFile(); $event.stopPropagation();"
+                    aria-label="Clear selected file"
                   >
                     &times;
                   </button>
@@ -213,17 +218,16 @@
               <div class="custom-input-group" style="margin-top: 16px">
                 <div class="caption-label-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                   <label class="custom-input-label" style="margin-bottom: 0;">Caption *</label>
-                  <ion-button
-                    type="button"
-                    fill="clear"
-                    size="small"
-                    class="ai-generate-btn"
-                    (click)="openAiModal()"
-                    style="--color: var(--ion-color-primary); font-weight: 600; display: flex; align-items: center; gap: 4px; margin: 0; --padding-start: 0; --padding-end: 0;"
-                  >
-                    <ion-icon name="sparkles" slot="start"></ion-icon>
-                    ✨ Generate with AI
-                  </ion-button>
+                    <ion-button
+                      type="button"
+                      fill="clear"
+                      size="small"
+                      class="ai-generate-btn"
+                      (click)="aiCaptionModal.open()"
+                    >
+                      <ion-icon name="sparkles" slot="start"></ion-icon>
+                      Generate with AI
+                    </ion-button>
                 </div>
                 <ion-item lines="none" class="custom-input-item text-area-item">
                   <ion-textarea
@@ -279,216 +283,17 @@
       </ng-template>
     </ion-modal>
 
-    <!-- Instagram Shop Detail Viewer Modal -->
-    <ion-modal [isOpen]="isDetailModalOpen" (didDismiss)="closeDetail()" class="instagram-detail-modal">
-      <ng-template>
-        @if (selectedItem) {
-        <div class="detail-modal-container">
-          <button type="button" class="detail-close-btn" (click)="closeDetail()">&times;</button>
-          
-          <div class="detail-modal-content-wrapper">
-            <!-- Left Side: Media Panel -->
-            <div class="detail-media-panel">
-              @if (selectedItemType === 'catalog') {
-                @if (selectedItem.mediaType === 'image') {
-                  <img [src]="getMediaUrl(selectedItem.mediaUrl)" alt="Portfolio Detail" />
-                } @else if (selectedItem.mediaType === 'video') {
-                  <video [src]="getMediaUrl(selectedItem.mediaUrl)" controls autoplay playsinline></video>
-                }
-              } @else {
-                @if (selectedItem.mediaType === 'VIDEO') {
-                  <video [src]="getMediaUrl(selectedItem.mediaUrl)" [poster]="selectedItem.thumbnailUrl ? getMediaUrl(selectedItem.thumbnailUrl) : ''" controls autoplay playsinline></video>
-                } @else {
-                  <img [src]="getMediaUrl(selectedItem.mediaUrl)" alt="Instagram Post Detail" />
-                }
-              }
-            </div>
+    <app-instagram-detail-modal
+      [(isOpen)]="isDetailModalOpen"
+      [selectedItem]="selectedItem"
+      [selectedItemType]="selectedItemType"
+      [authorSubtitle]="selectedItemType === 'instagram' ? 'Connected Feed Post' : 'Custom Upload Item'"
+      timestampLabel="Synced:"
+      [showDeleteButton]="selectedItemType === 'catalog'"
+      (dismissed)="closeDetail()"
+      (deleteRequested)="confirmDelete($event)"
+    ></app-instagram-detail-modal>
 
-            <!-- Right Side: Info Panel -->
-            <div class="detail-info-panel">
-              <!-- Header / Profile Segment -->
-              <div class="detail-author-header">
-                <div class="author-avatar-wrapper">
-                  <ion-icon [name]="selectedItemType === 'instagram' ? 'logo-instagram' : 'person-outline'" [class.instagram-logo]="selectedItemType === 'instagram'"></ion-icon>
-                </div>
-                <div class="author-info-meta">
-                  <h4>{{ selectedItemType === 'instagram' ? 'Instagram Media' : (selectedItem.title || 'Portfolio Showcase Item') }}</h4>
-                  <p class="author-subtitle">
-                    {{ selectedItemType === 'instagram' ? 'Connected Feed Post' : 'Custom Upload Item' }}
-                  </p>
-                </div>
-              </div>
-
-              <!-- Main Scrolling Caption Area -->
-              <div class="detail-scrollable-body">
-                <!-- Platform / Category Badge -->
-                <div class="detail-metadata-badges">
-                  @if (selectedItemType === 'catalog') {
-                    <span class="detail-badge category">{{ selectedItem.title }}</span>
-                    <span class="detail-badge platform-badge custom-badge">Showcase</span>
-                  } @else {
-                    <span class="detail-badge platform-badge instagram-badge">Instagram</span>
-                    <span class="detail-badge type">{{ selectedItem.mediaType }}</span>
-                  }
-                </div>
-                
-                <p class="detail-caption-text">
-                  {{ selectedItemType === 'instagram' ? (selectedItem.caption || 'No caption text.') : (selectedItem.description || 'No caption text.') }}
-                </p>
-                
-                @if (selectedItem.timestamp) {
-                  <span class="detail-timestamp-date">Synced: {{ selectedItem.timestamp | date:'mediumDate' }}</span>
-                }
-              </div>
-
-              <!-- Footer Actions Area -->
-              <div class="detail-footer-actions">
-                @if (selectedItemType === 'catalog') {
-                  <ion-button expand="block" color="danger" fill="solid" (click)="confirmDelete(selectedItem)" class="detail-delete-btn">
-                    <ion-icon name="trash-outline" slot="start"></ion-icon>
-                    Delete Portfolio Item
-                  </ion-button>
-                } @else {
-                  @if (selectedItem.permalink) {
-                    <ion-button
-                      expand="block"
-                      fill="solid"
-                      [href]="selectedItem.permalink"
-                      target="_blank"
-                      color="primary"
-                      style="margin: 0; --border-radius: 8px; font-weight: 600;"
-                    >
-                      <ion-icon name="logo-instagram" slot="start"></ion-icon>
-                      View on Instagram
-                    </ion-button>
-                  } @else {
-                    <div style="font-size: 0.8rem; color: var(--ion-color-medium); text-align: center; font-weight: 500;">
-                      Instagram Feed Post
-                    </div>
-                  }
-                }
-              </div>
-            </div>
-          </div>
-        </div>
-        }
-      </ng-template>
-    </ion-modal>
-
-    <!-- AI Caption Assistant Modal -->
-    <ion-modal [isOpen]="isAiModalOpen" (didDismiss)="isAiModalOpen = false" class="ai-caption-modal">
-      <ng-template>
-        <div class="ai-modal-header">
-          <h3>
-            <ion-icon name="sparkles" class="ai-icon"></ion-icon>
-            AI Caption Assistant
-          </h3>
-          <button type="button" class="close-modal-btn" (click)="closeAiModal()">&times;</button>
-        </div>
-
-        <div class="ai-modal-content">
-          <form [formGroup]="aiForm" (ngSubmit)="generateAiCaption()">
-            
-            <!-- Description Field -->
-            <div class="custom-input-group">
-              <label class="custom-input-label">Describe your post *</label>
-              <ion-item lines="none" class="custom-input-item text-area-item">
-                <ion-textarea
-                  formControlName="description"
-                  rows="3"
-                  placeholder="What is this post about? E.g., showing off a new skincare routine..."
-                ></ion-textarea>
-              </ion-item>
-              @if (aiForm.get('description')?.touched && aiForm.get('description')?.invalid) {
-              <div class="validation-error">
-                <ion-text color="danger">
-                  <small>Post description is required.</small>
-                </ion-text>
-              </div>
-              }
-            </div>
-
-            <ion-grid class="ion-no-padding">
-              <ion-row>
-                <!-- Platform Field -->
-                <ion-col size="12" size-md="6" class="ion-no-padding responsive-col-left">
-                  <div class="custom-input-group">
-                    <label class="custom-input-label">Platform</label>
-                    <ion-item lines="none" class="custom-input-item">
-                      <ion-select formControlName="platform" interface="popover" class="form-select" style="width: 100%;">
-                        <ion-select-option value="Instagram">Instagram</ion-select-option>
-                        <ion-select-option value="LinkedIn">LinkedIn</ion-select-option>
-                        <ion-select-option value="Facebook">Facebook</ion-select-option>
-                        <ion-select-option value="X">X (Twitter)</ion-select-option>
-                      </ion-select>
-                    </ion-item>
-                  </div>
-                </ion-col>
-
-                <!-- Tone Field -->
-                <ion-col size="12" size-md="6" class="ion-no-padding responsive-col-right">
-                  <div class="custom-input-group">
-                    <label class="custom-input-label">Tone</label>
-                    <ion-item lines="none" class="custom-input-item">
-                      <ion-select formControlName="tone" interface="popover" class="form-select" style="width: 100%;">
-                        <ion-select-option value="Casual">Casual</ion-select-option>
-                        <ion-select-option value="Professional">Professional</ion-select-option>
-                        <ion-select-option value="Funny">Funny</ion-select-option>
-                        <ion-select-option value="Friendly">Friendly</ion-select-option>
-                        <ion-select-option value="Motivational">Motivational</ion-select-option>
-                        <ion-select-option value="Luxury">Luxury</ion-select-option>
-                      </ion-select>
-                    </ion-item>
-                  </div>
-                </ion-col>
-              </ion-row>
-
-              <ion-row>
-                <!-- Length Field -->
-                <ion-col size="12" size-md="6" class="ion-no-padding responsive-col-left">
-                  <div class="custom-input-group">
-                    <label class="custom-input-label">Length</label>
-                    <ion-item lines="none" class="custom-input-item">
-                      <ion-select formControlName="length" interface="popover" class="form-select" style="width: 100%;">
-                        <ion-select-option value="Short">Short</ion-select-option>
-                        <ion-select-option value="Medium">Medium</ion-select-option>
-                        <ion-select-option value="Long">Long</ion-select-option>
-                      </ion-select>
-                    </ion-item>
-                  </div>
-                </ion-col>
-
-                <!-- Toggle Flags -->
-                <ion-col size="12" size-md="6" class="ion-no-padding responsive-col-right" style="display: flex; gap: 16px; align-items: center; margin-top: 12px; margin-bottom: 20px;">
-                  <div style="display: flex; align-items: center; gap: 6px;">
-                    <ion-toggle formControlName="includeEmojis" justify="space-between"></ion-toggle>
-                    <span class="custom-input-label" style="margin-bottom: 0;">Emojis</span>
-                  </div>
-                  <div style="display: flex; align-items: center; gap: 6px;">
-                    <ion-toggle formControlName="includeHashtags" justify="space-between"></ion-toggle>
-                    <span class="custom-input-label" style="margin-bottom: 0;">Hashtags</span>
-                  </div>
-                </ion-col>
-              </ion-row>
-            </ion-grid>
-
-            <div class="modal-actions" style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px; border-top: 1px solid var(--app-border-color); padding-top: 16px;">
-              <ion-button type="button" fill="clear" color="medium" (click)="closeAiModal()" [disabled]="isGenerating">
-                Cancel
-              </ion-button>
-              <ion-button type="submit" class="generate-submit-btn" [disabled]="isGenerating || aiForm.invalid" style="min-width: 140px;">
-                @if (isGenerating) {
-                  <ion-spinner name="crescent" slot="start" size="small"></ion-spinner>
-                  Generating...
-                } @else {
-                  <ion-icon name="sparkles" slot="start"></ion-icon>
-                  Generate
-                }
-              </ion-button>
-            </div>
-          </form>
-        </div>
-      </ng-template>
-    </ion-modal>
+    <app-ai-caption-modal #aiCaptionModal (captionGenerated)="onCaptionGenerated($event)"></app-ai-caption-modal>
   </div>
 </div>

@@ -9,8 +9,6 @@ import { ValidationError, NotFoundError, ConflictError } from "@shared/errors/ap
 import { ContentSubmission, IContentSubmission } from "../models/content-submission.model";
 import { NotificationService } from "@modules/notification/services/notification.service";
 import mongoose from "mongoose";
-import fs from "fs";
-import path from "path";
 
 export class ContentSubmissionService {
   private submissionRepository: ContentSubmissionRepository;
@@ -34,6 +32,7 @@ export class ContentSubmissionService {
     influencerId: string,
     campaignId: string,
     mediaUrl: string,
+    mediaPublicId: string,
     mediaType: "IMAGE" | "VIDEO",
     caption?: string
   ): Promise<IContentSubmission> {
@@ -55,8 +54,9 @@ export class ContentSubmissionService {
     return await this.submissionRepository.create({
       campaignId: campaign._id as mongoose.Types.ObjectId,
       influencerId: new mongoose.Types.ObjectId(influencerId),
-      brandId: campaign.brandId, // Point to brand profile
+      brandId: campaign.brandId,
       mediaUrl,
+      mediaPublicId,
       mediaType,
       caption: caption || "",
       status: "DRAFT",
@@ -68,7 +68,7 @@ export class ContentSubmissionService {
   async updateDraft(
     submissionId: string,
     influencerId: string,
-    data: { mediaUrl?: string; mediaType?: "IMAGE" | "VIDEO"; caption?: string }
+    data: { mediaUrl?: string; mediaPublicId?: string; mediaType?: "IMAGE" | "VIDEO"; caption?: string }
   ): Promise<IContentSubmission> {
     const submission = await this.submissionRepository.findById(submissionId);
     if (!submission) {
@@ -86,6 +86,7 @@ export class ContentSubmissionService {
 
     const updates: Partial<IContentSubmission> = {};
     if (data.mediaUrl) updates.mediaUrl = data.mediaUrl;
+    if (data.mediaPublicId) updates.mediaPublicId = data.mediaPublicId;
     if (data.mediaType) updates.mediaType = data.mediaType;
     if (data.caption !== undefined) updates.caption = data.caption;
 
@@ -405,46 +406,15 @@ export class ContentSubmissionService {
     const campaign = await this.campaignRepository.findById(submission.campaignId.toString());
     const campaignTitle = campaign ? campaign.title : "Campaign Collaboration";
 
-    // 1. Resolve source path on local disk
-    const campaignFilename = submission.mediaUrl.replace("/static/campaigns/", "");
-    const sourcePath = path.join(__dirname, "../../../static/campaigns", campaignFilename);
-
-    // 2. Generate a new filename and destination path for portfolio
-    const ext = path.extname(campaignFilename);
-    const newFilename = `portfolio-${Date.now()}${ext}`;
-    const destDir = path.join(__dirname, "../../../static/portfolio");
-    const destPath = path.join(destDir, newFilename);
-
-    // 3. Verify files and folders on disk
-    if (!fs.existsSync(sourcePath)) {
-      throw new ValidationError("The original campaign media file could not be found on the server");
-    }
-
-    if (!fs.existsSync(destDir)) {
-      fs.mkdirSync(destDir, { recursive: true });
-    }
-
-    // 4. Check for duplicates using the destination URL pattern to avoid double additions
-    const targetMediaUrl = `/static/portfolio/${newFilename}`;
-
-    // 5. Copy file physically
-    try {
-      await fs.promises.copyFile(sourcePath, destPath);
-      console.log(`[ContentSubmissionService] Copied file from ${sourcePath} to ${destPath}`);
-    } catch (err) {
-      console.error("[ContentSubmissionService] File copy failed:", err);
-      throw new ValidationError("Failed to duplicate file on server for portfolio");
-    }
-
-    // 6. Create portfolio entry in database
     const portfolioItem = new PortfolioMedia({
       userId: new mongoose.Types.ObjectId(influencerId),
       title: `Campaign: ${campaignTitle}`,
       description: submission.caption || "",
-      mediaUrl: targetMediaUrl,
+      mediaUrl: submission.mediaUrl,
+      mediaPublicId: submission.mediaPublicId,
       mediaType: submission.mediaType.toLowerCase() as "image" | "video",
       mimeType: submission.mediaType === "VIDEO" ? "video/mp4" : "image/jpeg",
-      fileSize: 1024 * 1024, // Estimate/Default size in bytes
+      fileSize: 1024 * 1024,
     });
 
     return await portfolioItem.save();

@@ -10,8 +10,10 @@ import {
 import { StorageService } from '../../services/storage.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ProfileService } from 'src/app/services/profile.service';
+import { AppStateService } from '../../services/app-state.service';
 import { InstagramService } from 'src/app/services/instagram.service';
 import { environment } from 'src/environments/environment';
+import { getAvatarUrl } from '../../shared/utils/media.utils';
 import {
   IonContent,
   IonIcon,
@@ -132,6 +134,7 @@ export class ProfilePage implements OnInit {
     private profileService: ProfileService,
     private instagramService: InstagramService,
     private storage: StorageService,
+    private appState: AppStateService,
     private router: Router,
     private route: ActivatedRoute,
     private toastController: ToastController,
@@ -325,19 +328,7 @@ export class ProfilePage implements OnInit {
     }
   }
 
-  // Helper to construct full avatar URL for static files
-  getAvatarUrl(url: string | null | undefined): string {
-    if (!url) return '';
-    if (
-      url.startsWith('http://') ||
-      url.startsWith('https://') ||
-      url.startsWith('data:')
-    ) {
-      return url;
-    }
-    const backendBase = environment.apiUrl.replace('/api', '');
-    return `${backendBase}${url}`;
-  }
+  getAvatarUrl = getAvatarUrl;
 
   // Image upload and preview handling
   onFileSelected(event: any) {
@@ -358,10 +349,9 @@ export class ProfilePage implements OnInit {
               loading.dismiss();
               if (response && response.success && response.data) {
                 const uploadedPath = response.data.avatar;
-                // Update visual preview immediately
                 this.avatarPreview = uploadedPath;
-                // Patch form control to store relative URL path
                 this.profileForm.patchValue({ avatarUrl: uploadedPath });
+                this.appState.setFromProfile({ avatarUrl: uploadedPath });
                 this.showToast('Image uploaded successfully!', 'success');
               }
             },

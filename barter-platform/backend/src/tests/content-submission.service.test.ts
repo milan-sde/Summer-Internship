@@ -186,6 +186,7 @@ describe("ContentSubmissionService Workflow Tests", () => {
         influencerUser._id.toString(),
         testCampaign._id.toString(),
         mediaUrl,
+        "test-public-id",
         "IMAGE",
         "Loving this winter jacket from Acme! #ad"
       );

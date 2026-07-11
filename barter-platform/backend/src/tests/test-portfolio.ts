@@ -72,6 +72,8 @@ const testPortfolioSystem = async () => {
 
     uploadedImageItem = await portfolioService.addPortfolioMedia(
       tempUser._id.toString(),
+      "https://res.cloudinary.com/demo/image/upload/v1/test.jpg",
+      "test/image-public-id",
       mockImageFile,
       "My Test Image",
       "This is a test description"
@@ -92,6 +94,8 @@ const testPortfolioSystem = async () => {
 
     uploadedVideoItem = await portfolioService.addPortfolioMedia(
       tempUser._id.toString(),
+      "https://res.cloudinary.com/demo/video/upload/v1/test.mp4",
+      "test/video-public-id",
       mockVideoFile,
       "My Test Video",
       "This is a test video description"

@@ -5,7 +5,6 @@ import {
   IonContent,
   IonIcon,
   IonButton,
-  IonModal
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -23,9 +22,11 @@ import {
 } from 'ionicons/icons';
 import { ProfileService } from 'src/app/services/profile.service';
 import { environment } from 'src/environments/environment';
+import { getMediaUrl } from '../../shared/utils/media.utils';
 
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { HeaderComponent } from '../../shared/components/header/header.component';
+import { InstagramDetailModalComponent } from '../../shared/components/instagram-detail-modal/instagram-detail-modal.component';
 
 @Component({
   selector: 'app-influencer-profile',
@@ -37,9 +38,9 @@ import { HeaderComponent } from '../../shared/components/header/header.component
     IonContent,
     IonIcon,
     IonButton,
-    IonModal,
     SidebarComponent,
-    HeaderComponent
+    HeaderComponent,
+    InstagramDetailModalComponent
   ]
 })
 export class InfluencerProfilePage implements OnInit {
@@ -122,15 +123,7 @@ export class InfluencerProfilePage implements OnInit {
     });
   }
 
-  // Resolves the full URL for static assets from backend
-  getMediaUrl(url: string): string {
-    if (!url) return '';
-    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
-      return url;
-    }
-    const backendBase = environment.apiUrl.replace('/api', '');
-    return `${backendBase}${url}`;
-  }
+  getMediaUrl = getMediaUrl;
 
   // Get initials for profile picture fallback
   getInitials(name: string): string {

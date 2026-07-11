@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { ContentSubmissionService } from "../services/content-submission.service";
 import { asyncHandler } from "@shared/middlewares/async-handler";
 import { ValidationError } from "@shared/errors/app-error";
+import { cloudinaryService } from "@shared/services/cloudinary.service";
 import {
   CreateContentSubmissionSchema,
   UpdateContentSubmissionSchema,
@@ -20,12 +21,20 @@ export const createDraft = asyncHandler(async (req: Request, res: Response) => {
   }
 
   const validatedData = CreateContentSubmissionSchema.parse(req.body);
-  const mediaUrl = `/static/campaigns/${req.file.filename}`;
+  const folderKey = validatedData.mediaType === "VIDEO" ? "reels" : "campaigns";
+  const localUrl = `/static/campaigns/${req.file.filename}`;
+  const { url: mediaUrl, publicId: mediaPublicId } = await cloudinaryService.uploadAndCleanup(
+    req.file.path,
+    folderKey,
+    req.file.mimetype,
+    localUrl
+  );
 
   const submission = await contentSubmissionService.createDraft(
     influencerId,
     campaignId,
     mediaUrl,
+    mediaPublicId,
     validatedData.mediaType,
     validatedData.caption
   );
@@ -50,7 +59,16 @@ export const updateDraft = asyncHandler(async (req: Request, res: Response) => {
   };
 
   if (req.file) {
-    updates.mediaUrl = `/static/campaigns/${req.file.filename}`;
+    const folderKey = validatedData.mediaType === "VIDEO" ? "reels" : "campaigns";
+    const localUrl = `/static/campaigns/${req.file.filename}`;
+    const { url, publicId } = await cloudinaryService.uploadAndCleanup(
+      req.file.path,
+      folderKey,
+      req.file.mimetype,
+      localUrl
+    );
+    updates.mediaUrl = url;
+    updates.mediaPublicId = publicId;
   }
 
   const submission = await contentSubmissionService.updateDraft(

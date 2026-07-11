@@ -11,6 +11,7 @@ import { StorageService } from '../../services/storage.service';
 import { Router } from '@angular/router';
 import { ProfileService } from 'src/app/services/profile.service';
 import { environment } from 'src/environments/environment';
+import { getAvatarUrl } from '../../shared/utils/media.utils';
 import {
   IonHeader,
   IonToolbar,
@@ -257,15 +258,7 @@ export class CompleteProfilePage implements OnInit {
     }
   }
 
-  // Helper to construct full avatar URL for static files
-  getAvatarUrl(url: string | null | undefined): string {
-    if (!url) return '';
-    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
-      return url;
-    }
-    const backendBase = environment.apiUrl.replace('/api', '');
-    return `${backendBase}${url}`;
-  }
+  getAvatarUrl = getAvatarUrl;
 
   // Image upload and preview handling
   onFileSelected(event: any) {

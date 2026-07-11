@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { StorageService } from './storage.service';
+import { AppStateService } from './app-state.service';
 
 export interface User {
   id: string;
@@ -22,6 +23,7 @@ export class AuthService {
   constructor(
     private http: HttpClient,
     private storage: StorageService,
+    private appState: AppStateService,
     private router: Router,
   ) {
     this.loadUser();
@@ -91,6 +93,7 @@ export class AuthService {
     this.storage.setRefreshToken(refreshToken);
     this.storage.setUser(user);
     this.currentUser = user;
+    this.appState.setFromAuth(user);
   }
 
   // Destroy session by calling API logout endpoint

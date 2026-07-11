@@ -183,6 +183,7 @@ describe("ContentSubmissionService Multi-Deliverable Tests", () => {
         influencerId,
         campaignId,
         file1,
+        "test-public-id-1",
         "IMAGE",
         "This is deliverable 1!"
       );
@@ -200,6 +201,7 @@ describe("ContentSubmissionService Multi-Deliverable Tests", () => {
         influencerId,
         campaignId,
         file2,
+        "test-public-id-2",
         "IMAGE",
         "This is deliverable 2!"
       );
@@ -268,6 +270,7 @@ describe("ContentSubmissionService Multi-Deliverable Tests", () => {
         influencerId,
         campaignId,
         file3,
+        "test-public-id-3",
         "IMAGE",
         "This is deliverable 3!"
       );

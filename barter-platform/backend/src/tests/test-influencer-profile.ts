@@ -85,6 +85,8 @@ const runAggregatorTest = async () => {
 
     portfolioItem = await portfolioService.addPortfolioMedia(
       tempUser._id.toString(),
+      "https://res.cloudinary.com/demo/video/upload/v1/test.mp4",
+      "test/public-id",
       mockFile,
       "Aggregator Project",
       "Unified view demonstration clip"

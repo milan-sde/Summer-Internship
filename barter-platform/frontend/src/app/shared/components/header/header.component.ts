@@ -1,7 +1,9 @@
 import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { StorageService } from '../../../services/storage.service';
+import { AppStateService, UserState } from '../../../services/app-state.service';
 import { NotificationService } from '../../../services/notification.service';
 import { NotificationPanelComponent } from '../notification-panel/notification-panel.component';
 import { IonIcon } from '@ionic/angular/standalone';
@@ -23,12 +25,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   @Output() toggleSidebar = new EventEmitter<void>();
 
-  user: any;
+  user: UserState = { id: '', email: '', role: '', fullName: '', avatarUrl: '', onboardingCompleted: false };
   unreadCount = 0;
   isNotificationPanelOpen = false;
+  private userSub?: Subscription;
 
   constructor(
-    private storage: StorageService,
+    private appState: AppStateService,
     private router: Router,
     public themeService: ThemeService,
     public notificationService: NotificationService
@@ -44,7 +47,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.user = this.storage.getUser();
+    this.userSub = this.appState.user$.subscribe(u => this.user = u);
     this.notificationService.refreshUnreadCount();
     this.notificationService.startPolling(30000);
     this.notificationService.unreadCount$.subscribe(count => {
@@ -54,6 +57,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.notificationService.stopPolling();
+    this.userSub?.unsubscribe();
   }
 
   getCurrentThemeIcon(): string {
@@ -77,6 +81,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   viewProfile() {
     this.router.navigate(['/profile']);
+  }
+
+  onAvatarError() {
+    this.user = { ...this.user, avatarUrl: '' };
   }
 
   toggleNotificationPanel() {

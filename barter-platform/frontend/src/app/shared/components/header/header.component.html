@@ -30,7 +30,17 @@
     <!-- User Avatar Menu Button -->
     <button class="avatar-menu-btn" (click)="viewProfile()">
       <div class="avatar-circle">
-        {{ user?.fullName ? user.fullName.charAt(0).toUpperCase() : (user?.email ? user.email.charAt(0).toUpperCase() : 'U') }}
+        @if (user.avatarUrl) {
+          <img
+            [src]="user.avatarUrl"
+            class="avatar-img"
+            (error)="onAvatarError()"
+            alt="Profile"
+          />
+        }
+        @if (!user.avatarUrl) {
+          <span class="avatar-initial">{{ user.fullName ? user.fullName.charAt(0).toUpperCase() : (user.email ? user.email.charAt(0).toUpperCase() : 'U') }}</span>
+        }
       </div>
     </button>
   </div>

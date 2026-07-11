@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { PortfolioService } from "../services/portfolio.service";
 import { asyncHandler } from "@shared/middlewares/async-handler";
+import { cloudinaryService } from "@shared/services/cloudinary.service";
 
 const portfolioService = new PortfolioService();
 
@@ -23,8 +24,19 @@ export const uploadPortfolioMedia = asyncHandler(
       return;
     }
 
+    const folderKey = req.file.mimetype.startsWith("video/") ? "reels" : "portfolio";
+    const localUrl = `/static/portfolio/${req.file.filename}`;
+    const { url: mediaUrl, publicId } = await cloudinaryService.uploadAndCleanup(
+      req.file.path,
+      folderKey,
+      req.file.mimetype,
+      localUrl
+    );
+
     const portfolioItem = await portfolioService.addPortfolioMedia(
       userId,
+      mediaUrl,
+      publicId,
       req.file,
       title,
       description

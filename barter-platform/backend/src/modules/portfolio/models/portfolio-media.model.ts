@@ -5,6 +5,7 @@ export interface IPortfolioMedia extends Document {
   title?: string;
   description?: string;
   mediaUrl: string;
+  mediaPublicId?: string;
   mediaType: "image" | "video";
   mimeType: string;
   fileSize: number;
@@ -35,7 +36,10 @@ const portfolioMediaSchema = new Schema<IPortfolioMedia>(
     mediaUrl: {
       type: String,
       required: true,
-      match: [/^\/static\/portfolio\/.+$/, "Invalid portfolio media URL path format"],
+    },
+    mediaPublicId: {
+      type: String,
+      required: false,
     },
     mediaType: {
       type: String,

@@ -5,6 +5,7 @@ import { CampaignService, ICampaign } from '../../services/campaign.service';
 import { StorageService } from '../../services/storage.service';
 import { ProfileService } from '../../services/profile.service';
 import { environment } from 'src/environments/environment';
+import { getAvatarUrl } from '../../shared/utils/media.utils';
 import {
   IonHeader,
   IonToolbar,
@@ -359,14 +360,7 @@ export class CampaignsPage implements OnInit {
     });
   }
 
-  getAvatarUrl(url: string | null | undefined): string {
-    if (!url) return '';
-    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
-      return url;
-    }
-    const backendBase = environment.apiUrl.replace('/api', '');
-    return `${backendBase}${url}`;
-  }
+  getAvatarUrl = getAvatarUrl;
 
   getInitials(name: string): string {
     if (!name) return 'B';

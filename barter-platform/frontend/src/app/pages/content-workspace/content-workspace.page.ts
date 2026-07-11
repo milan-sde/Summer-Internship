@@ -4,25 +4,16 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CampaignService } from '../../services/campaign.service';
 import { StorageService } from '../../services/storage.service';
-import { AiService } from 'src/app/services/ai.service';
 import { environment } from 'src/environments/environment';
+import { getAvatarUrl } from '../../shared/utils/media.utils';
 import {
   IonContent,
   IonButton,
   IonIcon,
   IonSpinner,
-  IonModal,
   IonTextarea,
   IonRefresher,
   IonRefresherContent,
-  IonSelect,
-  IonSelectOption,
-  IonToggle,
-  IonItem,
-  IonText,
-  IonGrid,
-  IonRow,
-  IonCol,
   ToastController,
   LoadingController
 } from '@ionic/angular/standalone';
@@ -43,7 +34,6 @@ import {
   refreshOutline,
   copyOutline,
   arrowBackOutline,
-  sparkles,
   createOutline,
   timeOutline,
   syncOutline,
@@ -54,10 +44,10 @@ import {
   chevronDownOutline
 } from 'ionicons/icons';
 import { Subscription, forkJoin } from 'rxjs';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { HeaderComponent } from '../../shared/components/header/header.component';
+import { AiCaptionModalComponent } from '../../shared/components/ai-caption-modal/ai-caption-modal.component';
 
 @Component({
   selector: 'app-content-workspace',
@@ -68,25 +58,16 @@ import { HeaderComponent } from '../../shared/components/header/header.component
   imports: [
     CommonModule,
     FormsModule,
-    ReactiveFormsModule,
     IonContent,
     IonButton,
     IonIcon,
     IonSpinner,
-    IonModal,
     IonTextarea,
     IonRefresher,
     IonRefresherContent,
-    IonSelect,
-    IonSelectOption,
-    IonToggle,
-    IonItem,
-    IonText,
-    IonGrid,
-    IonRow,
-    IonCol,
     SidebarComponent,
-    HeaderComponent
+    HeaderComponent,
+    AiCaptionModalComponent
   ]
 })
 export class ContentWorkspacePage implements OnInit, OnDestroy {
@@ -121,11 +102,6 @@ export class ContentWorkspacePage implements OnInit, OnDestroy {
   isSubmittingContent = false;
   isPublishingToInstagram = false;
 
-  // AI caption modal
-  isAiModalOpen = false;
-  isGenerating = false;
-  aiForm!: FormGroup;
-
   get isOverview(): boolean {
     return !this.campaignId;
   }
@@ -142,8 +118,6 @@ export class ContentWorkspacePage implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private toastController: ToastController,
     private loadingController: LoadingController,
-    private fb: FormBuilder,
-    private aiService: AiService
   ) {
     addIcons({
       logoInstagram,
@@ -161,7 +135,6 @@ export class ContentWorkspacePage implements OnInit, OnDestroy {
       refreshOutline,
       copyOutline,
       arrowBackOutline,
-      sparkles,
       createOutline,
       timeOutline,
       syncOutline,
@@ -175,7 +148,6 @@ export class ContentWorkspacePage implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.currentUser = this.storage.getUser();
-    this.initForm();
   }
 
   ionViewWillEnter() {
@@ -196,17 +168,6 @@ export class ContentWorkspacePage implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.paramsSub?.unsubscribe();
-  }
-
-  initForm() {
-    this.aiForm = this.fb.group({
-      description: ['', [Validators.required]],
-      tone: ['Casual', [Validators.required]],
-      length: ['Medium', [Validators.required]],
-      platform: ['Instagram', [Validators.required]],
-      includeEmojis: [true],
-      includeHashtags: [true],
-    });
   }
 
   // ================= DATA LOADING =================
@@ -610,69 +571,14 @@ export class ContentWorkspacePage implements OnInit, OnDestroy {
     return this.submissions.filter(s => s.status === status).length;
   }
 
-  // ================= AI CAPTION =================
-
-  openAiModal() {
-    this.aiForm.reset({
-      description: '',
-      tone: 'Casual',
-      length: 'Medium',
-      platform: 'Instagram',
-      includeEmojis: true,
-      includeHashtags: true,
-    });
-    this.isAiModalOpen = true;
+  onCaptionGenerated(caption: string) {
+    this.submissionCaption = caption;
     this.cdr.markForCheck();
-  }
-
-  closeAiModal() {
-    this.isAiModalOpen = false;
-    this.cdr.markForCheck();
-  }
-
-  generateAiCaption() {
-    if (this.aiForm.invalid) {
-      this.aiForm.markAllAsTouched();
-      return;
-    }
-
-    this.isGenerating = true;
-    this.cdr.markForCheck();
-
-    this.aiService.generateCaption(this.aiForm.value).subscribe({
-      next: (response) => {
-        this.isGenerating = false;
-        if (response && response.success && response.data?.caption) {
-          this.submissionCaption = response.data.caption;
-          this.showToast('Caption generated successfully!', 'success');
-          this.closeAiModal();
-        } else {
-          this.showToast('Failed to generate caption. Please try again.', 'danger');
-        }
-        this.cdr.markForCheck();
-      },
-      error: (error) => {
-        this.isGenerating = false;
-        console.error('Caption generation failed:', error);
-        this.showToast(
-          error.error?.error?.message || error.message || 'Failed to generate caption',
-          'danger'
-        );
-        this.cdr.markForCheck();
-      }
-    });
   }
 
   // ================= UTILITIES =================
 
-  getAvatarUrl(url: string | null | undefined): string {
-    if (!url) return '';
-    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
-      return url;
-    }
-    const backendBase = environment.apiUrl.replace('/api', '');
-    return `${backendBase}${url}`;
-  }
+  getAvatarUrl = getAvatarUrl;
 
   async showToast(message: string, color: string = 'primary') {
     const toast = await this.toastController.create({

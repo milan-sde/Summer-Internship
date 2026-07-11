@@ -117,7 +117,7 @@
           @if (portfolioMedia.length > 0) {
           <div class="media-grid">
             @for (item of portfolioMedia; track item.id) {
-            <div class="media-card" (click)="openDetail(item, 'catalog')">
+            <div class="media-card" (click)="openDetail(item, 'catalog')" role="button" tabindex="0" (keydown.enter)="openDetail(item, 'catalog')" (keydown.space)="openDetail(item, 'catalog'); $event.preventDefault()">
               <!-- Media Box -->
               <div class="media-showcase-box">
                 @if (item.mediaType === 'image') {
@@ -172,7 +172,7 @@
           @if (instagramMedia.length > 0) {
           <div class="media-grid">
             @for (media of instagramMedia; track $index) {
-            <div class="media-card" (click)="openDetail(media, 'instagram')">
+            <div class="media-card" (click)="openDetail(media, 'instagram')" role="button" tabindex="0" (keydown.enter)="openDetail(media, 'instagram')" (keydown.space)="openDetail(media, 'instagram'); $event.preventDefault()">
               <!-- Media Box -->
               <div class="media-showcase-box">
                 @if (media.mediaType === 'VIDEO') {
@@ -213,94 +213,15 @@
       }
     </ion-content>
 
-    <!-- Instagram Shop Detail Viewer Modal -->
-    <ion-modal [isOpen]="isDetailModalOpen" (didDismiss)="closeDetail()" class="instagram-detail-modal">
-      <ng-template>
-        @if (selectedItem) {
-        <div class="detail-modal-container">
-          <button type="button" class="detail-close-btn" (click)="closeDetail()">&times;</button>
-          
-          <div class="detail-modal-content-wrapper">
-            <!-- Left Side: Media Panel -->
-            <div class="detail-media-panel">
-              @if (selectedItemType === 'catalog') {
-                @if (selectedItem.mediaType === 'image') {
-                  <img [src]="getMediaUrl(selectedItem.mediaUrl)" alt="Portfolio Detail" />
-                } @else if (selectedItem.mediaType === 'video') {
-                  <video [src]="getMediaUrl(selectedItem.mediaUrl)" controls autoplay playsinline></video>
-                }
-              } @else {
-                @if (selectedItem.mediaType === 'VIDEO') {
-                  <video [src]="getMediaUrl(selectedItem.mediaUrl)" [poster]="selectedItem.thumbnailUrl ? getMediaUrl(selectedItem.thumbnailUrl) : ''" controls autoplay playsinline></video>
-                } @else {
-                  <img [src]="getMediaUrl(selectedItem.mediaUrl)" alt="Instagram Post Detail" />
-                }
-              }
-            </div>
-
-            <!-- Right Side: Info Panel -->
-            <div class="detail-info-panel">
-              <!-- Header / Profile Segment -->
-              <div class="detail-author-header">
-                <div class="author-avatar-wrapper">
-                  <ion-icon [name]="selectedItemType === 'instagram' ? 'logo-instagram' : 'person-outline'" [class.instagram-logo]="selectedItemType === 'instagram'"></ion-icon>
-                </div>
-                <div class="author-info-meta">
-                  <h4>{{ selectedItemType === 'instagram' ? 'Instagram Media' : (selectedItem.title || 'Portfolio Showcase Item') }}</h4>
-                  <p class="author-subtitle">
-                    {{ selectedItemType === 'instagram' ? '@' + (profile?.username || 'influencer') : (profile?.fullName || 'Influencer Showcase') }}
-                  </p>
-                </div>
-              </div>
-
-              <!-- Main Scrolling Caption Area -->
-              <div class="detail-scrollable-body">
-                <!-- Platform / Category Badge -->
-                <div class="detail-metadata-badges">
-                  @if (selectedItemType === 'catalog') {
-                    <span class="detail-badge category">{{ selectedItem.title }}</span>
-                    <span class="detail-badge platform-badge custom-badge">Showcase</span>
-                  } @else {
-                    <span class="detail-badge platform-badge instagram-badge">Instagram</span>
-                    <span class="detail-badge type">{{ selectedItem.mediaType }}</span>
-                  }
-                </div>
-                
-                <p class="detail-caption-text">
-                  {{ selectedItemType === 'instagram' ? (selectedItem.caption || 'No caption text.') : (selectedItem.description || 'No caption text.') }}
-                </p>
-                
-                @if (selectedItem.timestamp) {
-                  <span class="detail-timestamp-date">Published: {{ selectedItem.timestamp | date:'mediumDate' }}</span>
-                }
-              </div>
-
-              <!-- Footer Actions Area (Read-Only Viewer for Brands/Visitors) -->
-              <div class="detail-footer-actions">
-                @if (selectedItemType === 'instagram' && selectedItem.permalink) {
-                  <ion-button
-                    expand="block"
-                    fill="solid"
-                    [href]="selectedItem.permalink"
-                    target="_blank"
-                    color="primary"
-                    style="margin: 0; --border-radius: 8px; font-weight: 600;"
-                  >
-                    <ion-icon name="logo-instagram" slot="start"></ion-icon>
-                    View on Instagram
-                  </ion-button>
-                } @else {
-                  <div style="font-size: 0.8rem; color: var(--ion-color-medium); text-align: center; font-weight: 500;">
-                    Barter Platform Verified Showcase Item
-                  </div>
-                }
-              </div>
-            </div>
-          </div>
-        </div>
-        }
-      </ng-template>
-    </ion-modal>
+    <app-instagram-detail-modal
+      [(isOpen)]="isDetailModalOpen"
+      [selectedItem]="selectedItem"
+      [selectedItemType]="selectedItemType"
+      [authorSubtitle]="selectedItemType === 'instagram' ? '@' + (profile?.username || 'influencer') : (profile?.fullName || 'Influencer Showcase')"
+      timestampLabel="Published:"
+      fallbackText="Barter Platform Verified Showcase Item"
+      (dismissed)="closeDetail()"
+    ></app-instagram-detail-modal>
 
   </div>
 </div>

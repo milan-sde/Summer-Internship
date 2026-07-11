@@ -307,11 +307,6 @@ export class InstagramService {
     return decrypt(account.accessToken);
   }
 
-  /**
-   * Publishes approved content to the official Instagram Graph API.
-   * Handles both IMAGE posts and VIDEO (Reels) posts.
-   * Swaps local development URLs for a public placeholder asset during testing to satisfy Meta Graph API requirements.
-   */
   async publishContent(
     userId: string,
     mediaUrl: string,
@@ -327,25 +322,20 @@ export class InstagramService {
     const instagramId = account.instagramId;
     const apiVersion = getApiVersion();
 
-    // 1. Swapping local server URLs for a public fallback when running locally
     let publicMediaUrl = mediaUrl;
-    if (mediaUrl.includes("localhost") || mediaUrl.includes("127.0.0.1") || !mediaUrl.startsWith("http")) {
+    if (!mediaUrl.startsWith("http")) {
       const hostUrl = process.env.BACKEND_URL || process.env.RENDER_EXTERNAL_URL || "http://localhost:3000";
-      const fullUrl = mediaUrl.startsWith("/") ? `${hostUrl}${mediaUrl}` : mediaUrl;
-      
-      if (fullUrl.includes("localhost") || fullUrl.includes("127.0.0.1")) {
+      publicMediaUrl = `${hostUrl}${mediaUrl}`;
+      if (publicMediaUrl.includes("localhost") || publicMediaUrl.includes("127.0.0.1")) {
         if (mediaType === "VIDEO") {
-          publicMediaUrl = "https://www.w3schools.com/html/mov_bbb.mp4"; // Sample public MP4 video
+          publicMediaUrl = "https://www.w3schools.com/html/mov_bbb.mp4";
         } else {
-          publicMediaUrl = "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=800"; // Sample Instagram image
+          publicMediaUrl = "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=800";
         }
-        console.log(`[Instagram Service] Replacing local URL '${fullUrl}' with public fallback: '${publicMediaUrl}'`);
-      } else {
-        publicMediaUrl = fullUrl;
+        console.log(`[Instagram Service] Replacing local URL with public fallback: ${publicMediaUrl}`);
       }
     }
 
-    // 2. Step 1: Create media container
     console.log(`[Instagram Service] Creating media container for ${mediaType}...`);
     let containerUrl = `https://graph.instagram.com/${apiVersion}/${instagramId}/media?caption=${encodeURIComponent(
       caption

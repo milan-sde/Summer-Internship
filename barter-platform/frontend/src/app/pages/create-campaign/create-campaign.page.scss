@@ -6,8 +6,8 @@
   --ui-border-strong: rgba(25, 41, 70, 0.14);
   --ui-text: #131927;
   --ui-text-muted: #5e6b82;
-  --ui-brand: #2f6cf6;
-  --ui-brand-strong: #1f56d8;
+  --ui-brand: #FF7A00;
+  --ui-brand-strong: #e66e00;
   --ui-shadow-soft: 0 10px 30px rgba(27, 52, 103, 0.08);
   --ui-shadow-card: 0 18px 45px rgba(27, 52, 103, 0.14);
   --ui-radius-lg: 22px;
@@ -20,7 +20,7 @@
 .app-layout {
   display: flex;
   min-height: 100vh;
-  width: 100vw;
+  width: 100%;
   background: var(--ui-bg);
 }
 
@@ -37,15 +37,15 @@ ion-content.campaign-content {
   --background:
     radial-gradient(
       circle at 8% -15%,
-      rgba(47, 108, 246, 0.18),
+      rgba(255, 122, 0, 0.12),
       transparent 44%
     ),
     radial-gradient(
       circle at 92% -5%,
-      rgba(244, 92, 68, 0.12),
+      rgba(255, 122, 0, 0.06),
       transparent 30%
     ),
-    linear-gradient(180deg, #f8faff 0%, #f3f6fb 55%, #eff3fa 100%);
+    linear-gradient(180deg, #fef8f3 0%, #fbf3ed 55%, #faf0ea 100%);
 }
 
 .onboarding-wrapper {
@@ -286,10 +286,10 @@ form {
   font-size: 0.9rem;
   letter-spacing: 0.01em;
   --border-radius: 13px;
-  --box-shadow: 0 10px 24px rgba(47, 108, 246, 0.3);
-  --background: linear-gradient(135deg, #2f6cf6 0%, #1f56d8 100%);
-  --background-hover: linear-gradient(135deg, #2861dd 0%, #1a49b8 100%);
-  --background-activated: linear-gradient(135deg, #2355c4 0%, #153c98 100%);
+  --box-shadow: 0 10px 24px rgba(255, 122, 0, 0.3);
+  --background: linear-gradient(135deg, #FF7A00 0%, #e66e00 100%);
+  --background-hover: linear-gradient(135deg, #e66e00 0%, #cc6100 100%);
+  --background-activated: linear-gradient(135deg, #cc6100 0%, #b35500 100%);
   transition: transform 0.2s ease;
 
   &:not(.button-disabled):hover {

@@ -115,7 +115,8 @@
         <!-- Loading State -->
         @if (isLoading) {
         <div class="loading-state-container">
-          <div class="skeleton-card" *ngFor="let item of [1,2,3]">
+          @for (item of [1,2,3]; track $index) {
+          <div class="skeleton-card">
             <div class="skeleton-header">
               <div class="skeleton-avatar"></div>
               <div class="skeleton-title-wrapper">
@@ -129,6 +130,7 @@
             </div>
             <div class="skeleton-footer"></div>
           </div>
+        }
         </div>
         }
 
@@ -380,9 +382,9 @@
                     @if (applicant.status === 'REJECTED') {
                     <span class="status-indicator rejected">Rejected</span>
                     }
-                  </div>
-                </div>
-                }
+          </div>
+        </div>
+        }
               </div>
             </div>
             }
@@ -434,31 +436,30 @@
 
         @if (reviewSubmissions.length === 0) {
           <div class="no-submission-review-card text-center ion-padding">
-            <ion-icon name="alert-circle-outline" style="font-size: 3rem; color: var(--ion-color-medium);"></ion-icon>
+            <ion-icon name="alert-circle-outline" class="no-submission-icon"></ion-icon>
             <h4>No deliverables uploaded yet</h4>
             <p>The influencer has not uploaded any content drafts for review yet. Please wait for them to submit.</p>
           </div>
         } @else {
-          <!-- Tabs / Selectors for each deliverable -->
-          <div class="deliverables-review-tabs" style="margin-bottom: 20px;">
-            <h5 class="workspace-section-title" style="margin-top: 0; margin-bottom: 12px; font-weight: 600;">Submitted Deliverables ({{ reviewSubmissions.length }})</h5>
-            <div class="review-tabs-container" style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px;">
+          <div class="deliverables-review-tabs">
+            <h5 class="workspace-section-title">Submitted Deliverables ({{ reviewSubmissions.length }})</h5>
+            <div class="review-tabs-container">
+              @for (sub of reviewSubmissions; track sub.id) {
               <button 
-                *ngFor="let sub of reviewSubmissions" 
                 class="review-tab-btn" 
                 [class.active]="selectedReviewSubmission?.id === sub.id"
                 (click)="selectReviewSubmission(sub)"
-                style="display: flex; flex-direction: column; align-items: flex-start; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--app-border-color); background: var(--ion-color-light); cursor: pointer; min-width: 140px; text-align: left;"
               >
-                <ion-badge [class]="sub.status | lowercase" style="margin-bottom: 6px;">{{ sub.status }}</ion-badge>
-                <span class="tab-label" style="font-size: 0.85rem; font-weight: 600; color: var(--ion-color-dark);">{{ sub.mediaType }} (Rev {{ sub.revisionNumber }})</span>
+                <ion-badge [class]="sub.status | lowercase">{{ sub.status }}</ion-badge>
+                <span class="tab-label">{{ sub.mediaType }} (Rev {{ sub.revisionNumber }})</span>
               </button>
+              }
             </div>
           </div>
 
-          <div *ngIf="selectedReviewSubmission" class="review-details-wrapper">
-            <!-- Content Status Badge -->
-            <div class="review-status-bar" style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+          @if (selectedReviewSubmission) {
+          <div class="review-details-wrapper">
+            <div class="review-status-bar">
               <span>Selected Deliverable Status:</span>
               <ion-badge class="state-badge" [class]="selectedReviewSubmission.status | lowercase">
                 {{ selectedReviewSubmission.status }}
@@ -551,6 +552,7 @@
               }
             }
           </div>
+          }
         }
       </div>
     </ion-content>

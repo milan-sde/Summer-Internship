@@ -5,7 +5,6 @@ import {
   IonButton,
   IonContent,
   IonIcon,
-  IonModal,
   ToastController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -28,9 +27,11 @@ import {
 } from 'src/app/services/instagram.service';
 import { StorageService } from 'src/app/services/storage.service';
 import { environment } from 'src/environments/environment';
+import { getMediaUrl } from '../../shared/utils/media.utils';
 
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { HeaderComponent } from '../../shared/components/header/header.component';
+import { InstagramDetailModalComponent } from '../../shared/components/instagram-detail-modal/instagram-detail-modal.component';
 
 @Component({
   selector: 'app-instagram-catalogue',
@@ -42,9 +43,9 @@ import { HeaderComponent } from '../../shared/components/header/header.component
     IonButton,
     IonIcon,
     IonContent,
-    IonModal,
     SidebarComponent,
-    HeaderComponent
+    HeaderComponent,
+    InstagramDetailModalComponent
   ],
 })
 export class InstagramCataloguePage implements OnInit {
@@ -172,18 +173,7 @@ export class InstagramCataloguePage implements OnInit {
       });
   }
 
-  getMediaUrl(url: string): string {
-    if (!url) return '';
-    if (
-      url.startsWith('http://') ||
-      url.startsWith('https://') ||
-      url.startsWith('data:')
-    ) {
-      return url;
-    }
-    const backendBase = environment.apiUrl.replace('/api', '');
-    return `${backendBase}${url}`;
-  }
+  getMediaUrl = getMediaUrl;
 
   getMediaPreview(item: InstagramMediaItem): string {
     return this.getMediaUrl(item.thumbnailUrl || item.mediaUrl);

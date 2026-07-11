@@ -1,0 +1,78 @@
+<ion-modal [isOpen]="isOpen" (didDismiss)="onClose()" class="instagram-detail-modal">
+  <ng-template>
+    @if (selectedItem) {
+    <div class="detail-modal-container">
+      <button type="button" class="detail-close-btn" (click)="onClose()" aria-label="Close details">&times;</button>
+
+      <div class="detail-modal-content-wrapper">
+        <div class="detail-media-panel">
+          @if (isCatalogImage) {
+            <img [src]="getMediaUrl(selectedItem.mediaUrl)" alt="Portfolio Detail" />
+          } @else if (isCatalogVideo) {
+            <video [src]="getMediaUrl(selectedItem.mediaUrl)" controls autoplay playsinline></video>
+          } @else if (isInstagramVideo) {
+            <video [src]="getMediaUrl(selectedItem.mediaUrl)" [poster]="selectedItem.thumbnailUrl ? getMediaUrl(selectedItem.thumbnailUrl) : ''" controls autoplay playsinline></video>
+          } @else {
+            <img [src]="getMediaUrl(selectedItem.mediaUrl)" alt="Media Detail" />
+          }
+        </div>
+
+        <div class="detail-info-panel">
+          <div class="detail-author-header">
+            <div class="author-avatar-wrapper">
+              <ion-icon [name]="authorIconName" [class.instagram-logo]="!isCatalog"></ion-icon>
+            </div>
+            <div class="author-info-meta">
+              <h4>{{ computedAuthorTitle }}</h4>
+              @if (authorSubtitle) {
+              <p class="author-subtitle">{{ authorSubtitle }}</p>
+              }
+            </div>
+          </div>
+
+          <div class="detail-scrollable-body">
+            <div class="detail-metadata-badges">
+              @if (isCatalog) {
+                <span class="detail-badge category">{{ selectedItem.title }}</span>
+                <span class="detail-badge platform-badge custom-badge">Showcase</span>
+              } @else {
+                <span class="detail-badge platform-badge instagram-badge">Instagram</span>
+                <span class="detail-badge type">{{ selectedItem.mediaType }}</span>
+              }
+            </div>
+
+            <p class="detail-caption-text">{{ captionText }}</p>
+
+            @if (selectedItem.timestamp) {
+              <span class="detail-timestamp-date">{{ timestampLabel }} {{ selectedItem.timestamp | date:'mediumDate' }}</span>
+            }
+          </div>
+
+          <div class="detail-footer-actions">
+            @if (isCatalog && showDeleteButton) {
+              <ion-button expand="block" color="danger" fill="solid" (click)="onDelete()" class="detail-delete-btn">
+                <ion-icon name="trash-outline" slot="start"></ion-icon>
+                Delete Portfolio Item
+              </ion-button>
+            } @else if (hasPermalink) {
+              <ion-button
+                expand="block"
+                fill="solid"
+                [href]="selectedItem.permalink"
+                target="_blank"
+                color="primary"
+                class="detail-view-instagram-btn"
+              >
+                <ion-icon name="logo-instagram" slot="start"></ion-icon>
+                View on Instagram
+              </ion-button>
+            } @else {
+              <div class="detail-fallback-text">{{ fallbackText }}</div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+    }
+  </ng-template>
+</ion-modal>

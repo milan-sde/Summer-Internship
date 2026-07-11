@@ -194,7 +194,7 @@
             <div class="workspace-grid">
               <!-- Left: Campaign Brief -->
               <aside class="brief-card">
-                <div class="brief-toggle-header" (click)="toggleBrief()">
+                <div class="brief-toggle-header" (click)="toggleBrief()" role="button" tabindex="0" (keydown.enter)="toggleBrief()" (keydown.space)="toggleBrief(); $event.preventDefault()">
                   <div class="brief-header-info">
                     <h4 class="brief-heading">Campaign Brief</h4>
                     @if (campaign) {
@@ -309,7 +309,7 @@
 
                   <div class="deliverable-grid">
                     @for (sub of getFilteredSubmissions(); track sub.id) {
-                      <div class="deliverable-card" (click)="selectSubmission(sub)">
+                      <div class="deliverable-card" (click)="selectSubmission(sub)" role="button" tabindex="0" (keydown.enter)="selectSubmission(sub)" (keydown.space)="selectSubmission(sub); $event.preventDefault()">
                         <div class="del-card-media">
                           @if (sub.mediaUrl) {
                             @if (sub.mediaType === 'VIDEO') {
@@ -389,7 +389,7 @@
             <div class="workspace-grid">
               <!-- Left: Campaign Brief -->
               <aside class="brief-card">
-                <div class="brief-toggle-header" (click)="toggleBrief()">
+                <div class="brief-toggle-header" (click)="toggleBrief()" role="button" tabindex="0" (keydown.enter)="toggleBrief()" (keydown.space)="toggleBrief(); $event.preventDefault()">
                   <div class="brief-header-info">
                     <h4 class="brief-heading">Campaign Brief</h4>
                     @if (campaign) {
@@ -500,7 +500,7 @@
                     <!-- Media Upload -->
                     <div class="ws-form-group">
                       <label class="ws-form-label">Upload Media</label>
-                      <div class="ws-upload-zone" (click)="fileInput.click()">
+                      <div class="ws-upload-zone" (click)="fileInput.click()" role="button" tabindex="0" (keydown.enter)="fileInput.click()" (keydown.space)="fileInput.click(); $event.preventDefault()">
                         @if (submissionFilePreview) {
                           <div class="ws-media-preview">
                             @if (submissionMediaType === 'VIDEO') {
@@ -533,7 +533,7 @@
                     <div class="ws-form-group">
                       <div class="ws-form-label-row">
                         <label class="ws-form-label">Instagram Caption</label>
-                        <button class="ws-ai-btn" (click)="openAiModal()">
+                        <button class="ws-ai-btn" (click)="aiCaptionModal.open()">
                           <ion-icon name="sparkles"></ion-icon> Generate with AI
                         </button>
                       </div>
@@ -629,114 +629,4 @@
   </div>
 </div>
 
-<!-- ================= AI CAPTION ASSISTANT MODAL ================= -->
-<ion-modal [isOpen]="isAiModalOpen" (didDismiss)="isAiModalOpen = false" class="ai-caption-modal">
-  <ng-template>
-    <div class="ai-modal-header">
-      <h3>
-        <ion-icon name="sparkles" class="ai-icon"></ion-icon>
-        AI Caption Assistant
-      </h3>
-      <button type="button" class="close-modal-btn" (click)="closeAiModal()">&times;</button>
-    </div>
-
-    <div class="ai-modal-content">
-      <form [formGroup]="aiForm" (ngSubmit)="generateAiCaption()">
-
-        <!-- Description Field -->
-        <div class="custom-input-group">
-          <label class="custom-input-label">Describe your post *</label>
-          <ion-item lines="none" class="custom-input-item text-area-item">
-            <ion-textarea
-              formControlName="description"
-              rows="3"
-              placeholder="What is this post about? E.g., showing off a new skincare routine..."
-            ></ion-textarea>
-          </ion-item>
-          @if (aiForm.get('description')?.touched && aiForm.get('description')?.invalid) {
-          <div class="validation-error">
-            <ion-text color="danger">
-              <small>Post description is required.</small>
-            </ion-text>
-          </div>
-          }
-        </div>
-
-        <ion-grid class="ion-no-padding">
-          <ion-row>
-            <ion-col size="12" size-md="6" class="ion-no-padding responsive-col-left">
-              <div class="custom-input-group">
-                <label class="custom-input-label">Platform</label>
-                <ion-item lines="none" class="custom-input-item">
-                  <ion-select formControlName="platform" interface="popover" class="form-select" style="width: 100%;">
-                    <ion-select-option value="Instagram">Instagram</ion-select-option>
-                    <ion-select-option value="LinkedIn">LinkedIn</ion-select-option>
-                    <ion-select-option value="Facebook">Facebook</ion-select-option>
-                    <ion-select-option value="X">X (Twitter)</ion-select-option>
-                  </ion-select>
-                </ion-item>
-              </div>
-            </ion-col>
-
-            <ion-col size="12" size-md="6" class="ion-no-padding responsive-col-right">
-              <div class="custom-input-group">
-                <label class="custom-input-label">Tone</label>
-                <ion-item lines="none" class="custom-input-item">
-                  <ion-select formControlName="tone" interface="popover" class="form-select" style="width: 100%;">
-                    <ion-select-option value="Casual">Casual</ion-select-option>
-                    <ion-select-option value="Professional">Professional</ion-select-option>
-                    <ion-select-option value="Funny">Funny</ion-select-option>
-                    <ion-select-option value="Friendly">Friendly</ion-select-option>
-                    <ion-select-option value="Motivational">Motivational</ion-select-option>
-                    <ion-select-option value="Luxury">Luxury</ion-select-option>
-                  </ion-select>
-                </ion-item>
-              </div>
-            </ion-col>
-          </ion-row>
-
-          <ion-row>
-            <ion-col size="12" size-md="6" class="ion-no-padding responsive-col-left">
-              <div class="custom-input-group">
-                <label class="custom-input-label">Length</label>
-                <ion-item lines="none" class="custom-input-item">
-                  <ion-select formControlName="length" interface="popover" class="form-select" style="width: 100%;">
-                    <ion-select-option value="Short">Short</ion-select-option>
-                    <ion-select-option value="Medium">Medium</ion-select-option>
-                    <ion-select-option value="Long">Long</ion-select-option>
-                  </ion-select>
-                </ion-item>
-              </div>
-            </ion-col>
-
-            <ion-col size="12" size-md="6" class="ion-no-padding responsive-col-right" style="display: flex; gap: 16px; align-items: center; margin-top: 12px; margin-bottom: 20px;">
-              <div style="display: flex; align-items: center; gap: 6px;">
-                <ion-toggle formControlName="includeEmojis" justify="space-between"></ion-toggle>
-                <span class="custom-input-label" style="margin-bottom: 0;">Emojis</span>
-              </div>
-              <div style="display: flex; align-items: center; gap: 6px;">
-                <ion-toggle formControlName="includeHashtags" justify="space-between"></ion-toggle>
-                <span class="custom-input-label" style="margin-bottom: 0;">Hashtags</span>
-              </div>
-            </ion-col>
-          </ion-row>
-        </ion-grid>
-
-        <div class="modal-actions" style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px; border-top: 1px solid var(--app-border-color); padding-top: 16px;">
-          <ion-button type="button" fill="clear" color="medium" (click)="closeAiModal()" [disabled]="isGenerating">
-            Cancel
-          </ion-button>
-          <ion-button type="submit" class="generate-submit-btn" [disabled]="isGenerating || aiForm.invalid" style="min-width: 140px;">
-            @if (isGenerating) {
-              <ion-spinner name="crescent" slot="start" size="small"></ion-spinner>
-              Generating...
-            } @else {
-              <ion-icon name="sparkles" slot="start"></ion-icon>
-              Generate
-            }
-          </ion-button>
-        </div>
-      </form>
-    </div>
-  </ng-template>
-</ion-modal>
+<app-ai-caption-modal #aiCaptionModal (captionGenerated)="onCaptionGenerated($event)"></app-ai-caption-modal>

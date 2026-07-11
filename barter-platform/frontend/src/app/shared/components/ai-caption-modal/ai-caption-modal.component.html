@@ -1,0 +1,109 @@
+<ion-modal [isOpen]="isOpen" (didDismiss)="close()" class="ai-caption-modal">
+  <ng-template>
+    <div class="ai-modal-header">
+      <h3>
+        <ion-icon name="sparkles" class="ai-icon"></ion-icon>
+        AI Caption Assistant
+      </h3>
+      <button type="button" class="close-modal-btn" (click)="close()" aria-label="Close modal">&times;</button>
+    </div>
+
+    <div class="ai-modal-content">
+      <form [formGroup]="aiForm" (ngSubmit)="generate()">
+
+        <div class="custom-input-group">
+          <label class="custom-input-label">Describe your post *</label>
+          <ion-item lines="none" class="custom-input-item text-area-item">
+            <ion-textarea
+              formControlName="description"
+              rows="3"
+              placeholder="What is this post about? E.g., showing off a new skincare routine..."
+            ></ion-textarea>
+          </ion-item>
+          @if (aiForm.get('description')?.touched && aiForm.get('description')?.invalid) {
+          <div class="validation-error">
+            <ion-text color="danger">
+              <small>Post description is required.</small>
+            </ion-text>
+          </div>
+          }
+        </div>
+
+        <ion-grid class="ion-no-padding">
+          <ion-row>
+            <ion-col size="12" size-md="6" class="ion-no-padding responsive-col-left">
+              <div class="custom-input-group">
+                <label class="custom-input-label">Platform</label>
+                <ion-item lines="none" class="custom-input-item">
+                  <ion-select formControlName="platform" interface="popover" class="form-select">
+                    <ion-select-option value="Instagram">Instagram</ion-select-option>
+                    <ion-select-option value="LinkedIn">LinkedIn</ion-select-option>
+                    <ion-select-option value="Facebook">Facebook</ion-select-option>
+                    <ion-select-option value="X">X (Twitter)</ion-select-option>
+                  </ion-select>
+                </ion-item>
+              </div>
+            </ion-col>
+
+            <ion-col size="12" size-md="6" class="ion-no-padding responsive-col-right">
+              <div class="custom-input-group">
+                <label class="custom-input-label">Tone</label>
+                <ion-item lines="none" class="custom-input-item">
+                  <ion-select formControlName="tone" interface="popover" class="form-select">
+                    <ion-select-option value="Casual">Casual</ion-select-option>
+                    <ion-select-option value="Professional">Professional</ion-select-option>
+                    <ion-select-option value="Funny">Funny</ion-select-option>
+                    <ion-select-option value="Friendly">Friendly</ion-select-option>
+                    <ion-select-option value="Motivational">Motivational</ion-select-option>
+                    <ion-select-option value="Luxury">Luxury</ion-select-option>
+                  </ion-select>
+                </ion-item>
+              </div>
+            </ion-col>
+          </ion-row>
+
+          <ion-row>
+            <ion-col size="12" size-md="6" class="ion-no-padding responsive-col-left">
+              <div class="custom-input-group">
+                <label class="custom-input-label">Length</label>
+                <ion-item lines="none" class="custom-input-item">
+                  <ion-select formControlName="length" interface="popover" class="form-select">
+                    <ion-select-option value="Short">Short</ion-select-option>
+                    <ion-select-option value="Medium">Medium</ion-select-option>
+                    <ion-select-option value="Long">Long</ion-select-option>
+                  </ion-select>
+                </ion-item>
+              </div>
+            </ion-col>
+
+            <ion-col size="12" size-md="6" class="ion-no-padding responsive-col-right toggles-col">
+              <div class="toggle-group">
+                <ion-toggle formControlName="includeEmojis" justify="space-between"></ion-toggle>
+                <span class="custom-input-label toggle-label">Emojis</span>
+              </div>
+              <div class="toggle-group">
+                <ion-toggle formControlName="includeHashtags" justify="space-between"></ion-toggle>
+                <span class="custom-input-label toggle-label">Hashtags</span>
+              </div>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+
+        <div class="modal-actions">
+          <ion-button type="button" fill="clear" color="medium" (click)="close()" [disabled]="isGenerating">
+            Cancel
+          </ion-button>
+          <ion-button type="submit" class="generate-submit-btn" [disabled]="isGenerating || aiForm.invalid">
+            @if (isGenerating) {
+              <ion-spinner name="crescent" slot="start" size="small"></ion-spinner>
+              Generating...
+            } @else {
+              <ion-icon name="sparkles" slot="start"></ion-icon>
+              Generate
+            }
+          </ion-button>
+        </div>
+      </form>
+    </div>
+  </ng-template>
+</ion-modal>

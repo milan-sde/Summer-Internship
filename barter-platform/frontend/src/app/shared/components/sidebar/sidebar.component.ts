@@ -1,8 +1,11 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd, RouterLink } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
 import { StorageService } from '../../../services/storage.service';
 import { AuthService } from '../../../services/auth.service';
+import { AppStateService, UserState } from '../../../services/app-state.service';
 import { IonIcon, LoadingController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -15,7 +18,6 @@ import {
   closeOutline,
   documentTextOutline
 } from 'ionicons/icons';
-import { filter } from 'rxjs/operators';
 
 interface MenuItem {
   label: string;
@@ -31,12 +33,13 @@ interface MenuItem {
   standalone: true,
   imports: [CommonModule, RouterLink, IonIcon]
 })
-export class SidebarComponent implements OnInit {
+export class SidebarComponent implements OnInit, OnDestroy {
   @Input() isOpen = false;
   @Output() closeSidebar = new EventEmitter<void>();
 
-  user: any;
+  user: UserState = { id: '', email: '', role: '', fullName: '', avatarUrl: '', onboardingCompleted: false };
   currentRoute = '';
+  private userSub?: Subscription;
 
   menuItems: MenuItem[] = [
     {
@@ -75,7 +78,7 @@ export class SidebarComponent implements OnInit {
   ];
 
   constructor(
-    private storage: StorageService,
+    private appState: AppStateService,
     private authService: AuthService,
     private router: Router,
     private loadingController: LoadingController
@@ -100,8 +103,16 @@ export class SidebarComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.user = this.storage.getUser();
+    this.userSub = this.appState.user$.subscribe(u => this.user = u);
     this.currentRoute = this.router.url;
+  }
+
+  ngOnDestroy() {
+    this.userSub?.unsubscribe();
+  }
+
+  onAvatarError() {
+    this.user = { ...this.user, avatarUrl: '' };
   }
 
   shouldShowItem(item: MenuItem): boolean {

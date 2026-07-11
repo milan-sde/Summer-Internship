@@ -4,6 +4,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { ProfileService } from '../../services/profile.service';
 import { StorageService } from '../../services/storage.service';
+import { AppStateService } from '../../services/app-state.service';
 import { AnalyticsService, InfluencerAnalytics, BrandAnalytics } from '../../services/analytics.service';
 import {
   IonIcon,
@@ -84,6 +85,7 @@ export class DashboardPage implements OnInit {
   constructor(
     private authService: AuthService,
     private profileService: ProfileService,
+    private appState: AppStateService,
     private storage: StorageService,
     private analyticsService: AnalyticsService,
     private router: Router,
@@ -116,7 +118,7 @@ export class DashboardPage implements OnInit {
   }
 
   ngOnInit() {
-    this.user = this.storage.getUser();
+    this.appState.user$.subscribe((u: any) => this.user = u);
     this.loadProfile();
     this.checkInstagramCallback();
     this.loadAnalytics();
@@ -211,6 +213,7 @@ export class DashboardPage implements OnInit {
     this.profileService.getMyProfile().subscribe({
       next: (profile: any) => {
         this.user = { ...this.user, ...profile };
+        this.appState.setFromProfile(profile);
         if (callback) callback();
       },
       error: (error: any) => {
