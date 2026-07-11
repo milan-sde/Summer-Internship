@@ -48,6 +48,7 @@
                   [src]="getMediaUrl(profile.avatarUrl)"
                   class="profile-avatar-img"
                   alt="Avatar"
+                  (error)="profile.avatarUrl = ''"
                 />
                 } @else {
                 <span class="profile-avatar-initial">

@@ -10,6 +10,7 @@ import {
 import { StorageService } from '../../services/storage.service';
 import { Router } from '@angular/router';
 import { ProfileService } from 'src/app/services/profile.service';
+import { AppStateService } from '../../services/app-state.service';
 import { environment } from 'src/environments/environment';
 import { getAvatarUrl } from '../../shared/utils/media.utils';
 import {
@@ -125,6 +126,7 @@ export class CompleteProfilePage implements OnInit {
     private fb: FormBuilder,
     private profileService: ProfileService,
     private storage: StorageService,
+    private appState: AppStateService,
     private router: Router,
     private toastController: ToastController,
     private loadingController: LoadingController,
@@ -281,6 +283,7 @@ export class CompleteProfilePage implements OnInit {
               this.avatarPreview = uploadedPath;
               // Patch form control to store relative URL path
               this.profileForm.patchValue({ avatarUrl: uploadedPath });
+              this.appState.setFromProfile({ avatarUrl: uploadedPath });
               this.showToast('Image uploaded successfully!', 'success');
             }
           },

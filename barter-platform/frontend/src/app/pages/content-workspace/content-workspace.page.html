@@ -94,7 +94,7 @@
                       <div class="ov-brand-info">
                         <div class="ov-brand-avatar">
                           @if (item.campaign.brandLogo) {
-                            <img [src]="getAvatarUrl(item.campaign.brandLogo)" alt="Brand" />
+                            <img [src]="getAvatarUrl(item.campaign.brandLogo)" alt="Brand" (error)="item.campaign.brandLogo = ''" />
                           } @else {
                             <span class="ov-brand-initial">{{ item.campaign.brandName?.charAt(0) || 'B' }}</span>
                           }

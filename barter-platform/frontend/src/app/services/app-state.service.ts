@@ -14,12 +14,16 @@ export interface UserState {
 
 const backendBase = environment.apiUrl.replace('/api', '');
 
+let avatarCacheBust = 0;
+
 function resolveAvatarUrl(url: string | null | undefined): string {
   if (!url) return '';
+  const separator = url.includes('?') ? '&' : '?';
+  const cacheBust = `_cb=${avatarCacheBust}`;
   if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
-    return url;
+    return `${url}${separator}${cacheBust}`;
   }
-  return `${backendBase}${url}`;
+  return `${backendBase}${url}${separator}${cacheBust}`;
 }
 
 @Injectable({
@@ -40,7 +44,7 @@ export class AppStateService {
         email: (stored as any).email || '',
         role: (stored as any).role || '',
         fullName: (stored as any).fullName || '',
-        avatarUrl: resolveAvatarUrl((stored as any).avatarUrl || ''),
+        avatarUrl: resolveAvatarUrl((stored as any).avatarUrl || (stored as any).avatar || ''),
         onboardingCompleted: (stored as any).onboardingCompleted || false,
       };
     }
@@ -58,7 +62,8 @@ export class AppStateService {
   setUser(user: Partial<UserState>): void {
     const current = this.currentUser;
     const updated = { ...current, ...user };
-    if (updated.avatarUrl) {
+    if (updated.avatarUrl && updated.avatarUrl !== current.avatarUrl?.replace(/[?&]_cb=\d+/, '')) {
+      avatarCacheBust++;
       updated.avatarUrl = resolveAvatarUrl(updated.avatarUrl);
     }
     this.userSubject.next(updated);
@@ -71,7 +76,7 @@ export class AppStateService {
       email: user.email || '',
       role: user.role || '',
       fullName: user.fullName || '',
-      avatarUrl: user.avatarUrl || '',
+      avatarUrl: user.avatarUrl || user.avatar || '',
       onboardingCompleted: user.onboardingCompleted || false,
     });
   }

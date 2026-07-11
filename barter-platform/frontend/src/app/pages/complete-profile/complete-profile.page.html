@@ -38,7 +38,7 @@
             <div class="avatar-picker-wrapper">
               <div class="avatar-picker" (click)="fileInput.click()">
                 @if (avatarPreview) {
-                <img [src]="getAvatarUrl(avatarPreview)" alt="Avatar Preview" />
+                <img [src]="getAvatarUrl(avatarPreview)" alt="Avatar Preview" (error)="avatarPreview = null" />
                 } @else {
                 <span>{{ getInitials() }}</span>
                 }

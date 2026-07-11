@@ -206,9 +206,7 @@ const profileSchema = new Schema<IProfile>(
         delete ret._id;
         delete ret.__v;
 
-        if (ret.avatarUrl && !ret.avatarUrl.startsWith("http")) {
-          ret.avatarUrl = "http://localhost:3000" + ret.avatarUrl;
-        }
+        // Frontend resolves relative URLs via getMediaUrl; no prefix needed here
 
         return ret;
       },

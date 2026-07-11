@@ -11,6 +11,7 @@ export interface User {
   email: string;
   role: 'INFLUENCER' | 'BRAND';
   onboardingCompleted: boolean;
+  avatar?: string;
 }
 
 @Injectable({

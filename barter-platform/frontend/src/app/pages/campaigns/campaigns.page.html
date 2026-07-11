@@ -160,6 +160,7 @@
                     [src]="getAvatarUrl(campaign.brandLogo)"
                     class="brand-avatar-img"
                     alt="Brand Logo"
+                    (error)="campaign.brandLogo = ''"
                   />
                   } @else {
                   <span class="brand-avatar-initial">
@@ -325,6 +326,7 @@
                         [src]="getAvatarUrl(applicant.avatarUrl)"
                         class="applicant-avatar-img"
                         alt="Applicant Avatar"
+                        (error)="applicant.avatarUrl = ''"
                       />
                       } @else {
                       <span class="applicant-avatar-initial">
@@ -418,7 +420,7 @@
           <div class="applicant-profile-info">
             <div class="applicant-avatar-circle">
               @if (selectedApplicantForReview?.avatarUrl) {
-                <img [src]="getAvatarUrl(selectedApplicantForReview.avatarUrl)" class="applicant-avatar-img" alt="Avatar" />
+                <img [src]="getAvatarUrl(selectedApplicantForReview.avatarUrl)" class="applicant-avatar-img" alt="Avatar" (error)="selectedApplicantForReview.avatarUrl = ''" />
               } @else {
                 <span class="applicant-avatar-initial">{{ getInitials(selectedApplicantForReview?.fullName || '') }}</span>
               }

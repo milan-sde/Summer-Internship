@@ -127,6 +127,7 @@ export interface UserResponseDto {
   role: string;
   isEmailVerified: boolean;
   onboardingCompleted: boolean;
+  avatar?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -142,6 +143,7 @@ export interface AuthResponseDto {
       email: string;
       role: string;
       onboardingCompleted: boolean;
+      avatar?: string;
     };
     accessToken: string;
     refreshToken: string;

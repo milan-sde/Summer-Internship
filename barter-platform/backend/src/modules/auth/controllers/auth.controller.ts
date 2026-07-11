@@ -160,6 +160,7 @@ export const getMe = asyncHandler(async (req: Request, res: Response) => {
         role: user.role,
         isEmailVerified: user.isEmailVerified,
         onboardingCompleted: user.onBoardingCompleted,
+        avatar: user.avatar || undefined,
         createdAt: user.createdAt,
       },
     },
