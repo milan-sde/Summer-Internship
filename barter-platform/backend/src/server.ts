@@ -7,6 +7,7 @@ import dotenv from "dotenv";
 import path from "path";
 import { requestLogger } from "@shared/middlewares/request-logger";
 import { errorHandler } from "@shared/middlewares/error-handler";
+import { generalLimiter } from "@shared/middlewares/rate-limiter";
 import { connectDatabase } from "@shared/database/connection";
 import { authenticate, requireRole } from "@shared/middlewares/auth.middleware";
 import authRoutes from "@modules/auth/routes/auth.routes";
@@ -50,6 +51,9 @@ app.use("/static", express.static(path.join(__dirname, "..", "static")));
 
 //cookie parser:
 app.use(cookieParser());
+
+//general rate limiter:
+app.use("/api", generalLimiter);
 
 //logging:
 app.use(requestLogger);

@@ -113,6 +113,34 @@ export class AuthService {
     this.router.navigate(['/login']);
   }
 
+  // Send forgot password request to receive OTP on email
+  forgotPassword(email: string): Observable<any> {
+    return this.http.post(
+      `${this.apiUrl}/auth/forgot-password`,
+      { email },
+      { withCredentials: true },
+    );
+  }
+
+  // Reset password using OTP and new password
+  resetPassword(
+    email: string,
+    otp: string,
+    password: string,
+    confirmPassword: string,
+  ): Observable<any> {
+    return this.http.post(
+      `${this.apiUrl}/auth/reset-password`,
+      {
+        email,
+        token: otp,
+        password,
+        confirmPassword,
+      },
+      { withCredentials: true },
+    );
+  }
+
   // Fetch current user details synchronously from local storage cache
   getCurrentUser(): User | null {
     if (!this.currentUser) {

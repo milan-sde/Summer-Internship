@@ -14,7 +14,6 @@ declare global {
 
 const authService = new AuthService();
 
-// Register: Send OTP to user email
 export const register = asyncHandler(async (req: Request, res: Response) => {
   console.log("Registration request reached controller");
   await authService.register(req.body);
@@ -26,7 +25,6 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
-// Verify OTP: Confirm email address
 export const verifyOtp = asyncHandler(async (req: Request, res: Response) => {
   await authService.verifyOtp(req.body);
 
@@ -36,7 +34,6 @@ export const verifyOtp = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
-// Create Password: Set password after OTP verification
 export const createPassword = asyncHandler(
   async (req: Request, res: Response) => {
     await authService.createPassword(req.body);
@@ -48,16 +45,17 @@ export const createPassword = asyncHandler(
   },
 );
 
-// Login: Authenticate and get tokens
 export const login = asyncHandler(async (req: Request, res: Response) => {
-  const result = await authService.login(req.body);
+  const result = await authService.login(req.body, {
+    ipAddress: req.ip || req.socket.remoteAddress || undefined,
+    userAgent: req.headers["user-agent"] || undefined,
+  });
 
-  // Set refresh token as HTTP-only cookie (more secure)
   res.cookie("refreshToken", result.data.refreshToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
   res.status(200).json({
@@ -65,17 +63,14 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
     data: {
       user: result.data.user,
       accessToken: result.data.accessToken,
-      refreshToken: result.data.refreshToken, // Send refresh token in JSON body for frontend storage
+      refreshToken: result.data.refreshToken,
     },
   });
 });
 
-// Refresh Token: Get new access token using refresh token
 export const refresh = asyncHandler(async (req: Request, res: Response) => {
-  // Get refresh token from cookie or body
   let refreshToken = req.cookies.refreshToken || req.body.refreshToken;
 
-  // Convert stringified "undefined" or "null" from frontend back to undefined
   if (refreshToken === "undefined" || refreshToken === "null") {
     refreshToken = undefined;
   }
@@ -92,7 +87,6 @@ export const refresh = asyncHandler(async (req: Request, res: Response) => {
 
   const result = await authService.refreshTokens(refreshToken);
 
-  // Set new refresh token cookie
   res.cookie("refreshToken", result.data.refreshToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
@@ -105,20 +99,21 @@ export const refresh = asyncHandler(async (req: Request, res: Response) => {
     data: {
       user: result.data.user,
       accessToken: result.data.accessToken,
-      refreshToken: result.data.refreshToken, // Send new refresh token in JSON body for frontend storage
+      refreshToken: result.data.refreshToken,
     },
   });
 });
 
-// Logout: Invalidate refresh token
 export const logout = asyncHandler(async (req: Request, res: Response) => {
   const userId = req.user?.userId;
 
   if (userId) {
-    await authService.logout(userId);
+    await authService.logout(userId, {
+      ipAddress: req.ip || req.socket.remoteAddress || undefined,
+      userAgent: req.headers["user-agent"] || undefined,
+    });
   }
 
-  // Clear refresh token cookie
   res.clearCookie("refreshToken");
 
   res.status(200).json({
@@ -127,7 +122,6 @@ export const logout = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
-// Resend OTP to user email
 export const resendOtp = asyncHandler(async (req: Request, res: Response) => {
   await authService.resendOtp(req.body.email);
 
@@ -137,7 +131,31 @@ export const resendOtp = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
-// Get currently logged in user profile details
+// Forgot password: Send password reset OTP
+export const forgotPassword = asyncHandler(
+  async (req: Request, res: Response) => {
+    await authService.forgotPassword(req.body.email);
+
+    res.status(200).json({
+      success: true,
+      message:
+        "If an account with that email exists, a password reset code has been sent.",
+    });
+  },
+);
+
+// Reset password: Verify OTP and set new password
+export const resetPassword = asyncHandler(
+  async (req: Request, res: Response) => {
+    await authService.resetPassword(req.body);
+
+    res.status(200).json({
+      success: true,
+      message: "Password reset successfully. You can now login.",
+    });
+  },
+);
+
 export const getMe = asyncHandler(async (req: Request, res: Response) => {
   const user = await authService.getUserById(req.user!.userId);
 

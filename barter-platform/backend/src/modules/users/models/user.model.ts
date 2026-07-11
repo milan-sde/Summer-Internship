@@ -12,12 +12,14 @@ export interface IUser extends Document {
   password: string | null;
   role: UserRole;
   isEmailVerified: boolean;
+  emailVerifiedAt: Date | null;
   onBoardingCompleted: boolean;
   lastLoginAt: Date;
   refreshTokenVersion: number;
   avatar?: string | null;
   createdAt: Date;
   updatedAt: Date;
+  deletedAt: Date | null;
 
   comparePassword(candidatePassword: string): Promise<boolean>;
   incrementRefreshTokenVersion(): Promise<void>;
@@ -55,6 +57,11 @@ const userSchema = new Schema<IUser>(
       default: false,
     },
 
+    emailVerifiedAt: {
+      type: Date,
+      default: null,
+    },
+
     onBoardingCompleted: {
       type: Boolean,
       default: false,
@@ -71,6 +78,11 @@ const userSchema = new Schema<IUser>(
     },
     avatar: {
       type: String,
+      default: null,
+    },
+
+    deletedAt: {
+      type: Date,
       default: null,
     },
   },

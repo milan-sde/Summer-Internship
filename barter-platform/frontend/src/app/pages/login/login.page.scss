@@ -75,6 +75,16 @@
   }
 }
 
+.forgot-password-link {
+  text-align: right;
+  margin-top: 8px;
+
+  .link {
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+}
+
 .submit-btn {
   margin-top: 24px;
   height: 48px;

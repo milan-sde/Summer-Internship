@@ -177,4 +177,53 @@ If you didn't do this, please contact support immediately.
       `);
     }
   }
+
+  // Send password reset OTP email
+  async sendPasswordResetEmail(email: string, otp: string): Promise<void> {
+    const emailRegex = /^\S+@\S+\.\S+$/;
+    if (!emailRegex.test(email)) {
+      throw new ValidationError("Invalid email format");
+    }
+
+    const expiresInMinutes = process.env.OTP_EXPIRY_MINUTES || "10";
+
+    if (this.useMock || !this.resend) {
+      if (process.env.NODE_ENV !== "development") {
+        throw new Error("Resend transporter is not configured in production");
+      }
+      console.log(`
+📧 ========== PASSWORD RESET EMAIL ==========
+To: ${email}
+Subject: Reset your KonnectNow password
+
+Your password reset code is: ${otp}
+
+This code will expire in ${expiresInMinutes} minutes.
+
+If you didn't request this, please ignore this email.
+==============================================
+      `);
+      return;
+    }
+
+    try {
+      const fromName = process.env.EMAIL_FROM_NAME || "KonnectNow";
+      const fromAddress = process.env.EMAIL_FROM_ADDRESS || "onboarding@resend.dev";
+      const otpSpaced = otp.split("").join(" ");
+
+      const response = await this.resend.emails.send({
+        from: `${fromName} <${fromAddress}>`,
+        to: email,
+        subject: "Reset your KonnectNow password",
+        text: `KonnectNow\n\nReset your password\n\nUse the code below to reset your password:\n\n${otpSpaced}\n\nThis code expires in ${expiresInMinutes} minutes.\n\nIf you did not request this code, you can ignore this email.\n\nKonnectNow Team`,
+      });
+
+      if (response.error) {
+        throw response.error;
+      }
+    } catch (error: any) {
+      console.error(`Error sending password reset email to ${email}:`, error.message || error);
+      throw new Error("Email delivery failed");
+    }
+  }
 }
