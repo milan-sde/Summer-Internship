@@ -46,10 +46,12 @@
   </div>
 
   @if (isNotificationPanelOpen) {
-    <app-notification-panel
-      [isOpen]="isNotificationPanelOpen"
-      (closePanel)="closeNotificationPanel()"
-      (unreadCountChanged)="onUnreadCountChanged($event)"
-    ></app-notification-panel>
+    <div class="notification-tether">
+      <app-notification-panel
+        [isOpen]="isNotificationPanelOpen"
+        (closePanel)="closeNotificationPanel()"
+        (unreadCountChanged)="onUnreadCountChanged($event)"
+      ></app-notification-panel>
+    </div>
   }
 </header>
