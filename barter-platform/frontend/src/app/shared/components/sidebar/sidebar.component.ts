@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd, RouterLink } from '@angular/router';
 import { StorageService } from '../../../services/storage.service';
 import { AuthService } from '../../../services/auth.service';
-import { IonIcon, IonButton, LoadingController } from '@ionic/angular/standalone';
+import { IonIcon, LoadingController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   appsOutline,
@@ -29,7 +29,7 @@ interface MenuItem {
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss'],
   standalone: true,
-  imports: [CommonModule, RouterLink, IonIcon, IonButton]
+  imports: [CommonModule, RouterLink, IonIcon]
 })
 export class SidebarComponent implements OnInit {
   @Input() isOpen = false;

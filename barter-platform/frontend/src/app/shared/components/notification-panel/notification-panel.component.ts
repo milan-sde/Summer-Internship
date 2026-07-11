@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { NotificationService, INotification } from '../../../services/notification.service';
-import { IonIcon, IonButton, IonSpinner } from '@ionic/angular/standalone';
+import { IonIcon, IonSpinner } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { checkmarkDoneOutline, timeOutline, alertCircleOutline } from 'ionicons/icons';
 
@@ -12,7 +12,7 @@ import { checkmarkDoneOutline, timeOutline, alertCircleOutline } from 'ionicons/
   templateUrl: './notification-panel.component.html',
   styleUrls: ['./notification-panel.component.scss'],
   standalone: true,
-  imports: [CommonModule, IonIcon, IonButton, IonSpinner],
+  imports: [CommonModule, IonIcon, IonSpinner],
 })
 export class NotificationPanelComponent implements OnInit, OnDestroy {
   @Input() isOpen = false;

@@ -9,9 +9,6 @@ import {
 import { Router, RouterLink } from '@angular/router';
 import {
   IonContent,
-  IonHeader,
-  IonTitle,
-  IonToolbar,
   IonIcon,
   IonItem,
   IonInput,
@@ -41,9 +38,6 @@ import { AuthService } from 'src/app/services/auth.service';
     IonInput,
     IonIcon,
     IonContent,
-    IonHeader,
-    IonTitle,
-    IonToolbar,
     IonButton,
     CommonModule,
     ReactiveFormsModule,

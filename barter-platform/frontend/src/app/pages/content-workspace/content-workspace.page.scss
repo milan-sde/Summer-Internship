@@ -1,9 +1,16 @@
 // ─── App Layout ────────────────────────────────────────────────────────
 .app-layout-container {
-  display: flex;
-  min-height: 100vh;
   width: 100%;
+  min-height: 100vh;
   background-color: var(--ion-color-light);
+
+  @media (min-width: 992px) {
+    display: flex;
+  }
+
+  @media (max-width: 991px) {
+    display: block;
+  }
 }
 
 .main-content-viewport {
@@ -25,11 +32,15 @@ ion-content {
   min-width: 0;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 12px 12px;
+  padding: 12px;
   box-sizing: border-box;
 
   @media (min-width: 992px) {
-    padding: 24px 24px;
+    padding: 24px;
+  }
+
+  @media (max-width: 360px) {
+    padding: 8px;
   }
 }
 
@@ -108,6 +119,7 @@ ion-content {
   grid-template-columns: repeat(2, 1fr);
   gap: 12px;
   margin-bottom: 28px;
+  min-width: 0;
 
   @media (min-width: 500px) {
     grid-template-columns: repeat(3, 1fr);
@@ -171,6 +183,7 @@ ion-content {
   display: grid;
   grid-template-columns: 1fr;
   gap: 16px;
+  min-width: 0;
 
   @media (min-width: 700px) {
     grid-template-columns: repeat(2, 1fr);
@@ -263,6 +276,7 @@ ion-content {
   padding: 12px;
   background: var(--ion-color-light-tint);
   border-radius: 10px;
+  min-width: 0;
 }
 
 .ov-progress-item {
@@ -349,6 +363,7 @@ ion-content {
   height: 32px;
   width: 80px;
   display: inline-block;
+  flex-shrink: 0;
 }
 
 .skeleton-deliverable {
@@ -376,12 +391,14 @@ ion-content {
   gap: 6px;
   margin-bottom: 16px;
   flex-wrap: wrap;
+  min-width: 0;
 }
 
 .skeleton-cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 16px;
+  min-width: 0;
 }
 
 .loading-state-container {
@@ -408,6 +425,10 @@ ion-content {
     gap: 10px;
     padding: 0 0 12px;
     margin-bottom: 16px;
+  }
+
+  @media (max-width: 360px) {
+    gap: 8px;
   }
 
   .page-header-info {
@@ -515,6 +536,8 @@ ion-content {
   display: flex;
   gap: 24px;
   align-items: flex-start;
+  width: 100%;
+  max-width: 100%;
   min-width: 0;
 
   @media (max-width: 991px) {
@@ -532,6 +555,7 @@ ion-content {
 
   @media (min-width: 992px) {
     width: 280px;
+    min-width: 0;
     flex-shrink: 0;
     position: sticky;
     top: 24px;
@@ -540,6 +564,7 @@ ion-content {
 
   @media (max-width: 991px) {
     width: 100%;
+    min-width: 0;
   }
 }
 
@@ -557,6 +582,10 @@ ion-content {
   @media (min-width: 992px) {
     cursor: default;
     padding: 20px 20px 0;
+  }
+
+  @media (max-width: 360px) {
+    padding: 12px 14px;
   }
 
   .brief-heading {
@@ -628,6 +657,10 @@ ion-content {
   @media (max-width: 991px) {
     padding: 0 20px 16px;
 
+    @media (max-width: 360px) {
+      padding: 0 14px 12px;
+    }
+
     &.collapsed {
       display: none;
     }
@@ -697,6 +730,10 @@ ion-content {
 
   @media (max-width: 991px) {
     margin: 12px 20px;
+
+    @media (max-width: 360px) {
+      margin: 10px 14px;
+    }
   }
 }
 
@@ -704,6 +741,11 @@ ion-content {
 .brief-card > .brief-heading {
   padding-left: 20px;
   padding-right: 20px;
+
+  @media (max-width: 360px) {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
 }
 
 .progress-grid {
@@ -723,6 +765,7 @@ ion-content {
 
     @media (max-width: 360px) {
       grid-template-columns: repeat(2, 1fr);
+      padding: 0 14px 16px;
     }
   }
 }
@@ -804,6 +847,8 @@ ion-content {
 .content-area {
   flex: 1;
   min-width: 0;
+  width: 100%;
+  max-width: 100%;
 }
 
 // ─── States ────────────────────────────────────────────────────────────
@@ -818,6 +863,14 @@ ion-content {
   background: var(--app-bg-card);
   border: 1px solid var(--app-border-color);
   border-radius: 16px;
+
+  @media (max-width: 700px) {
+    padding: 32px 16px;
+  }
+
+  @media (max-width: 360px) {
+    padding: 24px 12px;
+  }
 }
 
 .ws-state-icon {
@@ -881,7 +934,9 @@ ion-content {
 .filters-wrapper {
   margin-bottom: 20px;
   width: 100%;
+  max-width: 100%;
   min-width: 0;
+  box-sizing: border-box;
 }
 
 .content-section-heading {
@@ -899,6 +954,7 @@ ion-content {
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
+  width: 100%;
   min-width: 0;
 
   @media (max-width: 700px) {
@@ -943,7 +999,7 @@ ion-content {
 // ─── Deliverable Cards ─────────────────────────────────────────────────
 .deliverable-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr));
   gap: 16px;
   min-width: 0;
 
@@ -960,6 +1016,7 @@ ion-content {
   cursor: pointer;
   transition: all 0.2s;
   min-width: 0;
+  max-width: 100%;
 
   &:hover {
     transform: translateY(-2px);
@@ -983,6 +1040,7 @@ ion-content {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
 
   &.del-img-broken {
     display: none;
@@ -1029,14 +1087,18 @@ ion-content {
 }
 
 .del-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   padding: 12px;
 
   @media (min-width: 992px) {
     padding: 14px;
   }
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+
+  @media (max-width: 360px) {
+    padding: 10px;
+  }
 }
 
 .del-card-top {
@@ -1044,6 +1106,8 @@ ion-content {
   align-items: center;
   justify-content: space-between;
   gap: 6px;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .del-card-caption {
@@ -1056,6 +1120,7 @@ ion-content {
   -webkit-box-orient: vertical;
   overflow: hidden;
   min-height: 0;
+  overflow-wrap: anywhere;
 }
 
 .del-card-date {
@@ -1256,6 +1321,11 @@ ion-content {
   align-items: center;
   margin-bottom: 8px;
 
+  @media (max-width: 500px) {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
   .ws-form-label {
     margin-bottom: 0;
   }
@@ -1292,6 +1362,14 @@ ion-content {
   cursor: pointer;
   transition: all 0.2s;
   background: var(--app-bg-card);
+
+  @media (max-width: 700px) {
+    padding: 16px;
+  }
+
+  @media (max-width: 360px) {
+    padding: 12px;
+  }
 
   &:hover {
     border-color: var(--ion-color-primary);
@@ -1333,6 +1411,13 @@ ion-content {
   justify-content: center;
   background: #000000;
   width: 100%;
+  max-width: 100%;
+
+  video, img {
+    max-width: 100%;
+    max-height: 260px;
+    object-fit: contain;
+  }
 }
 
 .ws-media-el {
@@ -1411,6 +1496,10 @@ ion-content {
   display: flex;
   gap: 12px;
   margin-top: 4px;
+
+  @media (max-width: 400px) {
+    flex-direction: column;
+  }
 
   ion-button {
     flex: 1;
@@ -1617,6 +1706,10 @@ ion-content {
 
 .ai-modal-content {
   padding: 20px;
+
+  @media (max-width: 480px) {
+    padding: 14px;
+  }
 }
 
 .custom-input-group {

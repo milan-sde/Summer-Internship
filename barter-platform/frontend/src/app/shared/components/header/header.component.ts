@@ -1,10 +1,10 @@
 import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { StorageService } from '../../../services/storage.service';
 import { NotificationService } from '../../../services/notification.service';
 import { NotificationPanelComponent } from '../notification-panel/notification-panel.component';
-import { IonIcon, IonButton } from '@ionic/angular/standalone';
+import { IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { menuOutline, notificationsOutline, arrowBackOutline, sunnyOutline, moonOutline, desktopOutline } from 'ionicons/icons';
 import { ThemeService } from '../../../services/theme.service';
@@ -14,7 +14,7 @@ import { ThemeService } from '../../../services/theme.service';
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
   standalone: true,
-  imports: [CommonModule, RouterLink, IonIcon, IonButton, NotificationPanelComponent]
+  imports: [CommonModule, IonIcon, NotificationPanelComponent]
 })
 export class HeaderComponent implements OnInit, OnDestroy {
   @Input() title = '';

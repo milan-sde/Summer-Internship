@@ -10,12 +10,7 @@ import { Router, RouterLink } from '@angular/router';
 import { CampaignService } from '../../services/campaign.service';
 import { ProfileService } from '../../services/profile.service';
 import {
-  IonHeader,
-  IonToolbar,
-  IonTitle,
   IonContent,
-  IonButtons,
-  IonBackButton,
   IonItem,
   IonIcon,
   IonInput,
@@ -59,12 +54,7 @@ import { HeaderComponent } from '../../shared/components/header/header.component
     IonCol,
     CommonModule,
     ReactiveFormsModule,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
     IonContent,
-    IonButtons,
-    IonBackButton,
     IonItem,
     IonIcon,
     IonInput,

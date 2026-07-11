@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { CampaignService, ICampaign } from '../../services/campaign.service';
 import { StorageService } from '../../services/storage.service';
 import { ProfileService } from '../../services/profile.service';
@@ -9,8 +9,9 @@ import {
   IonHeader,
   IonToolbar,
   IonTitle,
-  IonContent,
   IonButtons,
+  IonBadge,
+  IonContent,
   IonBackButton,
   IonButton,
   IonIcon,
@@ -25,8 +26,6 @@ import {
   IonItem,
   IonInput,
   IonTextarea,
-  IonSpinner,
-  IonBadge,
   IonToggle,
   IonText,
   IonGrid,
@@ -90,12 +89,12 @@ import { HeaderComponent } from '../../shared/components/header/header.component
   imports: [
     CommonModule,
     FormsModule,
-    RouterLink,
     IonHeader,
     IonToolbar,
     IonTitle,
-    IonContent,
     IonButtons,
+    IonBadge,
+    IonContent,
     IonButton,
     IonIcon,
     IonSegment,
@@ -107,8 +106,6 @@ import { HeaderComponent } from '../../shared/components/header/header.component
     IonSelectOption,
     IonModal,
     IonTextarea,
-    IonSpinner,
-    IonBadge,
     SidebarComponent,
     HeaderComponent
   ]

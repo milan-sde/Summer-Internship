@@ -8,12 +8,11 @@ import {
   Validators,
 } from '@angular/forms';
 import {
-  IonContent,
   IonHeader,
-  IonTitle,
   IonToolbar,
+  IonTitle,
+  IonContent,
   IonButton,
-  IonIcon,
   IonText,
   IonInputOtp,
   IonButtons,
@@ -34,12 +33,11 @@ import { AuthService } from '../../services/auth.service';
   imports: [
     IonInputOtp,
     IonText,
-    IonIcon,
     IonButton,
     IonContent,
     IonHeader,
-    IonTitle,
     IonToolbar,
+    IonTitle,
     IonButtons,
     IonBackButton,
     CommonModule,

@@ -13,9 +13,6 @@ import { ProfileService } from 'src/app/services/profile.service';
 import { InstagramService } from 'src/app/services/instagram.service';
 import { environment } from 'src/environments/environment';
 import {
-  IonHeader,
-  IonToolbar,
-  IonTitle,
   IonContent,
   IonIcon,
   IonItem,
@@ -26,8 +23,6 @@ import {
   IonGrid,
   IonRow,
   IonCol,
-  IonButtons,
-  IonBackButton,
 } from '@ionic/angular/standalone';
 import { ToastController, LoadingController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -63,9 +58,6 @@ import { HeaderComponent } from '../../shared/components/header/header.component
     CommonModule,
     ReactiveFormsModule,
     FormsModule,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
     IonContent,
     IonIcon,
     IonItem,
@@ -75,8 +67,6 @@ import { HeaderComponent } from '../../shared/components/header/header.component
     IonGrid,
     IonRow,
     IonCol,
-    IonButtons,
-    IonBackButton,
     TitleCasePipe,
     SidebarComponent,
     HeaderComponent

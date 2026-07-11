@@ -3,18 +3,9 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   IonButton,
-  IonButtons,
-  IonCard,
-  IonCardContent,
-  IonCol,
   IonContent,
-  IonGrid,
-  IonHeader,
   IonIcon,
   IonModal,
-  IonRow,
-  IonTitle,
-  IonToolbar,
   ToastController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -48,18 +39,9 @@ import { HeaderComponent } from '../../shared/components/header/header.component
   standalone: true,
   imports: [
     CommonModule,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
-    IonButtons,
     IonButton,
     IonIcon,
     IonContent,
-    IonGrid,
-    IonRow,
-    IonCol,
-    IonCard,
-    IonCardContent,
     IonModal,
     SidebarComponent,
     HeaderComponent

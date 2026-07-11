@@ -6,11 +6,6 @@ import { ProfileService } from '../../services/profile.service';
 import { StorageService } from '../../services/storage.service';
 import { AnalyticsService, InfluencerAnalytics, BrandAnalytics } from '../../services/analytics.service';
 import {
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonButtons,
-  IonButton,
   IonIcon,
   IonContent,
   IonRefresher,
@@ -20,10 +15,6 @@ import {
   IonCardTitle,
   IonCardSubtitle,
   IonCardContent,
-  IonList,
-  IonItem,
-  IonLabel,
-  IonBadge,
   IonSpinner,
   LoadingController,
   ToastController,
@@ -63,11 +54,6 @@ import { HeaderComponent } from '../../shared/components/header/header.component
   imports: [
     CommonModule,
     LowerCasePipe,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
-    IonButtons,
-    IonButton,
     IonIcon,
     IonContent,
     IonRefresher,
@@ -77,10 +63,6 @@ import { HeaderComponent } from '../../shared/components/header/header.component
     IonCardTitle,
     IonCardSubtitle,
     IonCardContent,
-    IonList,
-    IonItem,
-    IonLabel,
-    IonBadge,
     IonSpinner,
     SidebarComponent,
     HeaderComponent

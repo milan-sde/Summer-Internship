@@ -6,7 +6,7 @@
     <!-- Header -->
     <app-header (menuToggle)="toggleSidebar()"></app-header>
 
-    <ion-content class="ion-padding" scroll-y="true">
+    <ion-content class="ion-padding" [fullscreen]="true" scroll-y="true">
       <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
         <ion-refresher-content></ion-refresher-content>
       </ion-refresher>
@@ -313,13 +313,15 @@
                         <div class="del-card-media">
                           @if (sub.mediaUrl) {
                             @if (sub.mediaType === 'VIDEO') {
-                              <img
+                              <video
                                 [src]="getAvatarUrl(sub.mediaUrl)"
-                                alt="Video preview"
                                 class="del-card-img"
+                                preload="none"
+                                muted
+                                playsinline
                                 (error)="sub._mediaError = true"
                                 [class.del-img-broken]="sub._mediaError"
-                              />
+                              ></video>
                               <span class="del-card-media-badge">
                                 <ion-icon name="play-circle-outline"></ion-icon>
                                 Reel
@@ -541,7 +543,7 @@
                         [rows]="4"
                         class="ws-textarea"
                       ></ion-textarea>
-                      <span class="ws-char-count">{{ submissionCaption?.length || 0 }}/2200</span>
+                      <span class="ws-char-count">{{ submissionCaption.length || 0 }}/2200</span>
                     </div>
 
                     <!-- Action Buttons -->
